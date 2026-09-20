@@ -1,0 +1,16 @@
+blind_id,prompt_id,version,video_id,run
+V1-01,P4,v1,vid_003,1
+V1-02,P4,v1,vid_003,3
+V1-03,P1,v1,vid_003,1
+V1-04,P5,v1,vid_003,2
+V1-05,P2,v1,vid_003,3
+V1-06,P3,v1,vid_003,3
+V1-07,P1,v1,vid_003,3
+V1-08,P1,v1,vid_003,2
+V1-09,P5,v1,vid_003,3
+V1-10,P2,v1,vid_003,2
+V1-11,P3,v1,vid_003,2
+V1-12,P4,v1,vid_003,2
+V1-13,P5,v1,vid_003,1
+V1-14,P2,v1,vid_003,1
+V1-15,P3,v1,vid_003,1

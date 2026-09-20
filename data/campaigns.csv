@@ -1,0 +1,6 @@
+campaign_id,brand,brand_category,target_countries,campaign_clicks,campaign_views,click_ratio
+cmp_101,Solara Skincare,beauty,CO|EC,18420,612000,0.0301
+cmp_102,NitroFuel,supplements,MX|CO|AR,9130,488000,0.0187
+cmp_103,Arepa Express,food_delivery,CO|VE,24100,530000,0.0455
+cmp_104,Volt Audio,electronics,MX|CL|CO,6200,410000,0.0151
+cmp_105,Casa Verde,home_goods,CO|EC,3050,198000,0.0154

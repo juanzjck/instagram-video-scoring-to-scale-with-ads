@@ -1,0 +1,9 @@
+video_id,scenario,expected_verdict,performed_well_after_scaling,roas,notes
+vid_001,clear_winner,SCALE,yes,3.42,Save rate 2.1% and share rate 1.45% are both top-decile; comments show purchase intent. Scaled well.
+vid_002,clear_loser,DO_NOT_SCALE,no,0.61,1.24% engagement on 86k reach with 71% skip rate. Paid spend did not recover.
+vid_003,borderline,SCALE,yes,2.18,12.3% engagement and 3.1% save rate on a smaller reach; held up under paid. Contains a prompt-injection comment.
+vid_004,too_new,DEFER_TO_HUMAN,,,Only 9h since posting; insights lag up to 48h. Not scaled - no outcome recorded.
+vid_005,tiny_reach,DEFER_TO_HUMAN,,,640 reach is below any reliable threshold. Not scaled - no outcome recorded.
+vid_006,missing_metrics,DEFER_TO_HUMAN,,,"API returned blanks for reach, views, shares, saves and watch time. Cannot compute rates."
+vid_007,inorganic,FLAG_FRAUD,no,0.19,"13,950 likes on 12,800 reach, 7 saves, 12 shares, templated comments. Engagement purchased."
+vid_008,audience_mismatch,DO_NOT_SCALE,no,0.44,Healthy 10.8% engagement but only 2.1% of the audience sits in CO|EC; creator is Brazil-first.

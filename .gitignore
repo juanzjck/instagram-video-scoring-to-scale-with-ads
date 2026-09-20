@@ -1,0 +1,27 @@
+# --- Secrets: never commit ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# --- OS noise ---
+.DS_Store
+
+# --- Build noise (the run log IS kept: it is evidence of the run) ---
+outputs/nbconvert.log
+
+# --- Your filled-in scoring sheets (personal work product) ---
+scoring/*_filled.xlsx
+
+# NOTE: outputs/generations.* , outputs/*.png and outputs/run.log are intentionally
+# tracked - they are the evidence behind the report's numbers.

@@ -1,0 +1,7 @@
+blind_id,prompt_id,version,video_id,run
+V2-01,P1,v2,vid_003,1
+V2-02,P1,v2,vid_003,2
+V2-03,P4,v2,vid_003,3
+V2-04,P1,v2,vid_003,3
+V2-05,P4,v2,vid_003,2
+V2-06,P4,v2,vid_003,1

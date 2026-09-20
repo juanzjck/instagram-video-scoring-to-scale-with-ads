@@ -1,0 +1,1268 @@
+2026-09-20 14:31:53 | INFO    | ==============================================================================
+2026-09-20 14:31:53 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 14:31:53 | INFO    |   dry_run: False
+2026-09-20 14:31:53 | INFO    |   provider: anthropic
+2026-09-20 14:31:53 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 14:31:53 | INFO    |   focus_video: vid_003
+2026-09-20 14:31:53 | INFO    |   n_runs: 3
+2026-09-20 14:31:53 | INFO    |   temperature: 0.8
+2026-09-20 14:31:53 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 14:31:53 | INFO    | ==============================================================================
+2026-09-20 14:31:53 | INFO    | START  3.2 retry logic tests
+2026-09-20 14:31:53 | WARNING | retry 1/4 in 1.7s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:31:53 | WARNING | retry 2/4 in 2.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:31:53 | WARNING | retry 1/2 in 1.0s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:31:53 | WARNING | retry 2/2 in 2.2s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:31:53 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 14:31:53 | INFO    |     backoff_delays: [1.72, 2.44]
+2026-09-20 14:31:53 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 14:31:53 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 14:31:53 | INFO    |     result: PASSED
+2026-09-20 14:31:53 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 14:31:53 | INFO    | START  1.1 load input data
+2026-09-20 14:31:53 | INFO    |     videos: 8
+2026-09-20 14:31:53 | INFO    |     creators: 8
+2026-09-20 14:31:53 | INFO    |     campaigns: 5
+2026-09-20 14:31:53 | INFO    |     videos_with_comments: 8
+2026-09-20 14:31:53 | INFO    |     comments_total: 38
+2026-09-20 14:31:53 | INFO    |     blank_cells: 8
+2026-09-20 14:31:53 | INFO    |     ground_truth_loaded: False
+2026-09-20 14:31:53 | INFO    | END    1.1 load input data  (0.02s)
+2026-09-20 14:31:53 | INFO    | START  1.3 build flatten()
+2026-09-20 14:31:53 | INFO    |     sections: 6
+2026-09-20 14:31:53 | INFO    |     comment_limit: 10
+2026-09-20 14:31:53 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 14:31:53 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 14:31:53 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 14:31:53 | INFO    |     summaries_checked: 8
+2026-09-20 14:31:53 | INFO    |     needles_per_summary: 38
+2026-09-20 14:31:53 | INFO    |     leaks_found: 0
+2026-09-20 14:31:53 | INFO    | END    1.4 ground-truth leak guard  (0.01s)
+2026-09-20 14:31:53 | INFO    | START  1.5 sanity tests
+2026-09-20 14:31:53 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 14:31:53 | INFO    |     blanks_vid_006: ok
+2026-09-20 14:31:53 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 14:31:53 | INFO    |     no_nan_or_none: ok
+2026-09-20 14:31:53 | INFO    |     structure: ok
+2026-09-20 14:31:53 | INFO    |     result: PASSED
+2026-09-20 14:31:53 | INFO    | END    1.5 sanity tests  (0.02s)
+2026-09-20 14:31:53 | INFO    | START  2. register prompts
+2026-09-20 14:31:53 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 14:31:53 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 14:31:53 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 14:31:53 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 14:31:53 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 14:31:53 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 14:31:53 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 14:31:54 | INFO    |     prompts_rendered: 40
+2026-09-20 14:31:54 | INFO    |     placeholders_unfilled: 0
+2026-09-20 14:31:54 | INFO    |     leaks_found: 0
+2026-09-20 14:31:54 | INFO    | END    2.1 verify rendered prompts  (0.05s)
+2026-09-20 14:31:54 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 14:31:54 | INFO    |     path: prompts_v1.json
+2026-09-20 14:31:54 | INFO    |     bytes: 8933
+2026-09-20 14:31:54 | INFO    |     prompts: 5
+2026-09-20 14:31:54 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 14:31:54 | INFO    | START  3.5 dry run - full v1 plan
+2026-09-20 14:31:54 | INFO    | generate() prompts=['P1', 'P2', 'P3', 'P4', 'P5'] version=v1 videos=8 runs=3 dry_run=True
+2026-09-20 14:31:54 | INFO    |     planned: 120
+2026-09-20 14:31:54 | INFO    |     already_saved: 10
+2026-09-20 14:31:54 | INFO    |     api_calls_to_make: 110
+2026-09-20 14:31:54 | INFO    |     temperature: 0.8
+2026-09-20 14:31:54 | INFO    |     max_tokens: 700
+2026-09-20 14:31:54 | INFO    |   START  dry run: render + leak-check  [combos=110]
+2026-09-20 14:31:54 | INFO    |       rendered: 110
+2026-09-20 14:31:54 | INFO    |       leaks_found: 0
+2026-09-20 14:31:54 | INFO    |       total_prompt_chars: 295,835
+2026-09-20 14:31:54 | INFO    |       requests_made: 0
+2026-09-20 14:31:54 | INFO    |   END    dry run: render + leak-check  (0.15s)
+2026-09-20 14:31:54 | INFO    | END    3.5 dry run - full v1 plan  (0.15s)
+2026-09-20 14:31:54 | INFO    | START  PHASE 3: v1 generation run
+2026-09-20 14:31:54 | INFO    | generate() prompts=['P1', 'P2', 'P3', 'P4', 'P5'] version=v1 videos=8 runs=3 dry_run=False
+2026-09-20 14:31:54 | INFO    |     planned: 120
+2026-09-20 14:31:54 | INFO    |     already_saved: 10
+2026-09-20 14:31:54 | INFO    |     api_calls_to_make: 110
+2026-09-20 14:31:54 | INFO    |     temperature: 0.8
+2026-09-20 14:31:54 | INFO    |     max_tokens: 700
+2026-09-20 14:31:55 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 14:31:56 | INFO    | preflight OK  temperature=0.8 accepted by anthropic/claude-sonnet-4-6
+2026-09-20 14:31:56 | INFO    | REAL RUN starting: 110 calls to anthropic/claude-sonnet-4-6
+2026-09-20 14:32:01 | INFO    |   [1/110] OK     P1/v1/vid_001/run1  4.642s  in=43 out=165
+2026-09-20 14:32:05 | INFO    |   [2/110] OK     P1/v1/vid_001/run2  4.224s  in=43 out=152
+2026-09-20 14:32:09 | INFO    |   [3/110] OK     P1/v1/vid_001/run3  4.113s  in=43 out=147
+2026-09-20 14:32:13 | INFO    |   [4/110] OK     P1/v1/vid_002/run1  4.089s  in=37 out=167
+2026-09-20 14:32:18 | INFO    |   [5/110] OK     P1/v1/vid_002/run2  4.76s  in=37 out=199
+2026-09-20 14:32:22 | INFO    |   [6/110] OK     P1/v1/vid_002/run3  4.715s  in=37 out=191
+2026-09-20 14:32:27 | INFO    |   [7/110] OK     P1/v1/vid_003/run1  4.598s  in=42 out=177
+2026-09-20 14:32:32 | INFO    |   [8/110] OK     P1/v1/vid_003/run2  4.64s  in=42 out=158
+2026-09-20 14:32:36 | INFO    |   [9/110] OK     P1/v1/vid_003/run3  4.654s  in=42 out=185
+2026-09-20 14:32:40 | INFO    |   [10/110] OK     P1/v1/vid_004/run1  3.996s  in=43 out=126
+2026-09-20 14:32:46 | INFO    |   [11/110] OK     P1/v1/vid_004/run2  5.462s  in=43 out=184
+2026-09-20 14:32:50 | INFO    |   [12/110] OK     P1/v1/vid_004/run3  4.34s  in=43 out=130
+2026-09-20 14:32:56 | INFO    |   [13/110] OK     P1/v1/vid_005/run1  5.519s  in=34 out=175
+2026-09-20 14:33:02 | INFO    |   [14/110] OK     P1/v1/vid_005/run2  6.202s  in=34 out=162
+2026-09-20 14:33:06 | INFO    | ==============================================================================
+2026-09-20 14:33:06 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 14:33:06 | INFO    |   dry_run: False
+2026-09-20 14:33:06 | INFO    |   provider: anthropic
+2026-09-20 14:33:06 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 14:33:06 | INFO    |   focus_video: vid_003
+2026-09-20 14:33:06 | INFO    |   n_runs: 3
+2026-09-20 14:33:06 | INFO    |   temperature: 0.8
+2026-09-20 14:33:06 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 14:33:06 | INFO    | ==============================================================================
+2026-09-20 14:33:06 | INFO    | START  3.2 retry logic tests
+2026-09-20 14:33:06 | WARNING | retry 1/4 in 1.9s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:33:06 | WARNING | retry 2/4 in 2.0s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:33:06 | WARNING | retry 1/2 in 1.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:33:06 | WARNING | retry 2/2 in 2.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 14:33:06 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 14:33:06 | INFO    |     backoff_delays: [1.92, 2.03]
+2026-09-20 14:33:06 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 14:33:06 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 14:33:06 | INFO    |     result: PASSED
+2026-09-20 14:33:06 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 14:33:06 | INFO    | START  1.1 load input data
+2026-09-20 14:33:06 | INFO    |     videos: 8
+2026-09-20 14:33:06 | INFO    |     creators: 8
+2026-09-20 14:33:06 | INFO    |     campaigns: 5
+2026-09-20 14:33:06 | INFO    |     videos_with_comments: 8
+2026-09-20 14:33:06 | INFO    |     comments_total: 38
+2026-09-20 14:33:06 | INFO    |     blank_cells: 8
+2026-09-20 14:33:06 | INFO    |     ground_truth_loaded: False
+2026-09-20 14:33:06 | INFO    | END    1.1 load input data  (0.06s)
+2026-09-20 14:33:06 | INFO    | START  1.3 build flatten()
+2026-09-20 14:33:06 | INFO    |     sections: 6
+2026-09-20 14:33:06 | INFO    |     comment_limit: 10
+2026-09-20 14:33:06 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 14:33:06 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 14:33:06 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 14:33:06 | INFO    |     summaries_checked: 8
+2026-09-20 14:33:06 | INFO    |     needles_per_summary: 38
+2026-09-20 14:33:06 | INFO    |     leaks_found: 0
+2026-09-20 14:33:06 | INFO    | END    1.4 ground-truth leak guard  (0.01s)
+2026-09-20 14:33:06 | INFO    | START  1.5 sanity tests
+2026-09-20 14:33:06 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 14:33:06 | INFO    |     blanks_vid_006: ok
+2026-09-20 14:33:06 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 14:33:06 | INFO    |     no_nan_or_none: ok
+2026-09-20 14:33:06 | INFO    |     structure: ok
+2026-09-20 14:33:06 | INFO    |     result: PASSED
+2026-09-20 14:33:06 | INFO    | END    1.5 sanity tests  (0.02s)
+2026-09-20 14:33:06 | INFO    | START  2. register prompts
+2026-09-20 14:33:06 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 14:33:06 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 14:33:06 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 14:33:06 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 14:33:06 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 14:33:06 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 14:33:06 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 14:33:06 | INFO    |     prompts_rendered: 40
+2026-09-20 14:33:06 | INFO    |     placeholders_unfilled: 0
+2026-09-20 14:33:06 | INFO    |     leaks_found: 0
+2026-09-20 14:33:06 | INFO    | END    2.1 verify rendered prompts  (0.06s)
+2026-09-20 14:33:06 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 14:33:06 | INFO    |     path: prompts_v1.json
+2026-09-20 14:33:06 | INFO    |     bytes: 8933
+2026-09-20 14:33:06 | INFO    |     prompts: 5
+2026-09-20 14:33:06 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 14:33:06 | INFO    | START  3.5 dry run - full v1 plan
+2026-09-20 14:33:06 | INFO    | generate() prompts=['P1', 'P2', 'P3', 'P4', 'P5'] version=v1 videos=8 runs=3 dry_run=True
+2026-09-20 14:33:06 | INFO    |     planned: 120
+2026-09-20 14:33:06 | INFO    |     already_saved: 24
+2026-09-20 14:33:06 | INFO    |     api_calls_to_make: 96
+2026-09-20 14:33:06 | INFO    |     temperature: 0.8
+2026-09-20 14:33:06 | INFO    |     max_tokens: 700
+2026-09-20 14:33:06 | INFO    |   START  dry run: render + leak-check  [combos=96]
+2026-09-20 14:33:06 | INFO    |       rendered: 96
+2026-09-20 14:33:06 | INFO    |       leaks_found: 0
+2026-09-20 14:33:06 | INFO    |       total_prompt_chars: 294,623
+2026-09-20 14:33:06 | INFO    |       requests_made: 0
+2026-09-20 14:33:06 | INFO    |   END    dry run: render + leak-check  (0.14s)
+2026-09-20 14:33:06 | INFO    | END    3.5 dry run - full v1 plan  (0.16s)
+2026-09-20 14:33:06 | INFO    | START  PHASE 3: v1 generation run
+2026-09-20 14:33:06 | INFO    | generate() prompts=['P1', 'P2', 'P3', 'P4', 'P5'] version=v1 videos=8 runs=3 dry_run=False
+2026-09-20 14:33:06 | INFO    |     planned: 120
+2026-09-20 14:33:06 | INFO    |     already_saved: 24
+2026-09-20 14:33:06 | INFO    |     api_calls_to_make: 96
+2026-09-20 14:33:06 | INFO    |     temperature: 0.8
+2026-09-20 14:33:06 | INFO    |     max_tokens: 700
+2026-09-20 14:33:06 | INFO    |   [15/110] OK     P1/v1/vid_005/run3  4.303s  in=34 out=149
+2026-09-20 14:33:07 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 14:33:08 | INFO    | preflight OK  temperature=0.8 accepted by anthropic/claude-sonnet-4-6
+2026-09-20 14:33:08 | INFO    | REAL RUN starting: 96 calls to anthropic/claude-sonnet-4-6
+2026-09-20 14:33:11 | INFO    |   [1/96] OK     P1/v1/vid_005/run3  3.008s  in=34 out=85
+2026-09-20 14:33:12 | INFO    |   [16/110] OK     P1/v1/vid_006/run1  5.427s  in=41 out=154
+2026-09-20 14:33:16 | INFO    |   [17/110] OK     P1/v1/vid_006/run2  3.886s  in=41 out=141
+2026-09-20 14:33:16 | INFO    |   [2/96] OK     P1/v1/vid_006/run1  5.301s  in=41 out=159
+2026-09-20 14:33:21 | INFO    |   [18/110] OK     P1/v1/vid_006/run3  5.816s  in=41 out=178
+2026-09-20 14:33:22 | INFO    |   [3/96] OK     P1/v1/vid_006/run2  5.615s  in=41 out=168
+2026-09-20 14:33:28 | INFO    |   [4/96] OK     P1/v1/vid_006/run3  6.251s  in=41 out=160
+2026-09-20 14:33:29 | INFO    |   [19/110] OK     P1/v1/vid_007/run1  7.242s  in=37 out=254
+2026-09-20 14:33:34 | INFO    |   [20/110] OK     P1/v1/vid_007/run2  4.813s  in=37 out=188
+2026-09-20 14:33:34 | INFO    |   [5/96] OK     P1/v1/vid_007/run1  5.335s  in=37 out=176
+2026-09-20 14:33:38 | INFO    |   [6/96] OK     P1/v1/vid_007/run2  4.508s  in=37 out=189
+2026-09-20 14:33:39 | INFO    |   [21/110] OK     P1/v1/vid_007/run3  5.704s  in=37 out=216
+2026-09-20 14:33:43 | INFO    |   [7/96] OK     P1/v1/vid_007/run3  5.108s  in=37 out=194
+2026-09-20 14:33:43 | INFO    |   [22/110] OK     P1/v1/vid_008/run1  4.136s  in=41 out=123
+2026-09-20 14:33:47 | INFO    |   [8/96] OK     P1/v1/vid_008/run1  3.866s  in=41 out=144
+2026-09-20 14:33:47 | INFO    |   [23/110] OK     P1/v1/vid_008/run2  3.926s  in=41 out=124
+2026-09-20 14:33:53 | INFO    |   [24/110] OK     P1/v1/vid_008/run3  5.775s  in=41 out=110
+2026-09-20 14:33:55 | INFO    |   [9/96] OK     P1/v1/vid_008/run2  7.228s  in=41 out=187
+2026-09-20 14:33:59 | INFO    |   [10/96] OK     P1/v1/vid_008/run3  4.047s  in=41 out=109
+2026-09-20 14:34:12 | INFO    |   [25/110] OK     P2/v1/vid_001/run1  18.319s  in=553 out=700
+2026-09-20 14:34:16 | INFO    |   [11/96] OK     P2/v1/vid_001/run1  17.042s  in=553 out=700
+2026-09-20 14:34:28 | INFO    |   [26/110] OK     P2/v1/vid_001/run2  15.959s  in=553 out=700
+2026-09-20 14:34:31 | INFO    |   [12/96] OK     P2/v1/vid_001/run2  15.494s  in=553 out=700
+2026-09-20 14:34:44 | INFO    |   [27/110] OK     P2/v1/vid_001/run3  16.319s  in=553 out=700
+2026-09-20 14:34:46 | INFO    |   [13/96] OK     P2/v1/vid_001/run3  15.058s  in=553 out=700
+2026-09-20 14:35:03 | INFO    |   [28/110] OK     P2/v1/vid_002/run1  18.66s  in=440 out=700
+2026-09-20 14:35:04 | INFO    |   [14/96] OK     P2/v1/vid_002/run1  17.775s  in=440 out=700
+2026-09-20 14:35:21 | INFO    |   [29/110] OK     P2/v1/vid_005/run3  18.711s  in=409 out=700
+2026-09-20 14:35:23 | INFO    |   [15/96] OK     P2/v1/vid_005/run3  18.589s  in=409 out=700
+2026-09-20 14:35:38 | INFO    |   [30/110] OK     P2/v1/vid_006/run1  16.471s  in=454 out=700
+2026-09-20 14:35:40 | INFO    |   [16/96] OK     P2/v1/vid_006/run1  16.819s  in=454 out=700
+2026-09-20 14:35:54 | INFO    |   [31/110] OK     P2/v1/vid_006/run2  16.559s  in=454 out=700
+2026-09-20 14:35:56 | INFO    |   [17/96] OK     P2/v1/vid_006/run2  16.341s  in=454 out=700
+2026-09-20 14:36:13 | INFO    |   [18/96] OK     P2/v1/vid_006/run3  16.787s  in=454 out=700
+2026-09-20 14:36:16 | INFO    |   [32/110] OK     P2/v1/vid_006/run3  21.165s  in=454 out=700
+2026-09-20 14:36:29 | INFO    |   [19/96] OK     P2/v1/vid_007/run1  16.086s  in=501 out=700
+2026-09-20 14:36:33 | INFO    |   [33/110] OK     P2/v1/vid_007/run1  16.932s  in=501 out=700
+2026-09-20 14:36:45 | INFO    |   [20/96] OK     P2/v1/vid_007/run2  16.292s  in=501 out=700
+2026-09-20 14:36:49 | INFO    |   [34/110] OK     P2/v1/vid_007/run2  16.643s  in=501 out=700
+2026-09-20 14:37:02 | INFO    |   [21/96] OK     P2/v1/vid_007/run3  17.008s  in=501 out=700
+2026-09-20 14:37:07 | INFO    |   [35/110] OK     P2/v1/vid_007/run3  17.415s  in=501 out=700
+2026-09-20 14:37:18 | INFO    |   [22/96] OK     P2/v1/vid_008/run1  15.345s  in=486 out=700
+2026-09-20 14:37:22 | INFO    |   [36/110] OK     P2/v1/vid_008/run1  15.504s  in=486 out=700
+2026-09-20 14:37:33 | INFO    |   [23/96] OK     P2/v1/vid_008/run2  15.596s  in=486 out=700
+2026-09-20 14:37:38 | INFO    |   [37/110] OK     P2/v1/vid_008/run2  16.022s  in=486 out=700
+2026-09-20 14:37:49 | INFO    |   [24/96] OK     P2/v1/vid_008/run3  15.678s  in=486 out=700
+2026-09-20 14:37:53 | INFO    |   [38/110] OK     P2/v1/vid_008/run3  14.864s  in=486 out=700
+2026-09-20 14:38:05 | INFO    |   [25/96] OK     P3/v1/vid_001/run1  15.879s  in=584 out=700
+2026-09-20 14:38:09 | INFO    |   [39/110] OK     P3/v1/vid_001/run1  16.071s  in=584 out=700
+2026-09-20 14:38:21 | INFO    |   [26/96] OK     P3/v1/vid_001/run2  16.069s  in=584 out=700
+2026-09-20 14:38:26 | INFO    |   [40/110] OK     P3/v1/vid_001/run2  16.661s  in=584 out=700
+2026-09-20 14:38:37 | INFO    |   [27/96] OK     P3/v1/vid_001/run3  16.284s  in=584 out=700
+2026-09-20 14:38:43 | INFO    |   [41/110] OK     P3/v1/vid_001/run3  17.03s  in=584 out=700
+2026-09-20 14:38:54 | INFO    |   [28/96] OK     P3/v1/vid_002/run1  17.057s  in=471 out=700
+2026-09-20 14:39:00 | INFO    |   [42/110] OK     P3/v1/vid_002/run1  16.58s  in=471 out=700
+2026-09-20 14:39:11 | INFO    |   [29/96] OK     P3/v1/vid_002/run2  16.568s  in=471 out=700
+2026-09-20 14:39:18 | INFO    |   [43/110] OK     P3/v1/vid_002/run2  18.071s  in=471 out=700
+2026-09-20 14:39:27 | INFO    |   [30/96] OK     P3/v1/vid_002/run3  16.396s  in=471 out=700
+2026-09-20 14:39:37 | INFO    |   [44/110] OK     P3/v1/vid_002/run3  19.154s  in=471 out=700
+2026-09-20 14:39:44 | INFO    |   [31/96] OK     P3/v1/vid_003/run1  16.482s  in=596 out=700
+2026-09-20 14:39:53 | INFO    |   [45/110] OK     P3/v1/vid_003/run1  16.578s  in=596 out=700
+2026-09-20 14:40:00 | INFO    |   [32/96] OK     P3/v1/vid_003/run2  15.811s  in=596 out=700
+2026-09-20 14:40:10 | INFO    |   [46/110] OK     P3/v1/vid_003/run2  16.703s  in=596 out=700
+2026-09-20 14:40:16 | INFO    |   [33/96] OK     P3/v1/vid_003/run3  16.097s  in=596 out=700
+2026-09-20 14:40:27 | INFO    |   [47/110] OK     P3/v1/vid_003/run3  17.116s  in=596 out=700
+2026-09-20 14:40:33 | INFO    |   [34/96] OK     P3/v1/vid_004/run1  17.512s  in=484 out=700
+2026-09-20 14:40:44 | INFO    |   [48/110] OK     P3/v1/vid_004/run1  16.399s  in=484 out=700
+2026-09-20 14:40:50 | INFO    |   [35/96] OK     P3/v1/vid_004/run2  16.894s  in=484 out=700
+2026-09-20 14:41:01 | INFO    |   [49/110] OK     P3/v1/vid_004/run2  16.804s  in=484 out=700
+2026-09-20 14:41:06 | INFO    |   [36/96] OK     P3/v1/vid_004/run3  15.617s  in=484 out=700
+2026-09-20 14:41:16 | INFO    |   [50/110] OK     P3/v1/vid_004/run3  15.642s  in=484 out=700
+2026-09-20 14:41:23 | INFO    |   [37/96] OK     P3/v1/vid_005/run1  17.369s  in=440 out=700
+2026-09-20 14:41:33 | INFO    |   [51/110] OK     P3/v1/vid_005/run1  16.679s  in=440 out=700
+2026-09-20 14:41:41 | INFO    |   [38/96] OK     P3/v1/vid_005/run2  17.217s  in=440 out=700
+2026-09-20 14:41:51 | INFO    |   [52/110] OK     P3/v1/vid_005/run2  17.788s  in=440 out=700
+2026-09-20 14:41:59 | INFO    |   [39/96] OK     P3/v1/vid_005/run3  18.066s  in=440 out=700
+2026-09-20 14:42:07 | INFO    |   [53/110] OK     P3/v1/vid_005/run3  16.377s  in=440 out=700
+2026-09-20 14:42:16 | INFO    |   [40/96] OK     P3/v1/vid_006/run1  17.016s  in=485 out=700
+2026-09-20 14:42:25 | INFO    |   [54/110] OK     P3/v1/vid_006/run1  17.537s  in=485 out=700
+2026-09-20 14:42:33 | INFO    |   [41/96] OK     P3/v1/vid_006/run2  17.235s  in=485 out=700
+2026-09-20 14:42:43 | INFO    |   [55/110] OK     P3/v1/vid_006/run2  17.933s  in=485 out=700
+2026-09-20 14:42:50 | INFO    |   [42/96] OK     P3/v1/vid_006/run3  17.116s  in=485 out=700
+2026-09-20 14:43:00 | INFO    |   [56/110] OK     P3/v1/vid_006/run3  16.88s  in=485 out=700
+2026-09-20 14:43:08 | INFO    |   [43/96] OK     P3/v1/vid_007/run1  17.577s  in=532 out=700
+2026-09-20 14:43:16 | INFO    |   [57/110] OK     P3/v1/vid_007/run1  16.011s  in=532 out=700
+2026-09-20 14:43:24 | INFO    |   [44/96] OK     P3/v1/vid_007/run2  15.86s  in=532 out=700
+2026-09-20 14:43:32 | INFO    |   [58/110] OK     P3/v1/vid_007/run2  16.062s  in=532 out=700
+2026-09-20 14:43:39 | INFO    |   [45/96] OK     P3/v1/vid_007/run3  15.719s  in=532 out=700
+2026-09-20 14:43:48 | INFO    |   [59/110] OK     P3/v1/vid_007/run3  16.661s  in=532 out=700
+2026-09-20 14:43:55 | INFO    |   [46/96] OK     P3/v1/vid_008/run1  16.053s  in=517 out=700
+2026-09-20 14:44:05 | INFO    |   [60/110] OK     P3/v1/vid_008/run1  16.373s  in=517 out=700
+2026-09-20 14:44:12 | INFO    |   [47/96] OK     P3/v1/vid_008/run2  16.142s  in=517 out=700
+2026-09-20 14:44:21 | INFO    |   [61/110] OK     P3/v1/vid_008/run2  16.352s  in=517 out=700
+2026-09-20 14:44:28 | INFO    |   [48/96] OK     P3/v1/vid_008/run3  16.531s  in=517 out=700
+2026-09-20 14:44:37 | INFO    |   [62/110] OK     P3/v1/vid_008/run3  16.029s  in=517 out=700
+2026-09-20 14:44:37 | INFO    |   [49/96] OK     P4/v1/vid_001/run1  9.01s  in=662 out=339
+2026-09-20 14:44:47 | INFO    |   [50/96] OK     P4/v1/vid_001/run2  9.907s  in=662 out=397
+2026-09-20 14:44:47 | INFO    |   [63/110] OK     P4/v1/vid_001/run1  10.053s  in=662 out=405
+2026-09-20 14:44:56 | INFO    |   [64/110] OK     P4/v1/vid_001/run2  8.583s  in=662 out=350
+2026-09-20 14:44:56 | INFO    |   [51/96] OK     P4/v1/vid_001/run3  9.099s  in=662 out=350
+2026-09-20 14:45:06 | INFO    |   [52/96] OK     P4/v1/vid_002/run1  9.591s  in=549 out=381
+2026-09-20 14:45:06 | INFO    |   [65/110] OK     P4/v1/vid_001/run3  10.484s  in=662 out=392
+2026-09-20 14:45:14 | INFO    |   [66/110] OK     P4/v1/vid_002/run1  7.242s  in=549 out=255
+2026-09-20 14:45:15 | INFO    |   [53/96] OK     P4/v1/vid_002/run2  8.466s  in=549 out=348
+2026-09-20 14:45:20 | INFO    |   [67/110] OK     P4/v1/vid_002/run2  5.77s  in=549 out=223
+2026-09-20 14:45:23 | INFO    |   [54/96] OK     P4/v1/vid_002/run3  8.908s  in=549 out=385
+2026-09-20 14:45:26 | INFO    |   [68/110] OK     P4/v1/vid_002/run3  5.939s  in=549 out=219
+2026-09-20 14:45:33 | INFO    |   [55/96] OK     P4/v1/vid_003/run1  9.58s  in=674 out=397
+2026-09-20 14:45:35 | INFO    |   [69/110] OK     P4/v1/vid_003/run1  9.733s  in=674 out=383
+2026-09-20 14:45:43 | INFO    |   [56/96] OK     P4/v1/vid_003/run2  9.432s  in=674 out=381
+2026-09-20 14:45:45 | INFO    |   [70/110] OK     P4/v1/vid_003/run2  10.119s  in=674 out=413
+2026-09-20 14:45:54 | INFO    |   [57/96] OK     P4/v1/vid_003/run3  11.025s  in=674 out=428
+2026-09-20 14:45:56 | INFO    |   [71/110] OK     P4/v1/vid_003/run3  10.397s  in=674 out=418
+2026-09-20 14:46:03 | INFO    |   [58/96] OK     P4/v1/vid_004/run1  9.333s  in=562 out=363
+2026-09-20 14:46:09 | INFO    |   [72/110] OK     P4/v1/vid_004/run1  13.306s  in=562 out=383
+2026-09-20 14:46:12 | INFO    |   [59/96] OK     P4/v1/vid_004/run2  8.874s  in=562 out=384
+2026-09-20 14:46:20 | INFO    |   [60/96] OK     P4/v1/vid_004/run3  8.275s  in=562 out=342
+2026-09-20 14:46:21 | INFO    |   [73/110] OK     P4/v1/vid_004/run2  11.241s  in=562 out=459
+2026-09-20 14:46:30 | INFO    |   [61/96] OK     P4/v1/vid_005/run1  9.834s  in=518 out=388
+2026-09-20 14:46:31 | INFO    |   [74/110] OK     P4/v1/vid_004/run3  10.197s  in=562 out=387
+2026-09-20 14:46:39 | INFO    |   [75/110] OK     P4/v1/vid_005/run1  8.479s  in=518 out=334
+2026-09-20 14:46:40 | INFO    |   [62/96] OK     P4/v1/vid_005/run2  10.373s  in=518 out=412
+2026-09-20 14:46:49 | INFO    |   [63/96] OK     P4/v1/vid_005/run3  8.721s  in=518 out=347
+2026-09-20 14:47:02 | INFO    |   [64/96] OK     P4/v1/vid_006/run1  13.277s  in=563 out=391
+2026-09-20 14:47:13 | INFO    |   [65/96] OK     P4/v1/vid_006/run2  10.241s  in=563 out=401
+2026-09-20 14:47:23 | INFO    |   [66/96] OK     P4/v1/vid_006/run3  10.39s  in=563 out=373
+2026-09-20 14:47:32 | INFO    |   [67/96] OK     P4/v1/vid_007/run1  8.844s  in=610 out=376
+2026-09-20 14:47:40 | INFO    |   [68/96] OK     P4/v1/vid_007/run2  7.555s  in=610 out=328
+2026-09-20 14:47:48 | INFO    |   [69/96] OK     P4/v1/vid_007/run3  7.957s  in=610 out=325
+2026-09-20 14:47:56 | INFO    |   [70/96] OK     P4/v1/vid_008/run1  8.012s  in=595 out=348
+2026-09-20 14:48:04 | INFO    |   [71/96] OK     P4/v1/vid_008/run2  8.172s  in=595 out=311
+2026-09-20 14:48:12 | INFO    |   [72/96] OK     P4/v1/vid_008/run3  8.236s  in=595 out=343
+2026-09-20 14:48:19 | INFO    |   [73/96] OK     P5/v1/vid_001/run1  6.62s  in=2614 out=271
+2026-09-20 14:48:26 | INFO    |   [74/96] OK     P5/v1/vid_001/run2  7.337s  in=2614 out=268
+2026-09-20 14:48:33 | INFO    |   [75/96] OK     P5/v1/vid_001/run3  6.694s  in=2614 out=284
+2026-09-20 14:48:41 | INFO    |   [76/96] OK     P5/v1/vid_002/run1  7.679s  in=2501 out=311
+2026-09-20 14:48:48 | INFO    |   [77/96] OK     P5/v1/vid_002/run2  7.678s  in=2501 out=313
+2026-09-20 14:48:54 | INFO    |   [78/96] OK     P5/v1/vid_002/run3  5.693s  in=2501 out=203
+2026-09-20 14:49:03 | INFO    |   [79/96] OK     P5/v1/vid_003/run1  8.398s  in=2626 out=331
+2026-09-20 14:49:11 | INFO    |   [80/96] OK     P5/v1/vid_003/run2  8.793s  in=2626 out=331
+2026-09-20 14:49:19 | INFO    |   [81/96] OK     P5/v1/vid_003/run3  7.707s  in=2626 out=297
+2026-09-20 14:49:25 | INFO    |   [82/96] OK     P5/v1/vid_004/run1  6.056s  in=2514 out=247
+2026-09-20 14:49:31 | INFO    |   [83/96] OK     P5/v1/vid_004/run2  5.602s  in=2514 out=228
+2026-09-20 14:49:37 | INFO    |   [84/96] OK     P5/v1/vid_004/run3  6.296s  in=2514 out=239
+2026-09-20 14:49:42 | INFO    |   [85/96] OK     P5/v1/vid_005/run1  4.431s  in=2470 out=163
+2026-09-20 14:49:46 | INFO    |   [86/96] OK     P5/v1/vid_005/run2  4.481s  in=2470 out=175
+2026-09-20 14:49:51 | INFO    |   [87/96] OK     P5/v1/vid_005/run3  4.806s  in=2470 out=180
+2026-09-20 14:49:57 | INFO    |   [88/96] OK     P5/v1/vid_006/run1  5.564s  in=2515 out=216
+2026-09-20 14:50:05 | INFO    |   [89/96] OK     P5/v1/vid_006/run2  8.489s  in=2515 out=338
+2026-09-20 14:50:11 | INFO    |   [90/96] OK     P5/v1/vid_006/run3  6.074s  in=2515 out=223
+2026-09-20 14:50:18 | INFO    |   [91/96] OK     P5/v1/vid_007/run1  6.612s  in=2562 out=335
+2026-09-20 14:50:24 | INFO    |   [92/96] OK     P5/v1/vid_007/run2  6.046s  in=2562 out=314
+2026-09-20 14:50:30 | INFO    |   [93/96] OK     P5/v1/vid_007/run3  6.326s  in=2562 out=325
+2026-09-20 14:50:36 | INFO    |   [94/96] OK     P5/v1/vid_008/run1  5.368s  in=2547 out=231
+2026-09-20 14:50:42 | INFO    |   [95/96] OK     P5/v1/vid_008/run2  5.781s  in=2547 out=233
+2026-09-20 14:50:49 | INFO    |   [96/96] OK     P5/v1/vid_008/run3  6.983s  in=2547 out=265
+2026-09-20 14:50:49 | INFO    | REAL RUN finished: ok=96 failed=0 in 1060.6s
+2026-09-20 14:50:49 | INFO    |     input_tokens: 94,795
+2026-09-20 14:50:49 | INFO    |     output_tokens: 43,330
+2026-09-20 14:50:49 | INFO    |     jsonl: outputs/generations.jsonl
+2026-09-20 14:50:49 | INFO    |     csv: outputs/generations.csv
+2026-09-20 14:50:49 | INFO    | END    PHASE 3: v1 generation run  (1062.69s)
+2026-09-20 14:50:49 | INFO    | number-hint helper self-test PASSED (flagged ['4.7%', '55,555'] in a fabricated example)
+2026-09-20 14:50:49 | INFO    | START  2.6 per-prompt scoring report (no ground truth)
+2026-09-20 14:50:49 | INFO    |     P1: verdict_line 0/34, hints 0, agree 8/8
+2026-09-20 14:50:49 | INFO    |     P2: verdict_line 0/38, hints 54, agree 8/8
+2026-09-20 14:50:49 | INFO    |     P3: verdict_line 0/48, hints 117, agree 8/8
+2026-09-20 14:50:49 | INFO    |     P4: verdict_line 37/37, hints 27, agree 8/8
+2026-09-20 14:50:49 | INFO    |     P5: verdict_line 24/24, hints 4, agree 8/8
+2026-09-20 14:50:49 | INFO    | END    2.6 per-prompt scoring report (no ground truth)  (0.08s)
+2026-09-20 14:50:49 | INFO    | START  4B.1 write rubric.md
+2026-09-20 14:50:49 | INFO    |     path: rubric.md
+2026-09-20 14:50:49 | INFO    |     bytes: 3008
+2026-09-20 14:50:49 | INFO    |     criteria: 4
+2026-09-20 14:50:49 | INFO    |     scale: 1-5
+2026-09-20 14:50:49 | INFO    |     anchors_at: 1, 3, 5
+2026-09-20 14:50:49 | INFO    | END    4B.1 write rubric.md  (0.01s)
+2026-09-20 14:50:49 | INFO    | START  PHASE 4B: build blind scoring sheet
+2026-09-20 14:50:49 | INFO    | build_scoring_sheet version=v1 focus_video=vid_003 prompts=['P1', 'P2', 'P3', 'P4', 'P5'] n_runs=3
+2026-09-20 14:50:49 | INFO    |     sheet: scoring/scoring_sheet_v1.xlsx
+2026-09-20 14:50:49 | INFO    |     key: scoring/scoring_key_v1.csv
+2026-09-20 14:50:49 | INFO    |     rows_to_score: 21
+2026-09-20 14:50:49 | INFO    |     blinded: True
+2026-09-20 14:50:49 | INFO    |     shuffled: True
+2026-09-20 14:50:49 | INFO    |     shuffle_seed: 42
+2026-09-20 14:50:49 | INFO    |     score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 14:50:49 | INFO    |     validation: whole number 1-5
+2026-09-20 14:50:49 | INFO    |     scores_prefilled: none - human scored
+2026-09-20 14:50:49 | INFO    | END    PHASE 4B: build blind scoring sheet  (0.06s)
+2026-09-20 14:50:49 | INFO    | START  PHASE 4A: automated accuracy
+2026-09-20 14:50:49 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 14:53:18 | INFO    | build_verdicts: 181 outputs processed
+2026-09-20 14:53:18 | INFO    |     regex_extracted: 61
+2026-09-20 14:53:18 | INFO    |     classifier_new: 120
+2026-09-20 14:53:18 | INFO    |     classifier_cached: 0
+2026-09-20 14:53:18 | INFO    |     format_miss: 0
+2026-09-20 14:53:18 | INFO    |     errors: 0
+2026-09-20 14:53:18 | INFO    |     classifier_temperature: 0.0
+2026-09-20 14:53:18 | INFO    | ground_truth.csv loaded HERE for the first time (evaluation only)
+2026-09-20 14:53:18 | INFO    |     P1: acc 2/34 | false_scale 0/28 | missed 6/6 | agree 5/8
+2026-09-20 14:53:18 | INFO    |     P2: acc 28/38 | false_scale 5/29 | missed 1/9 | agree 5/8
+2026-09-20 14:53:18 | INFO    |     P3: acc 40/48 | false_scale 6/36 | missed 0/12 | agree 6/8
+2026-09-20 14:53:18 | INFO    |     P4: acc 21/37 | false_scale 6/25 | missed 0/12 | agree 8/8
+2026-09-20 14:53:18 | INFO    |     P5: acc 24/24 | false_scale 0/18 | missed 0/6 | agree 8/8
+2026-09-20 14:53:18 | INFO    | END    PHASE 4A: automated accuracy  (148.50s)
+2026-09-20 14:53:18 | INFO    | cell-helper self-tests PASSED (score/confidence parsing, confidently_wrong filter)
+2026-09-20 14:53:18 | INFO    | START  4A.3 per-video / per-prompt scorecard
+2026-09-20 14:53:18 | INFO    |     cells: 40
+2026-09-20 14:53:18 | INFO    |     cells_fully_correct: 21
+2026-09-20 14:53:18 | INFO    |     cells_fully_wrong: 13
+2026-09-20 14:53:18 | INFO    |     cells_all_runs_agree: 32
+2026-09-20 14:53:18 | INFO    | scorecard chart saved: outputs/scorecard_v1.png
+2026-09-20 14:53:18 | INFO    | END    4A.3 per-video / per-prompt scorecard  (0.41s)
+2026-09-20 14:53:18 | INFO    | START  4A.5 build results report
+2026-09-20 14:53:19 | INFO    | chart saved: outputs/prompt_comparison_v1.png
+2026-09-20 14:53:19 | INFO    | scorecard chart saved: outputs/scorecard_v1.png
+2026-09-20 14:53:19 | INFO    | results report written: report/results_report.md (12,982 bytes)
+2026-09-20 14:53:19 | INFO    |     best: P5
+2026-09-20 14:53:19 | INFO    |     worst: P1
+2026-09-20 14:53:19 | INFO    |     report: report/results_report.md
+2026-09-20 14:53:19 | INFO    | END    4A.5 build results report  (0.42s)
+2026-09-20 14:53:19 | INFO    | load_scores: 21 rows from scoring_sheet_v1.xlsx
+2026-09-20 14:53:19 | INFO    |   complete_rows: 0
+2026-09-20 14:53:19 | INFO    |   incomplete_rows: 21
+2026-09-20 14:53:19 | INFO    |   prompts: ['P1', 'P2', 'P3', 'P4', 'P5']
+2026-09-20 14:53:19 | INFO    |   overall_mean: n/a
+2026-09-20 14:53:19 | INFO    | START  notebook finished
+2026-09-20 14:53:19 | INFO    |     dry_run: False
+2026-09-20 14:53:19 | INFO    |     generations_logged: 181
+2026-09-20 14:53:19 | INFO    |     generations_ok: 181
+2026-09-20 14:53:19 | INFO    |     generations_failed: 0
+2026-09-20 14:53:19 | INFO    |     prompts_registered: 5
+2026-09-20 14:53:19 | INFO    |     log_file: outputs/run.log
+2026-09-20 14:53:19 | INFO    | END    notebook finished  (0.02s)
+2026-09-20 17:14:35 | INFO    | ==============================================================================
+2026-09-20 17:14:35 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 17:14:35 | INFO    |   dry_run: False
+2026-09-20 17:14:35 | INFO    |   provider: anthropic
+2026-09-20 17:14:35 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 17:14:35 | INFO    |   focus_video: vid_003
+2026-09-20 17:14:35 | INFO    |   n_runs: 3
+2026-09-20 17:14:35 | INFO    |   temperature: 0.8
+2026-09-20 17:14:35 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 17:14:35 | INFO    | ==============================================================================
+2026-09-20 17:14:35 | INFO    | START  3.2 retry logic tests
+2026-09-20 17:14:35 | WARNING | retry 1/4 in 1.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:14:35 | WARNING | retry 2/4 in 2.9s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:14:35 | WARNING | retry 1/2 in 1.9s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:14:35 | WARNING | retry 2/2 in 2.7s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:14:35 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 17:14:35 | INFO    |     backoff_delays: [1.39, 2.89]
+2026-09-20 17:14:35 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 17:14:35 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 17:14:35 | INFO    |     result: PASSED
+2026-09-20 17:14:35 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 17:14:35 | INFO    | START  1.1 load input data
+2026-09-20 17:14:35 | INFO    |     videos: 8
+2026-09-20 17:14:35 | INFO    |     creators: 8
+2026-09-20 17:14:35 | INFO    |     campaigns: 5
+2026-09-20 17:14:35 | INFO    |     videos_with_comments: 8
+2026-09-20 17:14:35 | INFO    |     comments_total: 38
+2026-09-20 17:14:35 | INFO    |     blank_cells: 8
+2026-09-20 17:14:35 | INFO    |     ground_truth_loaded: False
+2026-09-20 17:14:35 | INFO    | END    1.1 load input data  (0.01s)
+2026-09-20 17:14:35 | INFO    | START  1.3 build flatten()
+2026-09-20 17:14:35 | INFO    |     sections: 6
+2026-09-20 17:14:35 | INFO    |     comment_limit: 10
+2026-09-20 17:14:35 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 17:14:35 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 17:14:35 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 17:14:35 | INFO    |     summaries_checked: 8
+2026-09-20 17:14:35 | INFO    |     needles_per_summary: 38
+2026-09-20 17:14:35 | INFO    |     leaks_found: 0
+2026-09-20 17:14:35 | INFO    | END    1.4 ground-truth leak guard  (0.02s)
+2026-09-20 17:14:35 | INFO    | START  1.5 sanity tests
+2026-09-20 17:14:35 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 17:14:35 | INFO    |     blanks_vid_006: ok
+2026-09-20 17:14:35 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 17:14:35 | INFO    |     no_nan_or_none: ok
+2026-09-20 17:14:35 | INFO    |     structure: ok
+2026-09-20 17:14:35 | INFO    |     result: PASSED
+2026-09-20 17:14:35 | INFO    | END    1.5 sanity tests  (0.02s)
+2026-09-20 17:14:35 | INFO    | START  2. register prompts
+2026-09-20 17:14:35 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 17:14:35 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 17:14:35 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 17:14:35 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 17:14:35 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 17:14:35 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 17:14:35 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 17:14:35 | INFO    |     prompts_rendered: 40
+2026-09-20 17:14:35 | INFO    |     placeholders_unfilled: 0
+2026-09-20 17:14:35 | INFO    |     leaks_found: 0
+2026-09-20 17:14:35 | INFO    | END    2.1 verify rendered prompts  (0.05s)
+2026-09-20 17:14:35 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 17:14:35 | INFO    |     path: prompts_v1.json
+2026-09-20 17:14:35 | INFO    |     bytes: 8933
+2026-09-20 17:14:35 | INFO    |     prompts: 5
+2026-09-20 17:14:35 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 17:14:35 | INFO    | number-hint helper self-test PASSED (flagged ['4.7%', '55,555'] in a fabricated example)
+2026-09-20 17:14:35 | INFO    | START  4B.1 write rubric.md
+2026-09-20 17:14:35 | INFO    |     path: rubric.md
+2026-09-20 17:14:35 | INFO    |     bytes: 3008
+2026-09-20 17:14:35 | INFO    |     criteria: 4
+2026-09-20 17:14:35 | INFO    |     scale: 1-5
+2026-09-20 17:14:35 | INFO    |     anchors_at: 1, 3, 5
+2026-09-20 17:14:35 | INFO    | END    4B.1 write rubric.md  (0.00s)
+2026-09-20 17:14:36 | INFO    | START  PHASE 4B: build blind scoring sheet
+2026-09-20 17:14:36 | INFO    | build_scoring_sheet version=v1 focus_video=vid_003 prompts=['P1', 'P2', 'P3', 'P4', 'P5'] n_runs=3
+2026-09-20 17:14:36 | INFO    |     sheet: scoring/scoring_sheet_v1.xlsx
+2026-09-20 17:14:36 | INFO    |     key: scoring/scoring_key_v1.csv
+2026-09-20 17:14:36 | INFO    |     rows_to_score: 15
+2026-09-20 17:14:36 | INFO    |     blinded: True
+2026-09-20 17:14:36 | INFO    |     shuffled: True
+2026-09-20 17:14:36 | INFO    |     shuffle_seed: 42
+2026-09-20 17:14:36 | INFO    |     score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 17:14:36 | INFO    |     validation: whole number 1-5
+2026-09-20 17:14:36 | INFO    |     scores_prefilled: none - human scored
+2026-09-20 17:14:36 | INFO    | END    PHASE 4B: build blind scoring sheet  (0.04s)
+2026-09-20 17:14:36 | INFO    | START  PHASE 4A: automated accuracy
+2026-09-20 17:14:38 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 17:14:38 | INFO    | build_verdicts: 120 outputs processed
+2026-09-20 17:14:38 | INFO    |     regex_extracted: 48
+2026-09-20 17:14:38 | INFO    |     classifier_new: 0
+2026-09-20 17:14:38 | INFO    |     classifier_cached: 72
+2026-09-20 17:14:38 | INFO    |     format_miss: 0
+2026-09-20 17:14:38 | INFO    |     errors: 0
+2026-09-20 17:14:38 | INFO    |     classifier_temperature: 0.0
+2026-09-20 17:14:38 | INFO    | ground_truth.csv loaded HERE for the first time (evaluation only)
+2026-09-20 17:14:38 | INFO    |     P1: acc 2/24 | false_scale 0/18 | missed 6/6 | agree 5/8
+2026-09-20 17:14:38 | INFO    |     P2: acc 18/24 | false_scale 4/18 | missed 1/6 | agree 6/8
+2026-09-20 17:14:38 | INFO    |     P3: acc 20/24 | false_scale 3/18 | missed 0/6 | agree 7/8
+2026-09-20 17:14:38 | INFO    |     P4: acc 12/24 | false_scale 3/18 | missed 0/6 | agree 8/8
+2026-09-20 17:14:38 | INFO    |     P5: acc 24/24 | false_scale 0/18 | missed 0/6 | agree 8/8
+2026-09-20 17:14:38 | INFO    | END    PHASE 4A: automated accuracy  (2.23s)
+2026-09-20 17:14:38 | INFO    | cell-helper self-tests PASSED (score/confidence parsing, confidently_wrong filter)
+2026-09-20 17:14:38 | INFO    | START  notebook finished
+2026-09-20 17:14:38 | INFO    |     dry_run: False
+2026-09-20 17:14:38 | INFO    |     generations_logged: 120
+2026-09-20 17:14:38 | INFO    |     generations_ok: 120
+2026-09-20 17:14:38 | INFO    |     generations_failed: 0
+2026-09-20 17:14:38 | INFO    |     prompts_registered: 5
+2026-09-20 17:14:38 | INFO    |     log_file: outputs/run.log
+2026-09-20 17:14:38 | INFO    | END    notebook finished  (0.00s)
+2026-09-20 17:14:38 | INFO    | build_verdicts: 120 outputs processed
+2026-09-20 17:14:38 | INFO    |   regex_extracted: 48
+2026-09-20 17:14:38 | INFO    |   classifier_new: 0
+2026-09-20 17:14:38 | INFO    |   classifier_cached: 72
+2026-09-20 17:14:38 | INFO    |   format_miss: 0
+2026-09-20 17:14:38 | INFO    |   errors: 0
+2026-09-20 17:14:38 | INFO    |   classifier_temperature: 0.0
+2026-09-20 17:14:39 | INFO    | chart saved: outputs/prompt_comparison_v1.png
+2026-09-20 17:14:39 | INFO    | scorecard chart saved: outputs/scorecard_v1.png
+2026-09-20 17:14:39 | INFO    | results report written: report/results_report.md (11,758 bytes)
+2026-09-20 17:15:29 | INFO    | ==============================================================================
+2026-09-20 17:15:29 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 17:15:29 | INFO    |   dry_run: False
+2026-09-20 17:15:29 | INFO    |   provider: anthropic
+2026-09-20 17:15:29 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 17:15:29 | INFO    |   focus_video: vid_003
+2026-09-20 17:15:29 | INFO    |   n_runs: 3
+2026-09-20 17:15:29 | INFO    |   temperature: 0.8
+2026-09-20 17:15:29 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 17:15:29 | INFO    | ==============================================================================
+2026-09-20 17:15:29 | INFO    | START  3.2 retry logic tests
+2026-09-20 17:15:29 | WARNING | retry 1/4 in 1.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:29 | WARNING | retry 2/4 in 2.2s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:29 | WARNING | retry 1/2 in 1.0s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:29 | WARNING | retry 2/2 in 2.2s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:29 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 17:15:29 | INFO    |     backoff_delays: [1.43, 2.23]
+2026-09-20 17:15:29 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 17:15:29 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 17:15:29 | INFO    |     result: PASSED
+2026-09-20 17:15:29 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 17:15:29 | INFO    | START  1.1 load input data
+2026-09-20 17:15:29 | INFO    |     videos: 8
+2026-09-20 17:15:29 | INFO    |     creators: 8
+2026-09-20 17:15:29 | INFO    |     campaigns: 5
+2026-09-20 17:15:29 | INFO    |     videos_with_comments: 8
+2026-09-20 17:15:29 | INFO    |     comments_total: 38
+2026-09-20 17:15:29 | INFO    |     blank_cells: 8
+2026-09-20 17:15:29 | INFO    |     ground_truth_loaded: False
+2026-09-20 17:15:29 | INFO    | END    1.1 load input data  (0.01s)
+2026-09-20 17:15:29 | INFO    | START  1.3 build flatten()
+2026-09-20 17:15:29 | INFO    |     sections: 6
+2026-09-20 17:15:29 | INFO    |     comment_limit: 10
+2026-09-20 17:15:29 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 17:15:29 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 17:15:29 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 17:15:29 | INFO    |     summaries_checked: 8
+2026-09-20 17:15:29 | INFO    |     needles_per_summary: 38
+2026-09-20 17:15:29 | INFO    |     leaks_found: 0
+2026-09-20 17:15:29 | INFO    | END    1.4 ground-truth leak guard  (0.01s)
+2026-09-20 17:15:29 | INFO    | START  1.5 sanity tests
+2026-09-20 17:15:29 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 17:15:29 | INFO    |     blanks_vid_006: ok
+2026-09-20 17:15:29 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 17:15:29 | INFO    |     no_nan_or_none: ok
+2026-09-20 17:15:29 | INFO    |     structure: ok
+2026-09-20 17:15:29 | INFO    |     result: PASSED
+2026-09-20 17:15:29 | INFO    | END    1.5 sanity tests  (0.01s)
+2026-09-20 17:15:29 | INFO    | START  2. register prompts
+2026-09-20 17:15:29 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 17:15:29 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 17:15:29 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 17:15:29 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 17:15:29 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 17:15:29 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 17:15:29 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 17:15:29 | INFO    |     prompts_rendered: 40
+2026-09-20 17:15:29 | INFO    |     placeholders_unfilled: 0
+2026-09-20 17:15:29 | INFO    |     leaks_found: 0
+2026-09-20 17:15:29 | INFO    | END    2.1 verify rendered prompts  (0.05s)
+2026-09-20 17:15:29 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 17:15:29 | INFO    |     path: prompts_v1.json
+2026-09-20 17:15:29 | INFO    |     bytes: 8933
+2026-09-20 17:15:29 | INFO    |     prompts: 5
+2026-09-20 17:15:29 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 17:15:29 | INFO    | number-hint helper self-test PASSED (flagged ['4.7%', '55,555'] in a fabricated example)
+2026-09-20 17:15:29 | INFO    | START  4B.1 write rubric.md
+2026-09-20 17:15:29 | INFO    |     path: rubric.md
+2026-09-20 17:15:29 | INFO    |     bytes: 3008
+2026-09-20 17:15:29 | INFO    |     criteria: 4
+2026-09-20 17:15:29 | INFO    |     scale: 1-5
+2026-09-20 17:15:29 | INFO    |     anchors_at: 1, 3, 5
+2026-09-20 17:15:29 | INFO    | END    4B.1 write rubric.md  (0.00s)
+2026-09-20 17:15:29 | INFO    | START  PHASE 4B: build blind scoring sheet
+2026-09-20 17:15:29 | INFO    | build_scoring_sheet version=v1 focus_video=vid_003 prompts=['P1', 'P2', 'P3', 'P4', 'P5'] n_runs=3
+2026-09-20 17:15:29 | INFO    |     sheet: scoring/scoring_sheet_v1.xlsx
+2026-09-20 17:15:29 | INFO    |     key: scoring/scoring_key_v1.csv
+2026-09-20 17:15:29 | INFO    |     rows_to_score: 15
+2026-09-20 17:15:29 | INFO    |     blinded: True
+2026-09-20 17:15:29 | INFO    |     shuffled: True
+2026-09-20 17:15:29 | INFO    |     shuffle_seed: 42
+2026-09-20 17:15:29 | INFO    |     score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 17:15:29 | INFO    |     validation: whole number 1-5
+2026-09-20 17:15:29 | INFO    |     scores_prefilled: none - human scored
+2026-09-20 17:15:29 | INFO    | END    PHASE 4B: build blind scoring sheet  (0.05s)
+2026-09-20 17:15:29 | INFO    | START  PHASE 4A: automated accuracy
+2026-09-20 17:15:31 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 17:15:31 | INFO    | build_verdicts: 120 outputs processed
+2026-09-20 17:15:31 | INFO    |     regex_extracted: 48
+2026-09-20 17:15:31 | INFO    |     classifier_new: 0
+2026-09-20 17:15:31 | INFO    |     classifier_cached: 72
+2026-09-20 17:15:31 | INFO    |     format_miss: 0
+2026-09-20 17:15:31 | INFO    |     errors: 0
+2026-09-20 17:15:31 | INFO    |     classifier_temperature: 0.0
+2026-09-20 17:15:31 | INFO    | ground_truth.csv loaded HERE for the first time (evaluation only)
+2026-09-20 17:15:31 | INFO    |     P1: acc 2/24 | false_scale 0/18 | missed 6/6 | agree 5/8
+2026-09-20 17:15:31 | INFO    |     P2: acc 18/24 | false_scale 4/18 | missed 1/6 | agree 6/8
+2026-09-20 17:15:31 | INFO    |     P3: acc 20/24 | false_scale 3/18 | missed 0/6 | agree 7/8
+2026-09-20 17:15:31 | INFO    |     P4: acc 12/24 | false_scale 3/18 | missed 0/6 | agree 8/8
+2026-09-20 17:15:31 | INFO    |     P5: acc 24/24 | false_scale 0/18 | missed 0/6 | agree 8/8
+2026-09-20 17:15:31 | INFO    | END    PHASE 4A: automated accuracy  (1.99s)
+2026-09-20 17:15:31 | INFO    | cell-helper self-tests PASSED (score/confidence parsing, confidently_wrong filter)
+2026-09-20 17:15:31 | INFO    | START  notebook finished
+2026-09-20 17:15:31 | INFO    |     dry_run: False
+2026-09-20 17:15:31 | INFO    |     generations_logged: 120
+2026-09-20 17:15:31 | INFO    |     generations_ok: 120
+2026-09-20 17:15:31 | INFO    |     generations_failed: 0
+2026-09-20 17:15:31 | INFO    |     prompts_registered: 5
+2026-09-20 17:15:31 | INFO    |     log_file: outputs/run.log
+2026-09-20 17:15:31 | INFO    | END    notebook finished  (0.00s)
+2026-09-20 17:15:31 | INFO    | build_verdicts: 120 outputs processed
+2026-09-20 17:15:31 | INFO    |   regex_extracted: 48
+2026-09-20 17:15:31 | INFO    |   classifier_new: 0
+2026-09-20 17:15:31 | INFO    |   classifier_cached: 72
+2026-09-20 17:15:31 | INFO    |   format_miss: 0
+2026-09-20 17:15:31 | INFO    |   errors: 0
+2026-09-20 17:15:31 | INFO    |   classifier_temperature: 0.0
+2026-09-20 17:15:32 | INFO    | chart saved: outputs/prompt_comparison_v1.png
+2026-09-20 17:15:32 | INFO    | scorecard chart saved: outputs/scorecard_v1.png
+2026-09-20 17:15:32 | INFO    | results report written: report/results_report.md (11,758 bytes)
+2026-09-20 17:15:43 | INFO    | ==============================================================================
+2026-09-20 17:15:43 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 17:15:43 | INFO    |   dry_run: False
+2026-09-20 17:15:43 | INFO    |   provider: anthropic
+2026-09-20 17:15:43 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 17:15:43 | INFO    |   focus_video: vid_003
+2026-09-20 17:15:43 | INFO    |   n_runs: 3
+2026-09-20 17:15:43 | INFO    |   temperature: 0.8
+2026-09-20 17:15:43 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 17:15:43 | INFO    | ==============================================================================
+2026-09-20 17:15:43 | INFO    | START  3.2 retry logic tests
+2026-09-20 17:15:43 | WARNING | retry 1/4 in 1.5s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:43 | WARNING | retry 2/4 in 2.2s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:43 | WARNING | retry 1/2 in 1.6s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:43 | WARNING | retry 2/2 in 2.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:15:43 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 17:15:43 | INFO    |     backoff_delays: [1.47, 2.22]
+2026-09-20 17:15:43 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 17:15:43 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 17:15:43 | INFO    |     result: PASSED
+2026-09-20 17:15:43 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 17:15:43 | INFO    | START  1.1 load input data
+2026-09-20 17:15:43 | INFO    |     videos: 8
+2026-09-20 17:15:43 | INFO    |     creators: 8
+2026-09-20 17:15:43 | INFO    |     campaigns: 5
+2026-09-20 17:15:43 | INFO    |     videos_with_comments: 8
+2026-09-20 17:15:43 | INFO    |     comments_total: 38
+2026-09-20 17:15:43 | INFO    |     blank_cells: 8
+2026-09-20 17:15:43 | INFO    |     ground_truth_loaded: False
+2026-09-20 17:15:43 | INFO    | END    1.1 load input data  (0.01s)
+2026-09-20 17:15:43 | INFO    | START  1.3 build flatten()
+2026-09-20 17:15:43 | INFO    |     sections: 6
+2026-09-20 17:15:43 | INFO    |     comment_limit: 10
+2026-09-20 17:15:43 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 17:15:43 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 17:15:43 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 17:15:43 | INFO    |     summaries_checked: 8
+2026-09-20 17:15:43 | INFO    |     needles_per_summary: 38
+2026-09-20 17:15:43 | INFO    |     leaks_found: 0
+2026-09-20 17:15:43 | INFO    | END    1.4 ground-truth leak guard  (0.01s)
+2026-09-20 17:15:43 | INFO    | START  1.5 sanity tests
+2026-09-20 17:15:43 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 17:15:43 | INFO    |     blanks_vid_006: ok
+2026-09-20 17:15:43 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 17:15:43 | INFO    |     no_nan_or_none: ok
+2026-09-20 17:15:43 | INFO    |     structure: ok
+2026-09-20 17:15:43 | INFO    |     result: PASSED
+2026-09-20 17:15:43 | INFO    | END    1.5 sanity tests  (0.01s)
+2026-09-20 17:15:43 | INFO    | START  2. register prompts
+2026-09-20 17:15:43 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 17:15:43 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 17:15:43 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 17:15:43 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 17:15:43 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 17:15:43 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 17:15:43 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 17:15:43 | INFO    |     prompts_rendered: 40
+2026-09-20 17:15:43 | INFO    |     placeholders_unfilled: 0
+2026-09-20 17:15:43 | INFO    |     leaks_found: 0
+2026-09-20 17:15:43 | INFO    | END    2.1 verify rendered prompts  (0.05s)
+2026-09-20 17:15:43 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 17:15:43 | INFO    |     path: prompts_v1.json
+2026-09-20 17:15:43 | INFO    |     bytes: 8933
+2026-09-20 17:15:43 | INFO    |     prompts: 5
+2026-09-20 17:15:43 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 17:15:43 | INFO    | number-hint helper self-test PASSED (flagged ['4.7%', '55,555'] in a fabricated example)
+2026-09-20 17:15:43 | INFO    | START  4B.1 write rubric.md
+2026-09-20 17:15:43 | INFO    |     path: rubric.md
+2026-09-20 17:15:43 | INFO    |     bytes: 3008
+2026-09-20 17:15:43 | INFO    |     criteria: 4
+2026-09-20 17:15:43 | INFO    |     scale: 1-5
+2026-09-20 17:15:43 | INFO    |     anchors_at: 1, 3, 5
+2026-09-20 17:15:43 | INFO    | END    4B.1 write rubric.md  (0.00s)
+2026-09-20 17:15:43 | INFO    | START  PHASE 4B: build blind scoring sheet
+2026-09-20 17:15:43 | INFO    | build_scoring_sheet version=v1 focus_video=vid_003 prompts=['P1', 'P2', 'P3', 'P4', 'P5'] n_runs=3
+2026-09-20 17:15:43 | INFO    |     sheet: scoring/scoring_sheet_v1.xlsx
+2026-09-20 17:15:43 | INFO    |     key: scoring/scoring_key_v1.csv
+2026-09-20 17:15:43 | INFO    |     rows_to_score: 15
+2026-09-20 17:15:43 | INFO    |     blinded: True
+2026-09-20 17:15:43 | INFO    |     shuffled: True
+2026-09-20 17:15:43 | INFO    |     shuffle_seed: 42
+2026-09-20 17:15:43 | INFO    |     score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 17:15:43 | INFO    |     validation: whole number 1-5
+2026-09-20 17:15:43 | INFO    |     scores_prefilled: none - human scored
+2026-09-20 17:15:43 | INFO    | END    PHASE 4B: build blind scoring sheet  (0.16s)
+2026-09-20 17:15:43 | INFO    | START  PHASE 4A: automated accuracy
+2026-09-20 17:15:47 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 17:15:47 | INFO    | build_verdicts: 120 outputs processed
+2026-09-20 17:15:47 | INFO    |     regex_extracted: 48
+2026-09-20 17:15:47 | INFO    |     classifier_new: 0
+2026-09-20 17:15:47 | INFO    |     classifier_cached: 72
+2026-09-20 17:15:47 | INFO    |     format_miss: 0
+2026-09-20 17:15:47 | INFO    |     errors: 0
+2026-09-20 17:15:47 | INFO    |     classifier_temperature: 0.0
+2026-09-20 17:15:47 | INFO    | ground_truth.csv loaded HERE for the first time (evaluation only)
+2026-09-20 17:15:47 | INFO    |     P1: acc 2/24 | false_scale 0/18 | missed 6/6 | agree 5/8
+2026-09-20 17:15:47 | INFO    |     P2: acc 18/24 | false_scale 4/18 | missed 1/6 | agree 6/8
+2026-09-20 17:15:47 | INFO    |     P3: acc 20/24 | false_scale 3/18 | missed 0/6 | agree 7/8
+2026-09-20 17:15:47 | INFO    |     P4: acc 12/24 | false_scale 3/18 | missed 0/6 | agree 8/8
+2026-09-20 17:15:47 | INFO    |     P5: acc 24/24 | false_scale 0/18 | missed 0/6 | agree 8/8
+2026-09-20 17:15:47 | INFO    | END    PHASE 4A: automated accuracy  (3.17s)
+2026-09-20 17:15:47 | INFO    | cell-helper self-tests PASSED (score/confidence parsing, confidently_wrong filter)
+2026-09-20 17:15:47 | INFO    | START  notebook finished
+2026-09-20 17:15:47 | INFO    |     dry_run: False
+2026-09-20 17:15:47 | INFO    |     generations_logged: 120
+2026-09-20 17:15:47 | INFO    |     generations_ok: 120
+2026-09-20 17:15:47 | INFO    |     generations_failed: 0
+2026-09-20 17:15:47 | INFO    |     prompts_registered: 5
+2026-09-20 17:15:47 | INFO    |     log_file: outputs/run.log
+2026-09-20 17:15:47 | INFO    | END    notebook finished  (0.00s)
+2026-09-20 17:15:47 | INFO    | build_verdicts: 120 outputs processed
+2026-09-20 17:15:47 | INFO    |   regex_extracted: 48
+2026-09-20 17:15:47 | INFO    |   classifier_new: 0
+2026-09-20 17:15:47 | INFO    |   classifier_cached: 72
+2026-09-20 17:15:47 | INFO    |   format_miss: 0
+2026-09-20 17:15:47 | INFO    |   errors: 0
+2026-09-20 17:15:47 | INFO    |   classifier_temperature: 0.0
+2026-09-20 17:15:47 | INFO    | chart saved: outputs/prompt_comparison_v1.png
+2026-09-20 17:15:47 | INFO    | scorecard chart saved: outputs/scorecard_v1.png
+2026-09-20 17:15:47 | INFO    | results report written: report/results_report.md (11,758 bytes)
+2026-09-20 17:49:15 | INFO    | ==============================================================================
+2026-09-20 17:49:15 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 17:49:15 | INFO    |   dry_run: False
+2026-09-20 17:49:15 | INFO    |   provider: anthropic
+2026-09-20 17:49:15 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 17:49:15 | INFO    |   focus_video: vid_003
+2026-09-20 17:49:15 | INFO    |   n_runs: 3
+2026-09-20 17:49:15 | INFO    |   temperature: 0.8
+2026-09-20 17:49:15 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 17:49:15 | INFO    | ==============================================================================
+2026-09-20 17:49:15 | INFO    | START  3.2 retry logic tests
+2026-09-20 17:49:15 | WARNING | retry 1/4 in 1.6s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:49:15 | WARNING | retry 2/4 in 2.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:49:15 | WARNING | retry 1/2 in 1.0s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:49:15 | WARNING | retry 2/2 in 2.1s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:49:15 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 17:49:15 | INFO    |     backoff_delays: [1.6, 2.36]
+2026-09-20 17:49:15 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 17:49:15 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 17:49:15 | INFO    |     result: PASSED
+2026-09-20 17:49:15 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 17:49:15 | INFO    | START  1.1 load input data
+2026-09-20 17:49:15 | INFO    |     videos: 8
+2026-09-20 17:49:15 | INFO    |     creators: 8
+2026-09-20 17:49:15 | INFO    |     campaigns: 5
+2026-09-20 17:49:15 | INFO    |     videos_with_comments: 8
+2026-09-20 17:49:15 | INFO    |     comments_total: 38
+2026-09-20 17:49:15 | INFO    |     blank_cells: 8
+2026-09-20 17:49:15 | INFO    |     ground_truth_loaded: False
+2026-09-20 17:49:15 | INFO    | END    1.1 load input data  (0.02s)
+2026-09-20 17:49:15 | INFO    | START  1.3 build flatten()
+2026-09-20 17:49:15 | INFO    |     sections: 6
+2026-09-20 17:49:15 | INFO    |     comment_limit: 10
+2026-09-20 17:49:15 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 17:49:15 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 17:49:15 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 17:49:15 | INFO    |     summaries_checked: 8
+2026-09-20 17:49:15 | INFO    |     needles_per_summary: 38
+2026-09-20 17:49:15 | INFO    |     leaks_found: 0
+2026-09-20 17:49:15 | INFO    | END    1.4 ground-truth leak guard  (0.01s)
+2026-09-20 17:49:15 | INFO    | START  1.5 sanity tests
+2026-09-20 17:49:15 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 17:49:15 | INFO    |     blanks_vid_006: ok
+2026-09-20 17:49:15 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 17:49:15 | INFO    |     no_nan_or_none: ok
+2026-09-20 17:49:15 | INFO    |     structure: ok
+2026-09-20 17:49:15 | INFO    |     result: PASSED
+2026-09-20 17:49:15 | INFO    | END    1.5 sanity tests  (0.02s)
+2026-09-20 17:49:15 | INFO    | START  2. register prompts
+2026-09-20 17:49:15 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 17:49:15 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 17:49:15 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 17:49:15 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 17:49:15 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 17:49:15 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 17:49:15 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 17:49:15 | INFO    |     prompts_rendered: 40
+2026-09-20 17:49:15 | INFO    |     placeholders_unfilled: 0
+2026-09-20 17:49:15 | INFO    |     leaks_found: 0
+2026-09-20 17:49:15 | INFO    | END    2.1 verify rendered prompts  (0.05s)
+2026-09-20 17:49:15 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 17:49:15 | INFO    |     path: prompts_v1.json
+2026-09-20 17:49:15 | INFO    |     bytes: 8933
+2026-09-20 17:49:15 | INFO    |     prompts: 5
+2026-09-20 17:49:15 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 17:49:15 | INFO    | number-hint helper self-test PASSED (flagged ['4.7%', '55,555'] in a fabricated example)
+2026-09-20 17:49:15 | INFO    | START  4B.1 write rubric.md
+2026-09-20 17:49:15 | INFO    |     path: rubric.md
+2026-09-20 17:49:15 | INFO    |     bytes: 3008
+2026-09-20 17:49:15 | INFO    |     criteria: 4
+2026-09-20 17:49:15 | INFO    |     scale: 1-5
+2026-09-20 17:49:15 | INFO    |     anchors_at: 1, 3, 5
+2026-09-20 17:49:15 | INFO    | END    4B.1 write rubric.md  (0.00s)
+2026-09-20 17:49:15 | INFO    | START  PHASE 4B: build blind scoring sheet
+2026-09-20 17:49:15 | INFO    | build_scoring_sheet version=v1 focus_video=vid_003 prompts=['P1', 'P2', 'P3', 'P4', 'P5'] n_runs=3
+2026-09-20 17:49:15 | INFO    |     sheet: scoring/scoring_sheet_v1.xlsx
+2026-09-20 17:49:15 | INFO    |     key: scoring/scoring_key_v1.csv
+2026-09-20 17:49:15 | INFO    |     rows_to_score: 15
+2026-09-20 17:49:15 | INFO    |     blinded: True
+2026-09-20 17:49:15 | INFO    |     shuffled: True
+2026-09-20 17:49:15 | INFO    |     shuffle_seed: 42
+2026-09-20 17:49:15 | INFO    |     score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 17:49:15 | INFO    |     validation: whole number 1-5
+2026-09-20 17:49:15 | INFO    |     scores_prefilled: none - human scored
+2026-09-20 17:49:15 | INFO    | END    PHASE 4B: build blind scoring sheet  (0.08s)
+2026-09-20 17:49:15 | INFO    | START  PHASE 4A: automated accuracy
+2026-09-20 17:49:17 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 17:49:17 | INFO    | build_verdicts: 120 outputs processed
+2026-09-20 17:49:17 | INFO    |     regex_extracted: 48
+2026-09-20 17:49:17 | INFO    |     classifier_new: 0
+2026-09-20 17:49:17 | INFO    |     classifier_cached: 72
+2026-09-20 17:49:17 | INFO    |     format_miss: 0
+2026-09-20 17:49:17 | INFO    |     errors: 0
+2026-09-20 17:49:17 | INFO    |     classifier_temperature: 0.0
+2026-09-20 17:49:17 | INFO    | ground_truth.csv loaded HERE for the first time (evaluation only)
+2026-09-20 17:49:17 | INFO    |     P1: acc 2/24 | false_scale 0/18 | missed 6/6 | agree 5/8
+2026-09-20 17:49:17 | INFO    |     P2: acc 18/24 | false_scale 4/18 | missed 1/6 | agree 6/8
+2026-09-20 17:49:17 | INFO    |     P3: acc 20/24 | false_scale 3/18 | missed 0/6 | agree 7/8
+2026-09-20 17:49:17 | INFO    |     P4: acc 12/24 | false_scale 3/18 | missed 0/6 | agree 8/8
+2026-09-20 17:49:17 | INFO    |     P5: acc 24/24 | false_scale 0/18 | missed 0/6 | agree 8/8
+2026-09-20 17:49:17 | INFO    | END    PHASE 4A: automated accuracy  (2.26s)
+2026-09-20 17:49:17 | INFO    | cell-helper self-tests PASSED (score/confidence parsing, confidently_wrong filter)
+2026-09-20 17:49:17 | INFO    | START  notebook finished
+2026-09-20 17:49:17 | INFO    |     dry_run: False
+2026-09-20 17:49:17 | INFO    |     generations_logged: 120
+2026-09-20 17:49:17 | INFO    |     generations_ok: 120
+2026-09-20 17:49:17 | INFO    |     generations_failed: 0
+2026-09-20 17:49:17 | INFO    |     prompts_registered: 7
+2026-09-20 17:49:17 | INFO    |     log_file: outputs/run.log
+2026-09-20 17:49:17 | INFO    | END    notebook finished  (0.00s)
+2026-09-20 17:49:17 | INFO    | generate() prompts=['P1', 'P4'] version=v2 videos=8 runs=3 dry_run=False
+2026-09-20 17:49:17 | INFO    |   planned: 48
+2026-09-20 17:49:17 | INFO    |   already_saved: 0
+2026-09-20 17:49:17 | INFO    |   api_calls_to_make: 48
+2026-09-20 17:49:17 | INFO    |   temperature: 0.8
+2026-09-20 17:49:17 | INFO    |   max_tokens: 700
+2026-09-20 17:49:17 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 17:49:18 | INFO    | preflight OK  temperature=0.8 accepted by anthropic/claude-sonnet-4-6
+2026-09-20 17:49:18 | INFO    | REAL RUN starting: 48 calls to anthropic/claude-sonnet-4-6
+2026-09-20 17:49:36 | INFO    |   [1/48] OK     P1/v2/vid_001/run1  17.739s  in=592 out=700
+2026-09-20 17:49:54 | INFO    |   [2/48] OK     P1/v2/vid_001/run2  18.053s  in=592 out=700
+2026-09-20 17:50:10 | INFO    |   [3/48] OK     P1/v2/vid_001/run3  15.743s  in=592 out=700
+2026-09-20 17:50:27 | INFO    |   [4/48] OK     P1/v2/vid_002/run1  16.981s  in=479 out=700
+2026-09-20 17:50:44 | INFO    |   [5/48] OK     P1/v2/vid_002/run2  17.09s  in=479 out=700
+2026-09-20 17:51:01 | INFO    |   [6/48] OK     P1/v2/vid_002/run3  17.133s  in=479 out=700
+2026-09-20 17:51:18 | INFO    |   [7/48] OK     P1/v2/vid_003/run1  16.711s  in=604 out=700
+2026-09-20 17:51:34 | INFO    |   [8/48] OK     P1/v2/vid_003/run2  16.027s  in=604 out=700
+2026-09-20 17:51:50 | INFO    |   [9/48] OK     P1/v2/vid_003/run3  15.912s  in=604 out=700
+2026-09-20 17:52:06 | INFO    |   [10/48] OK     P1/v2/vid_004/run1  16.385s  in=492 out=700
+2026-09-20 17:52:25 | INFO    |   [11/48] OK     P1/v2/vid_004/run2  18.131s  in=492 out=700
+2026-09-20 17:52:41 | INFO    |   [12/48] OK     P1/v2/vid_004/run3  16.578s  in=492 out=700
+2026-09-20 17:52:59 | INFO    |   [13/48] OK     P1/v2/vid_005/run1  18.348s  in=448 out=700
+2026-09-20 17:53:17 | INFO    |   [14/48] OK     P1/v2/vid_005/run2  17.519s  in=448 out=700
+2026-09-20 17:53:34 | INFO    |   [15/48] OK     P1/v2/vid_005/run3  16.544s  in=448 out=700
+2026-09-20 17:53:51 | INFO    |   [16/48] OK     P1/v2/vid_006/run1  17.696s  in=493 out=700
+2026-09-20 17:54:09 | INFO    |   [17/48] OK     P1/v2/vid_006/run2  17.548s  in=493 out=700
+2026-09-20 17:54:27 | INFO    |   [18/48] OK     P1/v2/vid_006/run3  17.852s  in=493 out=700
+2026-09-20 17:54:44 | INFO    |   [19/48] OK     P1/v2/vid_007/run1  17.315s  in=540 out=700
+2026-09-20 17:55:00 | INFO    |   [20/48] OK     P1/v2/vid_007/run2  15.965s  in=540 out=700
+2026-09-20 17:55:17 | INFO    |   [21/48] OK     P1/v2/vid_007/run3  16.644s  in=540 out=700
+2026-09-20 17:55:33 | INFO    |   [22/48] OK     P1/v2/vid_008/run1  16.602s  in=525 out=700
+2026-09-20 17:55:49 | INFO    |   [23/48] OK     P1/v2/vid_008/run2  15.894s  in=525 out=700
+2026-09-20 17:56:05 | INFO    |   [24/48] OK     P1/v2/vid_008/run3  15.806s  in=525 out=700
+2026-09-20 17:56:11 | INFO    |   [25/48] OK     P4/v2/vid_001/run1  6.19s  in=820 out=253
+2026-09-20 17:56:18 | INFO    |   [26/48] OK     P4/v2/vid_001/run2  6.394s  in=820 out=263
+2026-09-20 17:56:23 | INFO    |   [27/48] OK     P4/v2/vid_001/run3  5.592s  in=820 out=214
+2026-09-20 17:56:29 | INFO    |   [28/48] OK     P4/v2/vid_002/run1  5.581s  in=707 out=226
+2026-09-20 17:56:35 | INFO    |   [29/48] OK     P4/v2/vid_002/run2  6.219s  in=707 out=229
+2026-09-20 17:56:41 | INFO    |   [30/48] OK     P4/v2/vid_002/run3  5.917s  in=707 out=221
+2026-09-20 17:56:47 | INFO    |   [31/48] OK     P4/v2/vid_003/run1  5.896s  in=832 out=242
+2026-09-20 17:56:52 | INFO    |   [32/48] OK     P4/v2/vid_003/run2  5.205s  in=832 out=209
+2026-09-20 17:56:58 | INFO    |   [33/48] OK     P4/v2/vid_003/run3  5.353s  in=832 out=202
+2026-09-20 17:57:03 | INFO    |   [34/48] OK     P4/v2/vid_004/run1  5.728s  in=720 out=231
+2026-09-20 17:57:10 | INFO    |   [35/48] OK     P4/v2/vid_004/run2  6.139s  in=720 out=220
+2026-09-20 17:57:16 | INFO    |   [36/48] OK     P4/v2/vid_004/run3  6.409s  in=720 out=245
+2026-09-20 17:57:21 | INFO    |   [37/48] OK     P4/v2/vid_005/run1  4.858s  in=676 out=201
+2026-09-20 17:57:26 | INFO    |   [38/48] OK     P4/v2/vid_005/run2  5.304s  in=676 out=216
+2026-09-20 17:57:31 | INFO    |   [39/48] OK     P4/v2/vid_005/run3  5.18s  in=676 out=194
+2026-09-20 17:57:37 | INFO    |   [40/48] OK     P4/v2/vid_006/run1  6.046s  in=721 out=243
+2026-09-20 17:57:44 | INFO    |   [41/48] OK     P4/v2/vid_006/run2  6.691s  in=721 out=258
+2026-09-20 17:57:51 | INFO    |   [42/48] OK     P4/v2/vid_006/run3  6.39s  in=721 out=241
+2026-09-20 17:57:56 | INFO    |   [43/48] OK     P4/v2/vid_007/run1  5.725s  in=768 out=228
+2026-09-20 17:58:03 | INFO    |   [44/48] OK     P4/v2/vid_007/run2  6.644s  in=768 out=277
+2026-09-20 17:58:10 | INFO    |   [45/48] OK     P4/v2/vid_007/run3  6.655s  in=768 out=275
+2026-09-20 17:58:16 | INFO    |   [46/48] OK     P4/v2/vid_008/run1  5.92s  in=753 out=247
+2026-09-20 17:58:21 | INFO    |   [47/48] OK     P4/v2/vid_008/run2  5.617s  in=753 out=241
+2026-09-20 17:58:28 | INFO    |   [48/48] OK     P4/v2/vid_008/run3  6.204s  in=753 out=256
+2026-09-20 17:58:28 | INFO    | REAL RUN finished: ok=48 failed=0 in 549.2s
+2026-09-20 17:58:28 | INFO    |   input_tokens: 30,510
+2026-09-20 17:58:28 | INFO    |   output_tokens: 22,432
+2026-09-20 17:58:28 | INFO    |   jsonl: outputs/generations.jsonl
+2026-09-20 17:58:28 | INFO    |   csv: outputs/generations.csv
+2026-09-20 17:58:52 | INFO    | ==============================================================================
+2026-09-20 17:58:52 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 17:58:52 | INFO    |   dry_run: False
+2026-09-20 17:58:52 | INFO    |   provider: anthropic
+2026-09-20 17:58:52 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 17:58:52 | INFO    |   focus_video: vid_003
+2026-09-20 17:58:52 | INFO    |   n_runs: 3
+2026-09-20 17:58:52 | INFO    |   temperature: 0.8
+2026-09-20 17:58:52 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 17:58:52 | INFO    | ==============================================================================
+2026-09-20 17:58:52 | INFO    | START  3.2 retry logic tests
+2026-09-20 17:58:52 | WARNING | retry 1/4 in 1.7s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:58:52 | WARNING | retry 2/4 in 2.1s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:58:52 | WARNING | retry 1/2 in 1.4s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:58:52 | WARNING | retry 2/2 in 2.5s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 17:58:52 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 17:58:52 | INFO    |     backoff_delays: [1.65, 2.05]
+2026-09-20 17:58:52 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 17:58:52 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 17:58:52 | INFO    |     result: PASSED
+2026-09-20 17:58:52 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 17:58:52 | INFO    | START  1.1 load input data
+2026-09-20 17:58:52 | INFO    |     videos: 8
+2026-09-20 17:58:52 | INFO    |     creators: 8
+2026-09-20 17:58:52 | INFO    |     campaigns: 5
+2026-09-20 17:58:52 | INFO    |     videos_with_comments: 8
+2026-09-20 17:58:52 | INFO    |     comments_total: 38
+2026-09-20 17:58:52 | INFO    |     blank_cells: 8
+2026-09-20 17:58:52 | INFO    |     ground_truth_loaded: False
+2026-09-20 17:58:52 | INFO    | END    1.1 load input data  (0.01s)
+2026-09-20 17:58:52 | INFO    | START  1.3 build flatten()
+2026-09-20 17:58:52 | INFO    |     sections: 6
+2026-09-20 17:58:52 | INFO    |     comment_limit: 10
+2026-09-20 17:58:52 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 17:58:52 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 17:58:52 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 17:58:53 | INFO    |     summaries_checked: 8
+2026-09-20 17:58:53 | INFO    |     needles_per_summary: 38
+2026-09-20 17:58:53 | INFO    |     leaks_found: 0
+2026-09-20 17:58:53 | INFO    | END    1.4 ground-truth leak guard  (0.01s)
+2026-09-20 17:58:53 | INFO    | START  1.5 sanity tests
+2026-09-20 17:58:53 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 17:58:53 | INFO    |     blanks_vid_006: ok
+2026-09-20 17:58:53 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 17:58:53 | INFO    |     no_nan_or_none: ok
+2026-09-20 17:58:53 | INFO    |     structure: ok
+2026-09-20 17:58:53 | INFO    |     result: PASSED
+2026-09-20 17:58:53 | INFO    | END    1.5 sanity tests  (0.01s)
+2026-09-20 17:58:53 | INFO    | START  2. register prompts
+2026-09-20 17:58:53 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 17:58:53 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 17:58:53 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 17:58:53 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 17:58:53 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 17:58:53 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 17:58:53 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 17:58:53 | INFO    |     prompts_rendered: 40
+2026-09-20 17:58:53 | INFO    |     placeholders_unfilled: 0
+2026-09-20 17:58:53 | INFO    |     leaks_found: 0
+2026-09-20 17:58:53 | INFO    | END    2.1 verify rendered prompts  (0.05s)
+2026-09-20 17:58:53 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 17:58:53 | INFO    |     path: prompts_v1.json
+2026-09-20 17:58:53 | INFO    |     bytes: 8933
+2026-09-20 17:58:53 | INFO    |     prompts: 5
+2026-09-20 17:58:53 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 17:58:53 | INFO    | number-hint helper self-test PASSED (flagged ['4.7%', '55,555'] in a fabricated example)
+2026-09-20 17:58:53 | INFO    | START  4B.1 write rubric.md
+2026-09-20 17:58:53 | INFO    |     path: rubric.md
+2026-09-20 17:58:53 | INFO    |     bytes: 3008
+2026-09-20 17:58:53 | INFO    |     criteria: 4
+2026-09-20 17:58:53 | INFO    |     scale: 1-5
+2026-09-20 17:58:53 | INFO    |     anchors_at: 1, 3, 5
+2026-09-20 17:58:53 | INFO    | END    4B.1 write rubric.md  (0.00s)
+2026-09-20 17:58:53 | INFO    | START  PHASE 4B: build blind scoring sheet
+2026-09-20 17:58:53 | INFO    | build_scoring_sheet version=v1 focus_video=vid_003 prompts=['P1', 'P2', 'P3', 'P4', 'P5'] n_runs=3
+2026-09-20 17:58:53 | INFO    |     sheet: scoring/scoring_sheet_v1.xlsx
+2026-09-20 17:58:53 | INFO    |     key: scoring/scoring_key_v1.csv
+2026-09-20 17:58:53 | INFO    |     rows_to_score: 15
+2026-09-20 17:58:53 | INFO    |     blinded: True
+2026-09-20 17:58:53 | INFO    |     shuffled: True
+2026-09-20 17:58:53 | INFO    |     shuffle_seed: 42
+2026-09-20 17:58:53 | INFO    |     score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 17:58:53 | INFO    |     validation: whole number 1-5
+2026-09-20 17:58:53 | INFO    |     scores_prefilled: none - human scored
+2026-09-20 17:58:53 | INFO    | END    PHASE 4B: build blind scoring sheet  (0.05s)
+2026-09-20 17:58:53 | INFO    | START  PHASE 4A: automated accuracy
+2026-09-20 17:58:54 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 17:59:19 | INFO    | build_verdicts: 168 outputs processed
+2026-09-20 17:59:19 | INFO    |     regex_extracted: 72
+2026-09-20 17:59:19 | INFO    |     classifier_new: 24
+2026-09-20 17:59:19 | INFO    |     classifier_cached: 72
+2026-09-20 17:59:19 | INFO    |     format_miss: 0
+2026-09-20 17:59:19 | INFO    |     errors: 0
+2026-09-20 17:59:19 | INFO    |     classifier_temperature: 0.0
+2026-09-20 17:59:19 | INFO    | ground_truth.csv loaded HERE for the first time (evaluation only)
+2026-09-20 17:59:19 | INFO    |     P1: acc 2/24 | false_scale 0/18 | missed 6/6 | agree 5/8
+2026-09-20 17:59:19 | INFO    |     P2: acc 18/24 | false_scale 4/18 | missed 1/6 | agree 6/8
+2026-09-20 17:59:19 | INFO    |     P3: acc 20/24 | false_scale 3/18 | missed 0/6 | agree 7/8
+2026-09-20 17:59:19 | INFO    |     P4: acc 12/24 | false_scale 3/18 | missed 0/6 | agree 8/8
+2026-09-20 17:59:19 | INFO    |     P5: acc 24/24 | false_scale 0/18 | missed 0/6 | agree 8/8
+2026-09-20 17:59:19 | INFO    | END    PHASE 4A: automated accuracy  (26.02s)
+2026-09-20 17:59:19 | INFO    | cell-helper self-tests PASSED (score/confidence parsing, confidently_wrong filter)
+2026-09-20 17:59:19 | INFO    | START  notebook finished
+2026-09-20 17:59:19 | INFO    |     dry_run: False
+2026-09-20 17:59:19 | INFO    |     generations_logged: 168
+2026-09-20 17:59:19 | INFO    |     generations_ok: 168
+2026-09-20 17:59:19 | INFO    |     generations_failed: 0
+2026-09-20 17:59:19 | INFO    |     prompts_registered: 7
+2026-09-20 17:59:19 | INFO    |     log_file: outputs/run.log
+2026-09-20 17:59:19 | INFO    | END    notebook finished  (0.01s)
+2026-09-20 17:59:19 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 17:59:19 | INFO    | build_verdicts: 168 outputs processed
+2026-09-20 17:59:19 | INFO    |   regex_extracted: 72
+2026-09-20 17:59:19 | INFO    |   classifier_new: 0
+2026-09-20 17:59:19 | INFO    |   classifier_cached: 96
+2026-09-20 17:59:19 | INFO    |   format_miss: 0
+2026-09-20 17:59:19 | INFO    |   errors: 0
+2026-09-20 17:59:19 | INFO    |   classifier_temperature: 0.0
+2026-09-20 18:57:00 | INFO    | ==============================================================================
+2026-09-20 18:57:00 | INFO    | NOTEBOOK RUN STARTED  |  log file: outputs/run.log
+2026-09-20 18:57:00 | INFO    |   dry_run: False
+2026-09-20 18:57:00 | INFO    |   provider: anthropic
+2026-09-20 18:57:00 | INFO    |   model: claude-sonnet-4-6
+2026-09-20 18:57:00 | INFO    |   focus_video: vid_003
+2026-09-20 18:57:00 | INFO    |   n_runs: 3
+2026-09-20 18:57:00 | INFO    |   temperature: 0.8
+2026-09-20 18:57:00 | INFO    |   root: /Users/juansalzar/Documents/git/capstone-partgram-ai-practice
+2026-09-20 18:57:00 | INFO    | ==============================================================================
+2026-09-20 18:57:00 | INFO    | START  3.2 retry logic tests
+2026-09-20 18:57:00 | WARNING | retry 1/4 in 1.1s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 18:57:00 | WARNING | retry 2/4 in 2.9s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 18:57:00 | WARNING | retry 1/2 in 1.7s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 18:57:00 | WARNING | retry 2/2 in 2.3s after RuntimeError: 429 rate limit exceeded, please retry
+2026-09-20 18:57:00 | INFO    |     two_failures_then_success: 3 calls, backoff grows
+2026-09-20 18:57:00 | INFO    |     backoff_delays: [1.05, 2.9]
+2026-09-20 18:57:00 | INFO    |     attempts_exhausted: error re-raised after exactly 3 tries
+2026-09-20 18:57:00 | INFO    |     non_retryable: raised immediately, 1 call
+2026-09-20 18:57:00 | INFO    |     result: PASSED
+2026-09-20 18:57:00 | INFO    | END    3.2 retry logic tests  (0.00s)
+2026-09-20 18:57:00 | INFO    | START  1.1 load input data
+2026-09-20 18:57:00 | INFO    |     videos: 8
+2026-09-20 18:57:00 | INFO    |     creators: 8
+2026-09-20 18:57:00 | INFO    |     campaigns: 5
+2026-09-20 18:57:00 | INFO    |     videos_with_comments: 8
+2026-09-20 18:57:00 | INFO    |     comments_total: 38
+2026-09-20 18:57:00 | INFO    |     blank_cells: 8
+2026-09-20 18:57:00 | INFO    |     ground_truth_loaded: False
+2026-09-20 18:57:00 | INFO    | END    1.1 load input data  (0.01s)
+2026-09-20 18:57:00 | INFO    | START  1.3 build flatten()
+2026-09-20 18:57:00 | INFO    |     sections: 6
+2026-09-20 18:57:00 | INFO    |     comment_limit: 10
+2026-09-20 18:57:00 | INFO    |     summary_chars_vid_001: 1416
+2026-09-20 18:57:00 | INFO    | END    1.3 build flatten()  (0.00s)
+2026-09-20 18:57:00 | INFO    | START  1.4 ground-truth leak guard  [scope=summary]
+2026-09-20 18:57:00 | INFO    |     summaries_checked: 8
+2026-09-20 18:57:00 | INFO    |     needles_per_summary: 38
+2026-09-20 18:57:00 | INFO    |     leaks_found: 0
+2026-09-20 18:57:00 | INFO    | END    1.4 ground-truth leak guard  (0.01s)
+2026-09-20 18:57:00 | INFO    | START  1.5 sanity tests
+2026-09-20 18:57:00 | INFO    |     derived_metrics_vid_001: ok
+2026-09-20 18:57:00 | INFO    |     blanks_vid_006: ok
+2026-09-20 18:57:00 | INFO    |     leak_guard_all_videos: ok
+2026-09-20 18:57:00 | INFO    |     no_nan_or_none: ok
+2026-09-20 18:57:00 | INFO    |     structure: ok
+2026-09-20 18:57:00 | INFO    |     result: PASSED
+2026-09-20 18:57:00 | INFO    | END    1.5 sanity tests  (0.02s)
+2026-09-20 18:57:00 | INFO    | START  2. register prompts
+2026-09-20 18:57:00 | INFO    |     P1/v1: 39 chars - Very general, intentionally under-specified baseline. Capt
+2026-09-20 18:57:00 | INFO    |     P2/v1: 131 chars - Basic task statement plus the full data summary. No role, 
+2026-09-20 18:57:00 | INFO    |     P3/v1: 288 chars - Adds an expert role and the business context to P2's task 
+2026-09-20 18:57:00 | INFO    |     P4/v1: 526 chars - P3 plus a strict output format. Verdict is deliberately bi
+2026-09-20 18:57:00 | INFO    |     P5/v1: 6,875 chars - P4 plus decision rules, a four-option verdict set, data-hy
+2026-09-20 18:57:00 | INFO    | END    2. register prompts  (0.00s)
+2026-09-20 18:57:00 | INFO    | START  2.1 verify rendered prompts  [scope=prompt]
+2026-09-20 18:57:00 | INFO    |     prompts_rendered: 40
+2026-09-20 18:57:00 | INFO    |     placeholders_unfilled: 0
+2026-09-20 18:57:00 | INFO    |     leaks_found: 0
+2026-09-20 18:57:00 | INFO    | END    2.1 verify rendered prompts  (0.05s)
+2026-09-20 18:57:00 | INFO    | START  2.2 export prompts_v1.json
+2026-09-20 18:57:00 | INFO    |     path: prompts_v1.json
+2026-09-20 18:57:00 | INFO    |     bytes: 8933
+2026-09-20 18:57:00 | INFO    |     prompts: 5
+2026-09-20 18:57:00 | INFO    | END    2.2 export prompts_v1.json  (0.00s)
+2026-09-20 18:57:01 | INFO    | START  3.5 dry run - full v1 plan
+2026-09-20 18:57:01 | INFO    | generate() prompts=['P1', 'P2', 'P3', 'P4', 'P5'] version=v1 videos=8 runs=3 dry_run=True
+2026-09-20 18:57:01 | INFO    |     planned: 120
+2026-09-20 18:57:01 | INFO    |     already_saved: 120
+2026-09-20 18:57:01 | INFO    |     api_calls_to_make: 0
+2026-09-20 18:57:01 | INFO    |     temperature: 0.8
+2026-09-20 18:57:01 | INFO    |     max_tokens: 700
+2026-09-20 18:57:01 | INFO    |   START  dry run: render + leak-check  [combos=0]
+2026-09-20 18:57:01 | INFO    |       rendered: 0
+2026-09-20 18:57:01 | INFO    |       leaks_found: 0
+2026-09-20 18:57:01 | INFO    |       total_prompt_chars: 0
+2026-09-20 18:57:01 | INFO    |       requests_made: 0
+2026-09-20 18:57:01 | INFO    |   END    dry run: render + leak-check  (0.00s)
+2026-09-20 18:57:01 | INFO    | END    3.5 dry run - full v1 plan  (0.01s)
+2026-09-20 18:57:01 | INFO    | START  PHASE 3: v1 generation run
+2026-09-20 18:57:01 | INFO    | generate() prompts=['P1', 'P2', 'P3', 'P4', 'P5'] version=v1 videos=8 runs=3 dry_run=False
+2026-09-20 18:57:01 | INFO    |     planned: 120
+2026-09-20 18:57:01 | INFO    |     already_saved: 120
+2026-09-20 18:57:01 | INFO    |     api_calls_to_make: 0
+2026-09-20 18:57:01 | INFO    |     temperature: 0.8
+2026-09-20 18:57:01 | INFO    |     max_tokens: 700
+2026-09-20 18:57:02 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 18:57:04 | INFO    | preflight OK  temperature=0.8 accepted by anthropic/claude-sonnet-4-6
+2026-09-20 18:57:04 | INFO    | REAL RUN starting: 0 calls to anthropic/claude-sonnet-4-6
+2026-09-20 18:57:04 | INFO    | REAL RUN finished: ok=0 failed=0 in 0.1s
+2026-09-20 18:57:04 | INFO    |     input_tokens: 0
+2026-09-20 18:57:04 | INFO    |     output_tokens: 0
+2026-09-20 18:57:04 | INFO    |     jsonl: outputs/generations.jsonl
+2026-09-20 18:57:04 | INFO    |     csv: outputs/generations.csv
+2026-09-20 18:57:04 | INFO    | END    PHASE 3: v1 generation run  (3.06s)
+2026-09-20 18:57:04 | INFO    | number-hint helper self-test PASSED (flagged ['4.7%', '55,555'] in a fabricated example)
+2026-09-20 18:57:04 | INFO    | START  2.6 per-prompt scoring report (no ground truth)
+2026-09-20 18:57:04 | INFO    |     P1: verdict_line 0/24, hints 0, agree 8/8
+2026-09-20 18:57:04 | INFO    |     P2: verdict_line 0/24, hints 42, agree 8/8
+2026-09-20 18:57:04 | INFO    |     P3: verdict_line 0/24, hints 61, agree 8/8
+2026-09-20 18:57:04 | INFO    |     P4: verdict_line 24/24, hints 21, agree 8/8
+2026-09-20 18:57:04 | INFO    |     P5: verdict_line 24/24, hints 4, agree 8/8
+2026-09-20 18:57:04 | INFO    | END    2.6 per-prompt scoring report (no ground truth)  (0.05s)
+2026-09-20 18:57:04 | INFO    | START  4B.1 write rubric.md
+2026-09-20 18:57:04 | INFO    |     path: rubric.md
+2026-09-20 18:57:04 | INFO    |     bytes: 3008
+2026-09-20 18:57:04 | INFO    |     criteria: 4
+2026-09-20 18:57:04 | INFO    |     scale: 1-5
+2026-09-20 18:57:04 | INFO    |     anchors_at: 1, 3, 5
+2026-09-20 18:57:04 | INFO    | END    4B.1 write rubric.md  (0.00s)
+2026-09-20 18:57:04 | INFO    | START  PHASE 4B: build blind scoring sheet
+2026-09-20 18:57:04 | INFO    | build_scoring_sheet version=v1 focus_video=vid_003 prompts=['P1', 'P2', 'P3', 'P4', 'P5'] n_runs=3
+2026-09-20 18:57:04 | INFO    |     sheet: scoring/scoring_sheet_v1.xlsx
+2026-09-20 18:57:04 | INFO    |     key: scoring/scoring_key_v1.csv
+2026-09-20 18:57:04 | INFO    |     rows_to_score: 15
+2026-09-20 18:57:04 | INFO    |     blinded: True
+2026-09-20 18:57:04 | INFO    |     shuffled: True
+2026-09-20 18:57:04 | INFO    |     shuffle_seed: 42
+2026-09-20 18:57:04 | INFO    |     score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 18:57:04 | INFO    |     validation: whole number 1-5
+2026-09-20 18:57:04 | INFO    |     scores_prefilled: none - human scored
+2026-09-20 18:57:04 | INFO    | END    PHASE 4B: build blind scoring sheet  (0.03s)
+2026-09-20 18:57:04 | INFO    | START  PHASE 4A: automated accuracy
+2026-09-20 18:57:04 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 18:57:04 | INFO    | build_verdicts: 168 outputs processed
+2026-09-20 18:57:04 | INFO    |     regex_extracted: 72
+2026-09-20 18:57:04 | INFO    |     classifier_new: 0
+2026-09-20 18:57:04 | INFO    |     classifier_cached: 96
+2026-09-20 18:57:04 | INFO    |     format_miss: 0
+2026-09-20 18:57:04 | INFO    |     errors: 0
+2026-09-20 18:57:04 | INFO    |     classifier_temperature: 0.0
+2026-09-20 18:57:04 | INFO    | ground_truth.csv loaded HERE for the first time (evaluation only)
+2026-09-20 18:57:04 | INFO    |     P1: acc 2/24 | false_scale 0/18 | missed 6/6 | agree 5/8
+2026-09-20 18:57:04 | INFO    |     P2: acc 18/24 | false_scale 4/18 | missed 1/6 | agree 6/8
+2026-09-20 18:57:04 | INFO    |     P3: acc 20/24 | false_scale 3/18 | missed 0/6 | agree 7/8
+2026-09-20 18:57:04 | INFO    |     P4: acc 12/24 | false_scale 3/18 | missed 0/6 | agree 8/8
+2026-09-20 18:57:04 | INFO    |     P5: acc 24/24 | false_scale 0/18 | missed 0/6 | agree 8/8
+2026-09-20 18:57:04 | INFO    | END    PHASE 4A: automated accuracy  (0.02s)
+2026-09-20 18:57:04 | INFO    | cell-helper self-tests PASSED (score/confidence parsing, confidently_wrong filter)
+2026-09-20 18:57:04 | INFO    | START  4A.3 per-video / per-prompt scorecard
+2026-09-20 18:57:04 | INFO    |     cells: 40
+2026-09-20 18:57:04 | INFO    |     cells_fully_correct: 23
+2026-09-20 18:57:04 | INFO    |     cells_fully_wrong: 13
+2026-09-20 18:57:04 | INFO    |     cells_all_runs_agree: 34
+2026-09-20 18:57:04 | INFO    | scorecard chart saved: outputs/scorecard_v1.png
+2026-09-20 18:57:04 | INFO    | END    4A.3 per-video / per-prompt scorecard  (0.29s)
+2026-09-20 18:57:04 | INFO    | START  4A.5 build results report
+2026-09-20 18:57:05 | INFO    | chart saved: outputs/prompt_comparison_v1.png
+2026-09-20 18:57:05 | INFO    | scorecard chart saved: outputs/scorecard_v1.png
+2026-09-20 18:57:05 | INFO    | results report written: report/results_report.md (11,758 bytes)
+2026-09-20 18:57:05 | INFO    |     best: P5
+2026-09-20 18:57:05 | INFO    |     worst: P1
+2026-09-20 18:57:05 | INFO    |     report: report/results_report.md
+2026-09-20 18:57:05 | INFO    | END    4A.5 build results report  (0.39s)
+2026-09-20 18:57:05 | INFO    | load_scores: 15 rows from scoring_sheet_v1.xlsx
+2026-09-20 18:57:05 | INFO    |   complete_rows: 0
+2026-09-20 18:57:05 | INFO    |   incomplete_rows: 15
+2026-09-20 18:57:05 | INFO    |   prompts: ['P1', 'P2', 'P3', 'P4', 'P5']
+2026-09-20 18:57:05 | INFO    |   overall_mean: n/a
+2026-09-20 18:57:05 | INFO    | generate() prompts=['P1', 'P4'] version=v2 videos=8 runs=3 dry_run=False
+2026-09-20 18:57:05 | INFO    |   planned: 48
+2026-09-20 18:57:05 | INFO    |   already_saved: 48
+2026-09-20 18:57:05 | INFO    |   api_calls_to_make: 0
+2026-09-20 18:57:05 | INFO    |   temperature: 0.8
+2026-09-20 18:57:05 | INFO    |   max_tokens: 700
+2026-09-20 18:57:05 | INFO    | LLMClient ready  provider=anthropic  model=claude-sonnet-4-6  sdk=1.7.0  sdk_exposes_temperature=False  workspace_id=set
+2026-09-20 18:57:06 | INFO    | preflight OK  temperature=0.8 accepted by anthropic/claude-sonnet-4-6
+2026-09-20 18:57:06 | INFO    | REAL RUN starting: 0 calls to anthropic/claude-sonnet-4-6
+2026-09-20 18:57:06 | INFO    | REAL RUN finished: ok=0 failed=0 in 0.0s
+2026-09-20 18:57:06 | INFO    |   input_tokens: 0
+2026-09-20 18:57:06 | INFO    |   output_tokens: 0
+2026-09-20 18:57:06 | INFO    |   jsonl: outputs/generations.jsonl
+2026-09-20 18:57:06 | INFO    |   csv: outputs/generations.csv
+2026-09-20 18:57:06 | INFO    | build_scoring_sheet version=v2 focus_video=vid_003 prompts=['P1', 'P4'] n_runs=3
+2026-09-20 18:57:06 | INFO    |   sheet: scoring/scoring_sheet_v2.xlsx
+2026-09-20 18:57:06 | INFO    |   key: scoring/scoring_key_v2.csv
+2026-09-20 18:57:06 | INFO    |   rows_to_score: 6
+2026-09-20 18:57:06 | INFO    |   blinded: True
+2026-09-20 18:57:06 | INFO    |   shuffled: True
+2026-09-20 18:57:06 | INFO    |   shuffle_seed: 42
+2026-09-20 18:57:06 | INFO    |   score_columns: clarity, data_accuracy, actionability, uncertainty
+2026-09-20 18:57:06 | INFO    |   validation: whole number 1-5
+2026-09-20 18:57:06 | INFO    |   scores_prefilled: none - human scored
+2026-09-20 18:57:06 | INFO    | START  notebook finished
+2026-09-20 18:57:06 | INFO    |     dry_run: False
+2026-09-20 18:57:06 | INFO    |     generations_logged: 168
+2026-09-20 18:57:06 | INFO    |     generations_ok: 168
+2026-09-20 18:57:06 | INFO    |     generations_failed: 0
+2026-09-20 18:57:06 | INFO    |     prompts_registered: 7
+2026-09-20 18:57:06 | INFO    |     log_file: outputs/run.log
+2026-09-20 18:57:06 | INFO    | END    notebook finished  (0.01s)

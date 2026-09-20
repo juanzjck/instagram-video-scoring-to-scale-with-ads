@@ -1,0 +1,9 @@
+creator_id,handle,niche,followers,primary_language,follower_demographics_country
+cr_01,lucia.makes,beauty,48200,es,"{""CO"": 26400, ""EC"": 7100, ""MX"": 6300, ""PE"": 4200, ""US"": 2400}"
+cr_02,andres.fit,fitness,121500,es,"{""MX"": 58200, ""CO"": 21300, ""AR"": 18400, ""ES"": 12100, ""US"": 8300}"
+cr_03,cocina.de.vale,food,33900,es,"{""CO"": 15100, ""VE"": 6800, ""EC"": 5200, ""PA"": 3100, ""US"": 2300}"
+cr_04,tech.conmateo,tech,87600,es,"{""MX"": 31200, ""CO"": 19800, ""CL"": 14100, ""AR"": 12600, ""PE"": 6700}"
+cr_05,sofi.viaja,travel,15400,es,
+cr_06,el.parcero.juan,comedy,204000,es,"{""CO"": 96500, ""MX"": 41200, ""EC"": 24800, ""VE"": 19300, ""US"": 11900}"
+cr_07,growthhacks.ig,business,62300,es,"{""IN"": 24100, ""BD"": 11800, ""ID"": 9600, ""BR"": 7200, ""CO"": 3100}"
+cr_08,dani.hogar,home_decor,27800,es,"{""BR"": 13900, ""PT"": 5600, ""AR"": 3800, ""MX"": 2600, ""CO"": 1100}"
