@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.DS_Store
+# pipeline artifacts (frames, audio, model outputs). decisions.jsonl is the human log.
+runs/*/
+# uploaded datasets, with their own runs/
+uploads/

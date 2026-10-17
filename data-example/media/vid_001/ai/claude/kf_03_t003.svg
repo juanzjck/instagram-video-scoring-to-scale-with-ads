@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960">
+  <!-- Background wall -->
+  <rect width="540" height="960" fill="#f5ede6"/>
+  
+  <!-- Subtle wall gradient for depth -->
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fdf6f0"/>
+      <stop offset="100%" stop-color="#e8d8cc"/>
+    </linearGradient>
+    <linearGradient id="counterGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8ddd5"/>
+      <stop offset="100%" stop-color="#c9b8ac"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4c5a0"/>
+      <stop offset="100%" stop-color="#e8a87a"/>
+    </linearGradient>
+    <linearGradient id="faceGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f9d4b4"/>
+      <stop offset="100%" stop-color="#e8b88a"/>
+    </linearGradient>
+    <linearGradient id="bottleGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4ecd4"/>
+      <stop offset="40%" stop-color="#a8d5a8"/>
+      <stop offset="100%" stop-color="#7bb87b"/>
+    </linearGradient>
+    <linearGradient id="dropperGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#e8e8e8"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#c8c8c8"/>
+    </linearGradient>
+    <linearGradient id="hairGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3d2314"/>
+      <stop offset="100%" stop-color="#1a0d08"/>
+    </linearGradient>
+    <linearGradient id="mirrorGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dde8f0" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#b8ccd8" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="shirtGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0e6f6"/>
+      <stop offset="100%" stop-color="#d8c4e8"/>
+    </linearGradient>
+    <radialGradient id="serumDrop" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#d4f0d4" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#88cc88" stop-opacity="0.7"/>
+    </radialGradient>
+    <linearGradient id="shadowGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00000020"/>
+      <stop offset="100%" stop-color="#00000000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wall background -->
+  <rect width="540" height="960" fill="url(#wallGrad)"/>
+  
+  <!-- Subtle wall paneling lines -->
+  <rect x="0" y="0" width="540" height="3" fill="#e0d0c8" opacity="0.5"/>
+  
+  <!-- Mirror on wall -->
+  <rect x="155" y="30" width="230" height="290" rx="115" ry="20" fill="#c8d8e4" opacity="0.3" stroke="#d0c0b0" stroke-width="6"/>
+  <rect x="160" y="35" width="220" height="280" rx="110" ry="18" fill="url(#mirrorGrad)" stroke="#e8ddd5" stroke-width="3"/>
+  <!-- Mirror shine -->
+  <ellipse cx="210" cy="90" rx="30" ry="15" fill="white" opacity="0.3" transform="rotate(-20 210 90)"/>
+
+  <!-- Bathroom counter -->
+  <rect x="0" y="560" width="540" height="400" fill="url(#counterGrad)"/>
+  <rect x="0" y="555" width="540" height="15" fill="#d8c8bc" rx="3"/>
+  
+  <!-- Counter shadow -->
+  <rect x="0" y="555" width="540" height="30" fill="url(#shadowGrad)"/>
+
+  <!-- Serum bottle on counter -->
+  <rect x="60" y="460" width="60" height="110" rx="8" fill="url(#bottleGrad)" stroke="#6a9e6a" stroke-width="1.5"/>
+  <!-- Bottle neck -->
+  <rect x="78" y="440" width="24" height="30" rx="4" fill="#8fbc8f" stroke="#6a9e6a" stroke-width="1"/>
+  <!-- Bottle cap area -->
+  <rect x="74" y="430" width="32" height="18" rx="5" fill="#5a8a5a" stroke="#4a7a4a" stroke-width="1"/>
+  <!-- Bottle label -->
+  <rect x="64" y="490" width="52" height="55" rx="4" fill="white" opacity="0.85"/>
+  <text x="90" y="510" font-family="Arial" font-size="5.5" font-weight="bold" fill="#3a6a3a" text-anchor="middle">Solara</text>
+  <text x="90" y="521" font-family="Arial" font-size="5.5" font-weight="bold" fill="#3a6a3a" text-anchor="middle">Skincare</text>
+  <text x="90" y="532" font-family="Arial" font-size="4" fill="#5a8a5a" text-anchor="middle">SERUM</text>
+  <!-- Bottle shine -->
+  <rect x="68" y="465" width="10" height="50" rx="5" fill="white" opacity="0.3"/>
+
+  <!-- PERSON -->
+  <!-- Body / torso -->
+  <ellipse cx="270" cy="620" rx="130" ry="80" fill="url(#shirtGrad)"/>
+  <rect x="145" y="560" width="250" height="120" rx="20" fill="url(#shirtGrad)"/>
+  
+  <!-- Neck -->
+  <rect x="245" y="430" width="50" height="70" rx="10" fill="url(#faceGrad)"/>
+  
+  <!-- Shoulders -->
+  <ellipse cx="160" cy="570" rx="60" ry="35" fill="url(#shirtGrad)"/>
+  <ellipse cx="380" cy="570" rx="60" ry="35" fill="url(#shirtGrad)"/>
+
+  <!-- LEFT ARM (holding bottle/dropper) - raised up -->
+  <!-- Upper arm -->
+  <ellipse cx="155" cy="480" rx="32" ry="20" fill="url(#faceGrad)" transform="rotate(-50 155 480)"/>
+  <!-- Forearm -->
+  <ellipse cx="195" cy="390" rx="28" ry="18" fill="url(#faceGrad)" transform="rotate(-70 195 390)"/>
+  
+  <!-- RIGHT ARM (applying to cheek) -->
+  <!-- Upper arm -->
+  <ellipse cx="390" cy="490" rx="32" ry="20" fill="url(#faceGrad)" transform="rotate(50 390 490)"/>
+  <!-- Forearm raised to face -->
+  <ellipse cx="355" cy="395" rx="28" ry="18" fill="url(#faceGrad)" transform="rotate(65 355 395)"/>
+
+  <!-- Face -->
+  <ellipse cx="270" cy="300" rx="110" ry="125" fill="url(#faceGrad)"/>
+  
+  <!-- Hair -->
+  <!-- Back hair -->
+  <ellipse cx="270" cy="270" rx="118" ry="130" fill="url(#hairGrad)"/>
+  <!-- Top hair -->
+  <ellipse cx="270" cy="185" rx="112" ry="80" fill="url(#hairGrad)"/>
+  <!-- Side hair left -->
+  <ellipse cx="162" cy="300" rx="30" ry="80" fill="url(#hairGrad)"/>
+  <!-- Side hair right -->
+  <ellipse cx="378" cy="300" rx="30" ry="80" fill="url(#hairGrad)"/>
+  
+  <!-- Face re-draw over hair -->
+  <ellipse cx="270" cy="305" rx="105" ry="118" fill="url(#faceGrad)"/>
+  
+  <!-- Cheek blush -->
+  <ellipse cx="215" cy="345" rx="28" ry="16" fill="#f4a0a0" opacity="0.25"/>
+  <ellipse cx="325" cy="345" rx="28" ry="16" fill="#f4a0a0" opacity="0.25"/>
+  
+  <!-- Eyes -->
+  <!-- Left eye -->
+  <ellipse cx="230" cy="295" rx="18" ry="12" fill="white"/>
+  <ellipse cx="232" cy="297" rx="10" ry="10" fill="#3d2314"/>
+  <ellipse cx="234" cy="295" rx="6" ry="6" fill="#1a0a04"/>
+  <ellipse cx="237" cy="293" rx="2.5" ry="2.5" fill="white"/>
+  <!-- Left eyebrow -->
+  <path d="M210 278 Q232 268 252 274" stroke="#3d2314" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Left eyelashes -->
+  <path d="M213 290 Q212 284 213 280" stroke="#1a0a04" stroke-width="2" fill="none"/>
+  <path d="M220 287 Q219 281 221 278" stroke="#1a0a04" stroke-width="2" fill="none"/>
+  
+  <!-- Right eye -->
+  <ellipse cx="310" cy="295" rx="18" ry="12" fill="white"/>
+  <ellipse cx="312" cy="297" rx="10" ry="10" fill="#3d2314"/>
+  <ellipse cx="314" cy="295" rx="6" ry="6" fill="#1a0a04"/>
+  <ellipse cx="317" cy="293" rx="2.5" ry="2.5" fill="white"/>
+  <!-- Right eyebrow -->
+  <path d="M290 274 Q312 268 332 278" stroke="#3d2314" stroke-width="4" fill="none" stroke-linecap="round"/>
+  
+  <!-- Nose -->
+  <path d="M262 305 Q258 330 265 340 Q270 345 275 340 Q282 330 278 305" stroke="#d4956a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="263" cy="339" rx="7" ry="5" fill="#d4956a" opacity="0.4"/>
+  <ellipse cx="277" cy="339" rx="7" ry="5" fill="#d4956a" opacity="0.4"/>
+  
+  <!-- Mouth - slight smile / relaxed -->
+  <path d="M248 368 Q270 380 292 368" stroke="#c47a5a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M252 368 Q270 374 288 368" fill="#e8a080" opacity="0.5"/>
+  <!-- Lips -->
+  <path d="M250 366 Q270 360 290 366 Q280 375 270 377 Q260 375 250 366Z" fill="#d4826a" opacity="0.6"/>
+  <path d="M252 373 Q270 380 288 373 Q280 378 270 380 Q260 378 252 373Z" fill="#c06858" opacity="0.7"/>
+
+  <!-- Serum dropper in right hand, pointing toward cheek -->
+  <!-- Dropper body -->
+  <g transform="rotate(-30 340 370)">
+    <!-- Rubber bulb -->
+    <ellipse cx="340" cy="305" rx="16" ry="22" fill="#88aa88" stroke="#6a8a6a" stroke-width="1.5"/>
+    <!-- Dropper glass tube -->
+    <rect x="335" y="325" width="10" height="65" rx="5" fill="url(#dropperGrad)" stroke="#b8c8b8" stroke-width="1"/>
+    <!-- Dropper tip -->
+    <path d="M338 388 L342 388 L341 400 L339 400 Z" fill="#c8d8c8"/>
+    <!-- Serum in tube -->
+    <rect x="336.5" y="355" width="7" height="33" rx="3" fill="#88cc88" opacity="0.7"/>
+    <!-- Dropper shine -->
+    <rect x="337" y="328" width="3" height="55" rx="1.5" fill="white" opacity="0.5"/>
+  </g>
+
+  <!-- Serum drop falling onto cheek -->
+  <ellipse cx="315" cy="355" rx="6" ry="8" fill="url(#serumDrop)" stroke="#88cc88" stroke-width="1" opacity="0.85"/>
+  <!-- Smaller drop -->
+  <ellipse cx="318" cy="368" rx="3.5" ry="4.5" fill="#a8d8a8" opacity="0.7"/>
+  
+  <!-- Serum glistening on cheek -->
+  <ellipse cx="308" cy="358" rx="14" ry="10" fill="#c8ecc8" opacity="0.35"/>
+  <!-- Serum sheen highlights -->
+  <ellipse cx="306" cy="354" rx="5" ry="3" fill="white" opacity="0.4" transform="rotate(-20 306 354)"/>
+
+  <!-- Left hand near chin (steadying gesture) -->
+  <!-- Hand -->
+  <ellipse cx="205" cy="390" rx="22" ry="18" fill="url(#faceGrad)"/>
+  <!-- Fingers -->
+  <ellipse cx="190" cy="378" rx="9" ry="6" fill="#e8b88a" transform="rotate(-30 190 378)"/>
+  <ellipse cx="200" cy="372" rx="9" ry="6" fill="#e8b88a" transform="rotate(-10 200 372)"/>
+  <ellipse cx="212" cy="372" rx="9" ry="6" fill="#e8b88a" transform="rotate(10 212 372)"/>
+  <ellipse cx="222" cy="376" rx="9" ry="6" fill="#e8b88a" transform="rotate(25 222 376)"/>
+
+  <!-- Right hand holding dropper -->
+  <ellipse cx="348" cy="390" rx="22" ry="18" fill="url(#faceGrad)"/>
+  <ellipse cx="360" cy="376" rx="9" ry="6" fill="#e8b88a" transform="rotate(30 360 376)"/>
+  <ellipse cx="350" cy="372" rx="9" ry="6" fill="#e8b88a" transform="rotate(10 350 372)"/>
+  <ellipse cx="338" cy="373" rx="9" ry="6" fill="#e8b88a" transform="rotate(-10 338 373)"/>
+
+  <!-- Shirt collar -->
+  <path d="M220 450 Q270 480 320 450 L310 430 Q270 455 230 430 Z" fill="#e8daf4" stroke="#c8b4e0" stroke-width="1"/>
+
+  <!-- Counter objects -->
+  <!-- Small face towel rolled -->
+  <ellipse cx="430" cy="560" rx="45" ry="18" fill="#f0e8e0" stroke="#d8c8bc" stroke-width="1.5"/>
+  <ellipse cx="430" cy="555" rx="45" ry="16" fill="#f8f0ea"/>
+  <!-- Towel stripe -->
+  <path d="M390 555 Q430 548 470 555" stroke="#d4c0b0" stroke-width="2" fill="none"/>
+
+  <!-- Small pump bottle -->
+  <rect x="460" y="490" width="35" height="75" rx="6" fill="#e8d4c8" stroke="#c8b0a0" stroke-width="1.5"/>
+  <rect x="472" y="475" width="11" height="22" rx="3" fill="#c8a898"/>
+  <rect x="467" y="468" width="21" height="12" rx="4" fill="#b89888"/>
+  <!-- pump head -->
+  <rect x="470" y="458" width="15" height="15" rx="3" fill="#a08878"/>
+
+  <!-- Ambient light effect on wall -->
+  <ellipse cx="270" cy="250" rx="180" ry="120" fill="white" opacity="0.06"/>
+  
+  <!-- Floor/lower wall shadow -->
+  <rect x="0" y="820" width="540" height="140" fill="#c5b0a4" opacity="0.4"/>
+</svg>

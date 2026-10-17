@@ -1,0 +1,35 @@
+segment_id,video_id,start_s,end_s,language,text
+vid_001_seg00,vid_001,0,3,es,¿Tu piel brilla con este calor húmedo? Mira esto.
+vid_001_seg01,vid_001,3,8,es,"Paso uno: limpia con el gel de Solara, mañana y noche."
+vid_001_seg02,vid_001,8,14,es,"Paso dos: dos gotitas del sérum matificante, nada más."
+vid_001_seg03,vid_001,14,20,es,"Paso tres: la hidratante ligera, que no deja la piel grasosa."
+vid_001_seg04,vid_001,20,28,es,Llevo una semana y mira la diferencia. Usa mi código LUCIA15 en solara punto co.
+vid_003_seg00,vid_003,0,3,es,Arepa de queso en seis minutos y sin horno.
+vid_003_seg01,vid_003,3,10,es,Mezcla la harina con agua tibia y una pizca de sal.
+vid_003_seg02,vid_003,10,17,es,Rellena con queso y cierra bien los bordes.
+vid_003_seg03,vid_003,17,22,es,"Y si no tienes tiempo, la pides en Arepa Express y llega calientica."
+vid_003_seg04,vid_003,22,32,es,Mira ese queso. Usa mi código VALE10.
+vid_004_seg00,vid_004,0,3,es,Compré los audífonos más baratos de Volt. ¿Valen la pena?
+vid_004_seg01,vid_004,3,9,es,"El sonido, para este precio, está sorprendentemente bien."
+vid_004_seg02,vid_004,9,18,es,Los probé corriendo y no se caen.
+vid_004_seg03,vid_004,18,24,es,Review completo pronto. Link en mi bio.
+vid_005_seg00,vid_005,0,6,es,Este es mi rincón favorito de la casa.
+vid_005_seg01,vid_005,6,14,es,"Los cojines son de Casa Verde, súper suaves."
+vid_005_seg02,vid_005,14,18,es,Te dejo el link.
+vid_006_seg00,vid_006,0,3,es,Cuando pides domicilio un domingo...
+vid_006_seg01,vid_006,3,9,es,¿Ocho minutos? No puede ser.
+vid_006_seg02,vid_006,9,18,es,¡Llegó! Arepa Express no juega.
+vid_006_seg03,vid_006,18,21,es,"Pídela ya, parce."
+vid_008_seg00,vid_008,0,3,es,Así era mi sala antes.
+vid_008_seg01,vid_008,3,12,es,"Con un tapete, unos cuadros y cojines nuevos..."
+vid_008_seg02,vid_008,12,24,es,...le cambié la cara por menos de cincuenta dólares.
+vid_008_seg03,vid_008,24,30,es,"¿Cuál te gusta más, antes o después?"
+vid_009_seg00,vid_009,0,3,en,Stop paying seven dollars for iced coffee. Watch this.
+vid_009_seg01,vid_009,3,9,en,"Fill a glass with ice and pour in two shots of Northwind cold brew concentrate."
+vid_009_seg02,vid_009,9,15,en,"Add milk, a little caramel syrup, and stir. That is it."
+vid_009_seg03,vid_009,15,20,en,Two minutes and it tastes better than the coffee shop.
+vid_009_seg04,vid_009,20,26,en,I have made this every day for two weeks. Use my code MAYA15 at northwind coffee dot com.
+vid_010_seg00,vid_010,0,6,en,"So, um, good morning everybody. I just woke up."
+vid_010_seg01,vid_010,6,16,en,"I am going to make the bed, and then check my phone for a while."
+vid_010_seg02,vid_010,16,28,en,Not much planned for today. I might go for a walk later.
+vid_010_seg03,vid_010,28,40,en,"Anyway, that is my morning. See you tomorrow."

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PartGram · Scale review</title>
+<link rel="stylesheet" href="/static/style.css?v=4">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="dot"></span>PartGram <span class="sub">scale review</span></div>
+  <nav class="tabs" role="tablist">
+    <button id="tab-setup" class="tab active" role="tab">Dataset</button>
+    <button id="tab-review" class="tab" role="tab">Review</button>
+    <button id="tab-eval" class="tab" role="tab">Evaluation</button>
+    <button id="tab-recap" class="tab" role="tab">Recap</button>
+  </nav>
+  <div class="controls">
+    <label>Reviewer <input id="reviewer" type="text" placeholder="your name" autocomplete="off"></label>
+    <fieldset class="mode" aria-label="Review mode">
+      <label><input type="radio" name="mode" value="card" checked> Card</label>
+      <label><input type="radio" name="mode" value="text"> Text only</label>
+    </fieldset>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-head">
+      <h2>Videos</h2>
+      <button id="process-all" class="btn ghost small">Run pipeline</button>
+    </div>
+    <ul id="video-list"></ul>
+  </aside>
+  <main id="main" aria-live="polite"><p class="empty">Loading…</p></main>
+</div>
+
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

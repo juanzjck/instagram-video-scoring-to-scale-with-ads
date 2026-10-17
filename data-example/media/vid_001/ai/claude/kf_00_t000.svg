@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960">
+  <!-- Background: outdoor humid street -->
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b8d4e8"/>
+      <stop offset="100%" stop-color="#d9eaf5"/>
+    </linearGradient>
+    <linearGradient id="streetGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a8a8a"/>
+      <stop offset="100%" stop-color="#6a6a6a"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8b89a"/>
+      <stop offset="100%" stop-color="#c98060"/>
+    </linearGradient>
+    <linearGradient id="foreheadShine" x1="0.3" y1="0" x2="0.7" y2="0.4">
+      <stop offset="0%" stop-color="#fff5ee" stop-opacity="0.95"/>
+      <stop offset="40%" stop-color="#f5c9a8" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#e8b89a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="noseShine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff5ee" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#e8b89a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2010"/>
+      <stop offset="100%" stop-color="#1a0e08"/>
+    </linearGradient>
+    <linearGradient id="buildingGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c8c0b0"/>
+      <stop offset="100%" stop-color="#a09888"/>
+    </linearGradient>
+    <radialGradient id="humidOverlay" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#b8d4e8" stop-opacity="0.0"/>
+      <stop offset="100%" stop-color="#b8d4e8" stop-opacity="0.35"/>
+    </radialGradient>
+    <linearGradient id="clothGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a7fa0"/>
+      <stop offset="100%" stop-color="#3d5f7a"/>
+    </linearGradient>
+    <filter id="blur1">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="1.5"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="540" height="960" fill="url(#skyGrad)"/>
+
+  <!-- Background buildings blurred -->
+  <rect x="0" y="80" width="160" height="420" fill="url(#buildingGrad)" filter="url(#blur1)" opacity="0.7"/>
+  <rect x="150" y="120" width="120" height="380" fill="#b0a898" filter="url(#blur1)" opacity="0.7"/>
+  <rect x="360" y="90" width="180" height="410" fill="url(#buildingGrad)" filter="url(#blur1)" opacity="0.7"/>
+
+  <!-- Windows on buildings (blurred) -->
+  <rect x="30" y="140" width="25" height="30" fill="#8ab0cc" opacity="0.5" filter="url(#blur1)"/>
+  <rect x="75" y="140" width="25" height="30" fill="#8ab0cc" opacity="0.5" filter="url(#blur1)"/>
+  <rect x="30" y="200" width="25" height="30" fill="#8ab0cc" opacity="0.4" filter="url(#blur1)"/>
+  <rect x="75" y="200" width="25" height="30" fill="#8ab0cc" opacity="0.4" filter="url(#blur1)"/>
+  <rect x="390" y="150" width="28" height="32" fill="#8ab0cc" opacity="0.5" filter="url(#blur1)"/>
+  <rect x="440" y="150" width="28" height="32" fill="#8ab0cc" opacity="0.5" filter="url(#blur1)"/>
+  <rect x="390" y="210" width="28" height="32" fill="#8ab0cc" opacity="0.4" filter="url(#blur1)"/>
+  <rect x="440" y="210" width="28" height="32" fill="#8ab0cc" opacity="0.4" filter="url(#blur1)"/>
+
+  <!-- Street / pavement -->
+  <rect x="0" y="480" width="540" height="480" fill="url(#streetGrad)" opacity="0.6"/>
+
+  <!-- Street puddle / humid reflection -->
+  <ellipse cx="270" cy="540" rx="200" ry="30" fill="#a8c8e0" opacity="0.4"/>
+  <ellipse cx="150" cy="570" rx="80" ry="15" fill="#a8c8e0" opacity="0.3"/>
+  <ellipse cx="400" cy="560" rx="100" ry="18" fill="#a8c8e0" opacity="0.3"/>
+
+  <!-- Trees/foliage blurred in background -->
+  <ellipse cx="80" cy="320" rx="70" ry="55" fill="#6a9a5a" opacity="0.5" filter="url(#blur1)"/>
+  <ellipse cx="460" cy="300" rx="65" ry="50" fill="#5a8a4a" opacity="0.5" filter="url(#blur1)"/>
+
+  <!-- Humidity haze overlay -->
+  <rect width="540" height="960" fill="url(#humidOverlay)"/>
+
+  <!-- === WOMAN CLOSE-UP === -->
+
+  <!-- Neck -->
+  <path d="M210 600 Q270 620 330 600 L340 680 Q270 700 200 680 Z" fill="url(#skinGrad)"/>
+  <!-- Neck shadow -->
+  <path d="M210 600 Q230 615 270 618 Q250 640 210 650 Z" fill="#c07050" opacity="0.3"/>
+
+  <!-- Clothing / top -->
+  <path d="M0 750 Q100 680 200 680 Q270 700 340 680 Q440 680 540 750 L540 960 L0 960 Z" fill="url(#clothGrad)"/>
+  <!-- Collar detail -->
+  <path d="M200 680 Q270 720 340 680 Q320 740 270 755 Q220 740 200 680 Z" fill="#4a6f90" opacity="0.7"/>
+
+  <!-- Hair behind (back layer) -->
+  <ellipse cx="270" cy="310" rx="195" ry="220" fill="url(#hairGrad)"/>
+  <!-- Hair sides flowing down -->
+  <path d="M75 310 Q50 420 60 560 Q80 600 110 620 Q90 520 95 420 Q100 360 115 320 Z" fill="#2a1508"/>
+  <path d="M465 310 Q490 420 480 560 Q460 600 430 620 Q450 520 445 420 Q440 360 425 320 Z" fill="#2a1508"/>
+
+  <!-- Face shape -->
+  <ellipse cx="270" cy="350" rx="175" ry="195" fill="url(#skinGrad)"/>
+
+  <!-- Cheek warmth -->
+  <ellipse cx="155" cy="390" rx="50" ry="38" fill="#e07060" opacity="0.2"/>
+  <ellipse cx="385" cy="390" rx="50" ry="38" fill="#e07060" opacity="0.2"/>
+
+  <!-- === FOREHEAD SHINE (humidity/sweat) === -->
+  <ellipse cx="270" cy="250" rx="90" ry="60" fill="url(#foreheadShine)"/>
+  <!-- Specular highlight dots on forehead -->
+  <ellipse cx="255" cy="238" rx="18" ry="10" fill="white" opacity="0.75"/>
+  <ellipse cx="290" cy="248" rx="10" ry="6" fill="white" opacity="0.55"/>
+  <ellipse cx="240" cy="258" rx="8" ry="5" fill="white" opacity="0.45"/>
+  <ellipse cx="300" cy="232" rx="6" ry="4" fill="white" opacity="0.5"/>
+
+  <!-- Eyebrows -->
+  <path d="M165 295 Q200 278 235 285" stroke="#3a2010" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M305 285 Q340 278 375 295" stroke="#3a2010" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Eyes -->
+  <!-- Left eye -->
+  <ellipse cx="200" cy="325" rx="35" ry="22" fill="white"/>
+  <ellipse cx="200" cy="325" rx="22" ry="20" fill="#5a3820"/>
+  <ellipse cx="200" cy="325" rx="14" ry="14" fill="#2a1808"/>
+  <ellipse cx="208" cy="317" rx="5" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="193" cy="330" rx="2" ry="2" fill="white" opacity="0.6"/>
+  <!-- Eyelashes left -->
+  <path d="M165 315 Q180 305 200 303 Q220 305 235 315" stroke="#1a0e08" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Lower lash line -->
+  <path d="M165 335 Q182 342 200 343 Q218 342 235 335" stroke="#3a2010" stroke-width="1.5" fill="none" opacity="0.5"/>
+
+  <!-- Right eye -->
+  <ellipse cx="340" cy="325" rx="35" ry="22" fill="white"/>
+  <ellipse cx="340" cy="325" rx="22" ry="20" fill="#5a3820"/>
+  <ellipse cx="340" cy="325" rx="14" ry="14" fill="#2a1808"/>
+  <ellipse cx="348" cy="317" rx="5" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="333" cy="330" rx="2" ry="2" fill="white" opacity="0.6"/>
+  <!-- Eyelashes right -->
+  <path d="M305 315 Q320 305 340 303 Q360 305 375 315" stroke="#1a0e08" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M305 335 Q322 342 340 343 Q358 342 375 335" stroke="#3a2010" stroke-width="1.5" fill="none" opacity="0.5"/>
+
+  <!-- Nose -->
+  <path d="M255 330 Q248 370 245 400 Q258 415 270 418 Q282 415 295 400 Q292 370 285 330" fill="none" stroke="#c07050" stroke-width="2" opacity="0.4"/>
+  <!-- Nose tip -->
+  <ellipse cx="270" cy="410" rx="22" ry="14" fill="#d49070" opacity="0.5"/>
+  <!-- Nose bridge shadow -->
+  <path d="M258 360 Q255 390 258 408" stroke="#b06848" stroke-width="2" fill="none" opacity="0.3"/>
+  <!-- Nose shine -->
+  <ellipse cx="264" cy="398" rx="8" ry="5" fill="url(#noseShine)" opacity="0.8"/>
+
+  <!-- Lips -->
+  <!-- Upper lip -->
+  <path d="M222 458 Q242 448 260 453 Q270 446 280 453 Q298 448 318 458 Q298 465 270 463 Q242 465 222 458 Z" fill="#c05840"/>
+  <!-- Lower lip -->
+  <path d="M222 458 Q242 475 270 478 Q298 475 318 458 Q298 465 270 463 Q242 465 222 458 Z" fill="#d06050"/>
+  <!-- Lip shine -->
+  <ellipse cx="258" cy="468" rx="18" ry="5" fill="white" opacity="0.25"/>
+  <!-- Lip line -->
+  <path d="M222 458 Q270 462 318 458" stroke="#a04030" stroke-width="1" fill="none"/>
+
+  <!-- Subtle smile / philtrum -->
+  <path d="M260 440 Q270 445 280 440" stroke="#c07050" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+  <!-- Chin shadow -->
+  <ellipse cx="270" cy="530" rx="80" ry="25" fill="#b06848" opacity="0.25"/>
+
+  <!-- Ear left -->
+  <ellipse cx="96" cy="370" rx="22" ry="30" fill="#d4956a"/>
+  <path d="M105 350 Q110 370 105 390" stroke="#b06848" stroke-width="2" fill="none" opacity="0.5"/>
+
+  <!-- Ear right -->
+  <ellipse cx="444" cy="370" rx="22" ry="30" fill="#d4956a"/>
+  <path d="M435 350 Q430 370 435 390" stroke="#b06848" stroke-width="2" fill="none" opacity="0.5"/>
+
+  <!-- Hair front wisps / flyaways from humidity -->
+  <path d="M115 250 Q130 200 160 220 Q145 240 150 270" stroke="#3a2010" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M105 280 Q90 230 120 210" stroke="#2a1508" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <path d="M425 250 Q410 200 380 220 Q395 240 390 270" stroke="#3a2010" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M435 280 Q450 230 420 210" stroke="#2a1508" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Hair top parting and texture -->
+  <path d="M270 130 Q265 170 268 200" stroke="#1a0e08" stroke-width="3" fill="none" opacity="0.5"/>
+  <path d="M250 135 Q230 160 225 190" stroke="#1a0e08" stroke-width="2" fill="none" opacity="0.3"/>
+  <path d="M290 135 Q310 160 315 190" stroke="#1a0e08" stroke-width="2" fill="none" opacity="0.3"/>
+
+  <!-- Additional forehead sweat/shine droplets -->
+  <ellipse cx="220" cy="268" rx="4" ry="3" fill="white" opacity="0.6"/>
+  <ellipse cx="315" cy="262" rx="3" ry="2" fill="white" opacity="0.5"/>
+  <ellipse cx="270" cy="275" rx="3" ry="2" fill="white" opacity="0.45"/>
+
+  <!-- Cheek shine (humidity) -->
+  <ellipse cx="148" cy="385" rx="20" ry="12" fill="white" opacity="0.22"/>
+  <ellipse cx="392" cy="385" rx="20" ry="12" fill="white" opacity="0.22"/>
+
+  <!-- Final humid atmosphere vignette -->
+  <radialGradient id="vignette" cx="50%" cy="40%" r="70%">
+    <stop offset="60%" stop-color="transparent"/>
+    <stop offset="100%" stop-color="#6a8a9a" stop-opacity="0.4"/>
+  </radialGradient>
+  <rect width="540" height="960" fill="url(#vignette)"/>
+</svg>

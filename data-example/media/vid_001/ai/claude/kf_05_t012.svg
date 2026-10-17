@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960">
+
+  <!-- Background -->
+  <rect width="540" height="960" fill="#f8f0eb"/>
+
+  <!-- Dividing line -->
+  <line x1="270" y1="0" x2="270" y2="960" stroke="#d4a88a" stroke-width="3"/>
+
+  <!-- ===== LEFT SIDE - BEFORE (oily/shiny skin) ===== -->
+  <!-- Left panel background - slightly warm -->
+  <rect x="0" y="0" width="270" height="960" fill="#f5e8e0"/>
+
+  <!-- BEFORE label banner -->
+  <rect x="0" y="30" width="130" height="42" rx="0" fill="#c9856a"/>
+  <text x="65" y="58" font-family="Arial" font-size="22" font-weight="bold" fill="white" text-anchor="middle">BEFORE</text>
+
+  <!-- Left person - neck -->
+  <rect x="90" y="370" width="90" height="120" rx="15" fill="#e8a882"/>
+  <!-- Left person - face -->
+  <ellipse cx="135" cy="280" rx="85" ry="100" fill="#e8a882"/>
+
+  <!-- Shine/oily highlights on left face -->
+  <ellipse cx="135" cy="230" rx="30" ry="20" fill="rgba(255,255,255,0.55)"/>
+  <ellipse cx="100" cy="270" rx="18" ry="25" fill="rgba(255,255,255,0.45)"/>
+  <ellipse cx="170" cy="265" rx="18" ry="25" fill="rgba(255,255,255,0.45)"/>
+  <ellipse cx="135" cy="310" rx="22" ry="15" fill="rgba(255,255,255,0.4)"/>
+  <ellipse cx="118" cy="200" rx="12" ry="8" fill="rgba(255,255,255,0.5)"/>
+  <ellipse cx="155" cy="198" rx="10" ry="7" fill="rgba(255,255,255,0.5)"/>
+
+  <!-- Pores/blemishes left -->
+  <circle cx="110" cy="260" r="3.5" fill="#c47a60" opacity="0.7"/>
+  <circle cx="155" cy="255" r="3" fill="#c47a60" opacity="0.6"/>
+  <circle cx="130" cy="285" r="2.5" fill="#c47a60" opacity="0.5"/>
+  <circle cx="148" cy="300" r="4" fill="#c47a60" opacity="0.65"/>
+  <circle cx="118" cy="305" r="3" fill="#c47a60" opacity="0.55"/>
+  <!-- Redness patches -->
+  <ellipse cx="108" cy="275" rx="18" ry="14" fill="#d97b6a" opacity="0.3"/>
+  <ellipse cx="162" cy="272" rx="18" ry="14" fill="#d97b6a" opacity="0.3"/>
+
+  <!-- Left eyebrows -->
+  <path d="M100 210 Q118 200 135 207" stroke="#5c3a1e" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M155 207 Q168 198 180 207" stroke="#5c3a1e" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Left eyes -->
+  <ellipse cx="118" cy="235" rx="18" ry="11" fill="white"/>
+  <ellipse cx="162" cy="235" rx="18" ry="11" fill="white"/>
+  <circle cx="118" cy="235" r="8" fill="#5c3a1e"/>
+  <circle cx="162" cy="235" r="8" fill="#5c3a1e"/>
+  <circle cx="121" cy="232" r="3" fill="black"/>
+  <circle cx="165" cy="232" r="3" fill="black"/>
+  <circle cx="123" cy="230" r="1.5" fill="white"/>
+  <circle cx="167" cy="230" r="1.5" fill="white"/>
+  <!-- Eyelashes left eye -->
+  <path d="M100 225 Q118 218 136 225" stroke="#2a1800" stroke-width="2.5" fill="none"/>
+  <path d="M144 225 Q162 218 180 225" stroke="#2a1800" stroke-width="2.5" fill="none"/>
+
+  <!-- Left nose -->
+  <path d="M130 250 Q125 270 120 278 Q130 284 150 278 Q145 270 140 250" stroke="#c47a60" stroke-width="2" fill="none"/>
+  <!-- Nostril shine -->
+  <ellipse cx="122" cy="276" rx="8" ry="5" fill="#c47a60" opacity="0.4"/>
+  <ellipse cx="148" cy="276" rx="8" ry="5" fill="#c47a60" opacity="0.4"/>
+
+  <!-- Left lips -->
+  <path d="M110 318 Q135 310 160 318 Q155 333 135 338 Q115 333 110 318Z" fill="#c4706e"/>
+  <path d="M110 318 Q135 322 160 318" stroke="#b05858" stroke-width="1.5" fill="none"/>
+  <!-- Lip shine -->
+  <ellipse cx="135" cy="316" rx="18" ry="5" fill="rgba(255,255,255,0.3)"/>
+
+  <!-- Left hair -->
+  <path d="M55 250 Q50 180 70 140 Q90 80 135 65 Q180 80 200 140 Q215 180 215 250 Q215 200 200 170 Q185 120 135 108 Q85 120 72 170 Q58 200 55 250Z" fill="#3a2010"/>
+  <!-- Hair sides left person -->
+  <path d="M55 250 Q48 300 52 360 Q65 370 80 360 Q70 310 72 270Z" fill="#3a2010"/>
+  <path d="M215 250 Q222 300 218 360 Q205 370 190 360 Q200 310 198 270Z" fill="#3a2010"/>
+
+  <!-- Left ears -->
+  <ellipse cx="52" cy="280" rx="14" ry="18" fill="#e8a882"/>
+  <ellipse cx="218" cy="280" rx="14" ry="18" fill="#e8a882"/>
+
+  <!-- Left body / outfit -->
+  <path d="M60 490 Q80 450 135 440 Q190 450 210 490 L225 620 L45 620Z" fill="#b0c4d8"/>
+  <!-- Collar -->
+  <path d="M110 440 L135 480 L160 440" stroke="white" stroke-width="2" fill="none"/>
+
+  <!-- ===== RIGHT SIDE - AFTER (matte, smooth skin) ===== -->
+  <!-- Right panel background - slightly cooler -->
+  <rect x="270" y="0" width="270" height="960" fill="#faf4f1"/>
+
+  <!-- AFTER label banner -->
+  <rect x="410" y="30" width="130" height="42" rx="0" fill="#7a9a7e"/>
+  <text x="475" y="58" font-family="Arial" font-size="22" font-weight="bold" fill="white" text-anchor="middle">AFTER</text>
+
+  <!-- Right person - neck -->
+  <rect x="360" y="370" width="90" height="120" rx="15" fill="#e0a07a"/>
+  <!-- Right person - face - matte, even skin -->
+  <ellipse cx="405" cy="280" rx="85" ry="100" fill="#e8a87a"/>
+
+  <!-- Matte skin - no shine, subtle gradient for dimension only -->
+  <radialGradient id="matteShad" cx="50%" cy="45%" r="50%">
+    <stop offset="0%" stop-color="#eebc98" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="#c8845a" stop-opacity="0.15"/>
+  </radialGradient>
+  <ellipse cx="405" cy="280" rx="85" ry="100" fill="url(#matteShad)"/>
+
+  <!-- Even tone patches (no redness, no blemishes) -->
+  <!-- Subtle cheek glow blush - matte style -->
+  <ellipse cx="378" cy="285" rx="20" ry="13" fill="#e8917a" opacity="0.2"/>
+  <ellipse cx="432" cy="285" rx="20" ry="13" fill="#e8917a" opacity="0.2"/>
+
+  <!-- Right eyebrows -->
+  <path d="M370 210 Q388 200 405 207" stroke="#5c3a1e" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M425 207 Q438 198 450 207" stroke="#5c3a1e" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Right eyes -->
+  <ellipse cx="388" cy="235" rx="18" ry="11" fill="white"/>
+  <ellipse cx="432" cy="235" rx="18" ry="11" fill="white"/>
+  <circle cx="388" cy="235" r="8" fill="#5c3a1e"/>
+  <circle cx="432" cy="235" r="8" fill="#5c3a1e"/>
+  <circle cx="391" cy="232" r="3" fill="black"/>
+  <circle cx="435" cy="232" r="3" fill="black"/>
+  <circle cx="393" cy="230" r="1.5" fill="white"/>
+  <circle cx="437" cy="230" r="1.5" fill="white"/>
+  <!-- Eyelashes right eye -->
+  <path d="M370 225 Q388 218 406 225" stroke="#2a1800" stroke-width="2.5" fill="none"/>
+  <path d="M414 225 Q432 218 450 225" stroke="#2a1800" stroke-width="2.5" fill="none"/>
+
+  <!-- Right nose -->
+  <path d="M400 250 Q395 270 390 278 Q400 284 420 278 Q415 270 410 250" stroke="#c47a60" stroke-width="2" fill="none"/>
+  <ellipse cx="392" cy="276" rx="8" ry="5" fill="#c47a60" opacity="0.25"/>
+  <ellipse cx="418" cy="276" rx="8" ry="5" fill="#c47a60" opacity="0.25"/>
+
+  <!-- Right lips -->
+  <path d="M380 318 Q405 310 430 318 Q425 333 405 338 Q385 333 380 318Z" fill="#c4706e"/>
+  <path d="M380 318 Q405 322 430 318" stroke="#b05858" stroke-width="1.5" fill="none"/>
+
+  <!-- Right hair -->
+  <path d="M325 250 Q320 180 340 140 Q360 80 405 65 Q450 80 470 140 Q485 180 485 250 Q485 200 470 170 Q455 120 405 108 Q355 120 342 170 Q328 200 325 250Z" fill="#3a2010"/>
+  <!-- Hair sides right person -->
+  <path d="M325 250 Q318 300 322 360 Q335 370 350 360 Q340 310 342 270Z" fill="#3a2010"/>
+  <path d="M485 250 Q492 300 488 360 Q475 370 460 360 Q470 310 468 270Z" fill="#3a2010"/>
+
+  <!-- Right ears -->
+  <ellipse cx="322" cy="280" rx="14" ry="18" fill="#e0a07a"/>
+  <ellipse cx="488" cy="280" rx="14" ry="18" fill="#e0a07a"/>
+
+  <!-- Right body / outfit - nicer color -->
+  <path d="M330 490 Q350 450 405 440 Q460 450 480 490 L495 620 L315 620Z" fill="#9b85c0"/>
+  <!-- Collar -->
+  <path d="M380 440 L405 480 L430 440" stroke="white" stroke-width="2" fill="none"/>
+
+  <!-- ===== Product bottle bottom section ===== -->
+  <!-- Solara Skincare product between panels at bottom -->
+  <rect x="195" y="500" width="150" height="95" rx="12" fill="#e8d8c8"/>
+  <rect x="205" y="490" width="130" height="20" rx="6" fill="#c9a888"/>
+  <!-- Label -->
+  <rect x="202" y="515" width="136" height="65" rx="6" fill="white"/>
+  <rect x="202" y="515" width="136" height="18" rx="4" fill="#7a9a7e"/>
+  <text x="270" y="528" font-family="Arial" font-size="8" font-weight="bold" fill="white" text-anchor="middle">Solara Skincare</text>
+  <text x="270" y="548" font-family="Arial" font-size="7.5" fill="#7a5a3a" text-anchor="middle">MATTE CONTROL</text>
+  <text x="270" y="562" font-family="Arial" font-size="7" fill="#9a7a5a" text-anchor="middle">SERUM</text>
+  <text x="270" y="574" font-family="Arial" font-size="6.5" fill="#bbb" text-anchor="middle">30 ml</text>
+
+  <!-- Divider line center top -->
+  <line x1="270" y1="0" x2="270" y2="620" stroke="#d4a88a" stroke-width="2.5"/>
+
+  <!-- Small shine indicator arrows on left (oily) -->
+  <text x="135" y="165" font-family="Arial" font-size="11" fill="#c9856a" text-anchor="middle" opacity="0.9">✦ oily ✦</text>
+
+  <!-- Small matte text on right -->
+  <text x="405" y="165" font-family="Arial" font-size="11" fill="#7a9a7e" text-anchor="middle" opacity="0.9">✦ matte ✦</text>
+
+</svg>

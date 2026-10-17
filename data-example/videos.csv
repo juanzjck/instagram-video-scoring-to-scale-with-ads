@@ -1,0 +1,11 @@
+video_id,creator_id,campaign_id,media_product_type,posted_at,collected_at,hours_since_post,caption,reach,views,likes,comments,shares,saved,total_interactions,avg_watch_time_ms,skip_rate_pct
+vid_001,cr_01,cmp_101,REELS,2026-08-28T14:10:00Z,2026-09-01T14:10:00Z,96,3 pasos para una piel sin brillo en clima húmedo ☀️ #SolaraSkincare,100000,142000,8200,310,1450,2100,12060,14200,22.5
+vid_002,cr_02,cmp_102,REELS,2026-08-26T09:00:00Z,2026-09-01T09:00:00Z,144,Mi rutina de pierna completa en el gym 🦵 #NitroFuel,86400,91200,940,28,41,63,1072,4100,71.4
+vid_003,cr_03,cmp_103,REELS,2026-08-29T18:30:00Z,2026-09-01T18:30:00Z,72,"Arepa de queso en 6 minutos, sin horno 🧀 #ArepaExpress",41300,58700,3180,214,387,1290,5071,11800,38.9
+vid_004,cr_04,cmp_104,REELS,2026-09-01T03:00:00Z,2026-09-01T12:00:00Z,9,Probé los audífonos más baratos de Volt y esto pasó 🎧 #VoltAudio,7450,9100,612,44,58,131,845,9700,44.2
+vid_005,cr_05,cmp_105,REELS,2026-08-30T11:00:00Z,2026-09-01T11:00:00Z,48,Mi rincón favorito de la casa ✨ #CasaVerde,640,810,71,6,4,19,100,8300,49.0
+vid_006,cr_06,cmp_103,REELS,2026-08-27T20:00:00Z,2026-09-01T20:00:00Z,120,Cuando pides domicilio y llega en 8 minutos 😂 #ArepaExpress,,,14200,890,,,,,
+vid_007,cr_07,cmp_102,REELS,2026-08-28T06:00:00Z,2026-09-01T06:00:00Z,120,El secreto que nadie te cuenta para crecer 🚀 #NitroFuel,12800,96400,13950,1840,12,7,15809,1900,88.6
+vid_008,cr_08,cmp_101,REELS,2026-08-28T16:00:00Z,2026-09-01T16:00:00Z,96,Transformé mi sala con menos de 50 dólares 🛋️ #SolaraSkincare,52900,71400,4120,186,512,903,5721,12600,33.1
+vid_009,cr_09,cmp_106,REELS,2026-08-28T15:00:00Z,2026-09-01T15:00:00Z,96,The 2-minute iced latte that replaced my $7 coffee run ☕ #NorthwindCoffee,84000,121000,7100,265,1180,1890,10435,13600,24.1
+vid_010,cr_10,cmp_106,REELS,2026-08-27T12:00:00Z,2026-09-01T12:00:00Z,120,"Morning routine vlog, nothing special 😴 #NorthwindCoffee",73500,78900,810,22,30,48,910,3800,74.2

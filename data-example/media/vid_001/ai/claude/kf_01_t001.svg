@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960">
+  <!-- Background -->
+  <rect width="540" height="960" fill="#f5f0eb"/>
+  
+  <!-- Soft background gradient / wall -->
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdf6f0"/>
+      <stop offset="100%" stop-color="#ece4db"/>
+    </linearGradient>
+    <linearGradient id="bottleBodyGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c8e6e0"/>
+      <stop offset="40%" stop-color="#e8f7f4"/>
+      <stop offset="100%" stop-color="#a8d5ce"/>
+    </linearGradient>
+    <linearGradient id="bottleCapGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2a6b63"/>
+      <stop offset="50%" stop-color="#3a8b80"/>
+      <stop offset="100%" stop-color="#1e5550"/>
+    </linearGradient>
+    <linearGradient id="labelGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#f0faf8" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f2c5a0"/>
+      <stop offset="100%" stop-color="#e8a87a"/>
+    </linearGradient>
+    <linearGradient id="thumbGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f2c5a0"/>
+      <stop offset="100%" stop-color="#e0a070"/>
+    </linearGradient>
+    <linearGradient id="shadowGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00000000"/>
+      <stop offset="100%" stop-color="#00000022"/>
+    </linearGradient>
+    <radialGradient id="bgBloom" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#fff8f3"/>
+      <stop offset="100%" stop-color="#ece4db"/>
+    </radialGradient>
+    <linearGradient id="nailGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f7b8c8"/>
+      <stop offset="100%" stop-color="#e8a0b5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wall background -->
+  <rect width="540" height="960" fill="url(#bgBloom)"/>
+  
+  <!-- Soft ambient light patch -->
+  <ellipse cx="270" cy="280" rx="220" ry="200" fill="#ffffff" fill-opacity="0.25"/>
+
+  <!-- ===== HAND ===== -->
+  <!-- Palm / hand body coming from bottom -->
+  <!-- Main palm shape -->
+  <path d="M 155 780 Q 130 700 140 600 Q 145 540 160 490 Q 170 455 185 440 Q 200 425 220 430 Q 235 435 240 455 L 245 520 
+           Q 248 480 252 450 Q 258 420 275 415 Q 292 410 300 430 Q 308 448 310 480 L 312 525
+           Q 315 490 320 465 Q 328 440 345 438 Q 362 436 368 458 Q 374 475 373 510 L 372 545
+           Q 378 515 385 498 Q 395 478 410 480 Q 425 482 428 502 Q 432 522 428 560 L 420 600
+           Q 430 570 445 555 Q 458 542 470 548 Q 482 554 482 572 Q 484 595 472 630 L 450 680
+           Q 440 710 420 740 L 390 780 Z"
+        fill="url(#skinGrad)"/>
+  
+  <!-- Palm shadow/depth -->
+  <path d="M 200 780 Q 185 720 190 650 Q 195 590 210 545 Q 220 510 235 490"
+        fill="none" stroke="#d4956a" stroke-width="2" stroke-opacity="0.4"/>
+
+  <!-- Finger 1 (index) -->
+  <path d="M 185 440 Q 178 400 182 360 Q 185 320 192 290 Q 198 265 210 258 Q 222 252 230 262 Q 238 275 238 305 L 240 340 L 245 455"
+        fill="url(#skinGrad)"/>
+  <!-- Index finger nail -->
+  <ellipse cx="210" cy="268" rx="12" ry="9" fill="url(#nailGrad)" opacity="0.85"/>
+  <!-- Index knuckle lines -->
+  <path d="M 196 340 Q 210 335 224 340" fill="none" stroke="#d4956a" stroke-width="1.5" stroke-opacity="0.5"/>
+  <path d="M 194 370 Q 210 365 226 370" fill="none" stroke="#d4956a" stroke-width="1.5" stroke-opacity="0.5"/>
+
+  <!-- Finger 2 (middle) -->
+  <path d="M 275 415 Q 270 375 273 330 Q 275 290 280 262 Q 285 238 295 232 Q 308 226 316 238 Q 322 250 322 280 L 320 330 L 312 480"
+        fill="url(#skinGrad)"/>
+  <!-- Middle nail -->
+  <ellipse cx="296" cy="241" rx="12" ry="9" fill="url(#nailGrad)" opacity="0.85"/>
+  <!-- Knuckle lines -->
+  <path d="M 279 330 Q 296 324 313 330" fill="none" stroke="#d4956a" stroke-width="1.5" stroke-opacity="0.5"/>
+  <path d="M 278 360 Q 296 354 314 360" fill="none" stroke="#d4956a" stroke-width="1.5" stroke-opacity="0.5"/>
+
+  <!-- Finger 3 (ring) -->
+  <path d="M 345 438 Q 342 398 345 358 Q 348 318 353 292 Q 358 268 368 262 Q 380 256 388 268 Q 394 280 393 312 L 390 360 L 373 508"
+        fill="url(#skinGrad)"/>
+  <!-- Ring nail -->
+  <ellipse cx="370" cy="271" rx="12" ry="9" fill="url(#nailGrad)" opacity="0.85"/>
+  <!-- Knuckle lines -->
+  <path d="M 350 360 Q 368 354 386 360" fill="none" stroke="#d4956a" stroke-width="1.5" stroke-opacity="0.5"/>
+
+  <!-- Finger 4 (pinky) -->
+  <path d="M 410 480 Q 412 450 416 420 Q 420 392 426 372 Q 432 350 442 344 Q 454 338 460 350 Q 466 362 464 392 L 458 430 L 450 560"
+        fill="url(#skinGrad)"/>
+  <!-- Pinky nail -->
+  <ellipse cx="452" cy="353" rx="10" ry="8" fill="url(#nailGrad)" opacity="0.85"/>
+  
+  <!-- Thumb -->
+  <path d="M 140 600 Q 105 580 95 550 Q 85 520 98 500 Q 110 480 130 482 Q 148 484 158 505 Q 168 525 165 560 L 160 490"
+        fill="url(#skinGrad)"/>
+  <!-- Thumb nail -->
+  <ellipse cx="112" cy="497" rx="11" ry="8" fill="url(#nailGrad)" opacity="0.85"/>
+
+  <!-- Hand outline / shadow for depth -->
+  <path d="M 155 780 Q 130 700 140 600 Q 145 540 160 490 Q 170 455 185 440 Q 200 425 220 430 Q 235 435 240 455"
+        fill="none" stroke="#c8855a" stroke-width="1.5" stroke-opacity="0.35"/>
+
+  <!-- ===== BOTTLE ===== -->
+  <!-- Bottle shadow on hand/background -->
+  <ellipse cx="272" cy="610" rx="68" ry="14" fill="#00000018"/>
+
+  <!-- Bottle body -->
+  <rect x="192" y="170" width="158" height="430" rx="32" ry="32" fill="url(#bottleBodyGrad)"/>
+  
+  <!-- Bottle highlight (specular) -->
+  <rect x="208" y="190" width="28" height="390" rx="14" fill="#ffffff" fill-opacity="0.35"/>
+  
+  <!-- Bottle edge shadow right -->
+  <rect x="324" y="185" width="26" height="420" rx="13" fill="#000000" fill-opacity="0.08"/>
+
+  <!-- ===== LABEL ===== -->
+  <rect x="205" y="255" width="132" height="250" rx="10" ry="10" fill="url(#labelGrad)" stroke="#3a8b80" stroke-width="1.5"/>
+  
+  <!-- Label decorative botanical line top -->
+  <path d="M 218 275 Q 235 268 252 275 Q 262 278 271 275 Q 280 268 295 275 Q 310 280 325 275"
+        fill="none" stroke="#3a8b80" stroke-width="1" stroke-opacity="0.6"/>
+  
+  <!-- Leaf/botanical motif -->
+  <ellipse cx="271" cy="296" rx="18" ry="10" fill="#3a8b80" fill-opacity="0.15" transform="rotate(-20, 271, 296)"/>
+  <path d="M 258 296 Q 271 284 284 296 Q 271 308 258 296" fill="#3a8b80" fill-opacity="0.3"/>
+  <path d="M 271 284 L 271 308" stroke="#3a8b80" stroke-width="1" stroke-opacity="0.5"/>
+  <!-- Small leaves -->
+  <path d="M 255 288 Q 262 280 268 288" fill="#3a8b80" fill-opacity="0.25"/>
+  <path d="M 287 288 Q 280 280 274 288" fill="#3a8b80" fill-opacity="0.25"/>
+
+  <!-- Brand name on label -->
+  <text x="271" y="328" font-family="Arial" font-size="13.5" font-weight="bold" fill="#2a6b63" text-anchor="middle" letter-spacing="0.5">Solara Skincare</text>
+  
+  <!-- Divider line -->
+  <line x1="218" y1="336" x2="324" y2="336" stroke="#3a8b80" stroke-width="0.8" stroke-opacity="0.5"/>
+  
+  <!-- Product type text -->
+  <text x="271" y="356" font-family="Arial" font-size="9.5" fill="#4a8880" text-anchor="middle" letter-spacing="1">GEL CLEANSER</text>
+  
+  <!-- Volume text -->
+  <text x="271" y="380" font-family="Arial" font-size="8.5" fill="#6aaba4" text-anchor="middle">150 mL / 5.0 fl oz</text>
+
+  <!-- Decorative dots row -->
+  <circle cx="248" cy="398" r="2" fill="#3a8b80" fill-opacity="0.4"/>
+  <circle cx="258" cy="398" r="2" fill="#3a8b80" fill-opacity="0.4"/>
+  <circle cx="268" cy="398" r="2" fill="#3a8b80" fill-opacity="0.4"/>
+  <circle cx="278" cy="398" r="2" fill="#3a8b80" fill-opacity="0.4"/>
+  <circle cx="288" cy="398" r="2" fill="#3a8b80" fill-opacity="0.4"/>
+  <circle cx="298" cy="398" r="2" fill="#3a8b80" fill-opacity="0.4"/>
+
+  <!-- Label decorative botanical line bottom -->
+  <path d="M 218 480 Q 235 487 252 480 Q 262 477 271 480 Q 280 487 295 480 Q 310 475 325 480"
+        fill="none" stroke="#3a8b80" stroke-width="1" stroke-opacity="0.6"/>
+
+  <!-- Bottle pump/cap top -->
+  <rect x="242" y="140" width="58" height="36" rx="10" fill="url(#bottleCapGrad)"/>
+  
+  <!-- Pump nozzle stem -->
+  <rect x="264" y="95" width="14" height="52" rx="7" fill="#2a6b63"/>
+  
+  <!-- Pump head / dispenser -->
+  <rect x="244" y="78" width="62" height="22" rx="11" fill="url(#bottleCapGrad)"/>
+  <!-- Pump head highlight -->
+  <rect x="252" y="82" width="20" height="8" rx="4" fill="#ffffff" fill-opacity="0.25"/>
+
+  <!-- Pump nozzle opening -->
+  <rect x="296" y="84" width="18" height="8" rx="4" fill="#1e5550"/>
+  <ellipse cx="315" cy="88" rx="5" ry="5" fill="#164440"/>
+
+  <!-- Bottle bottom curve shadow -->
+  <ellipse cx="271" cy="598" rx="79" ry="10" fill="#3a8b80" fill-opacity="0.12"/>
+
+  <!-- Gel texture inside bottle (semi-transparent) -->
+  <path d="M 200 450 Q 230 440 270 445 Q 310 448 340 440 L 340 600 Q 340 630 310 632 Q 270 634 232 632 Q 202 630 200 600 Z"
+        fill="#3a8b80" fill-opacity="0.08"/>
+
+</svg>

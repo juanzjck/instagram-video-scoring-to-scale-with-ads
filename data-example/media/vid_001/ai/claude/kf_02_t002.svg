@@ -1,0 +1,311 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960">
+  <!-- Background wall -->
+  <rect width="540" height="960" fill="#f5efe8"/>
+  
+  <!-- Wall gradient for depth -->
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0e8de"/>
+      <stop offset="100%" stop-color="#e8ddd2"/>
+    </linearGradient>
+    <linearGradient id="mirrorGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4eaf5"/>
+      <stop offset="100%" stop-color="#b8d8ed"/>
+    </linearGradient>
+    <linearGradient id="sinkGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d8d0c8"/>
+    </linearGradient>
+    <linearGradient id="counterGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2d8cc"/>
+      <stop offset="100%" stop-color="#c8bfb0"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5c5a0"/>
+      <stop offset="100%" stop-color="#e8a87a"/>
+    </linearGradient>
+    <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2010"/>
+      <stop offset="100%" stop-color="#1a0c04"/>
+    </linearGradient>
+    <linearGradient id="shirtGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a8c8e8"/>
+      <stop offset="100%" stop-color="#7aa8cc"/>
+    </linearGradient>
+    <linearGradient id="bottleGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f8f8f8"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0ddd8"/>
+    </linearGradient>
+    <linearGradient id="mirrorReflGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8f4fa" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#c8e0ee" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="lightGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff8e8"/>
+      <stop offset="100%" stop-color="#f0e4c8"/>
+    </linearGradient>
+    <radialGradient id="foamGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e8f0f8"/>
+    </radialGradient>
+    <linearGradient id="tileGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ddd5ca"/>
+      <stop offset="100%" stop-color="#c8bfb2"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#00000033"/>
+    </filter>
+  </defs>
+
+  <!-- Tiled wall background -->
+  <rect width="540" height="960" fill="url(#wallGrad)"/>
+  
+  <!-- Tile pattern on wall -->
+  <!-- Horizontal tile lines -->
+  <line x1="0" y1="80" x2="540" y2="80" stroke="#ddd0c4" stroke-width="1.5"/>
+  <line x1="0" y1="160" x2="540" y2="160" stroke="#ddd0c4" stroke-width="1.5"/>
+  <line x1="0" y1="240" x2="540" y2="240" stroke="#ddd0c4" stroke-width="1.5"/>
+  <line x1="0" y1="320" x2="540" y2="320" stroke="#ddd0c4" stroke-width="1.5"/>
+  <!-- Vertical tile lines - row 1 -->
+  <line x1="90" y1="0" x2="90" y2="80" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="180" y1="0" x2="180" y2="80" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="270" y1="0" x2="270" y2="80" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="360" y1="0" x2="360" y2="80" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="450" y1="0" x2="450" y2="80" stroke="#ddd0c4" stroke-width="1"/>
+  <!-- Vertical tile lines - row 2 offset -->
+  <line x1="45" y1="80" x2="45" y2="160" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="135" y1="80" x2="135" y2="160" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="225" y1="80" x2="225" y2="160" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="315" y1="80" x2="315" y2="160" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="405" y1="80" x2="405" y2="160" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="495" y1="80" x2="495" y2="160" stroke="#ddd0c4" stroke-width="1"/>
+  <!-- Vertical tile lines - row 3 -->
+  <line x1="90" y1="160" x2="90" y2="240" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="180" y1="160" x2="180" y2="240" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="270" y1="160" x2="270" y2="240" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="360" y1="160" x2="360" y2="240" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="450" y1="160" x2="450" y2="240" stroke="#ddd0c4" stroke-width="1"/>
+  <!-- Vertical tile lines - row 4 offset -->
+  <line x1="45" y1="240" x2="45" y2="320" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="135" y1="240" x2="135" y2="320" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="225" y1="240" x2="225" y2="320" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="315" y1="240" x2="315" y2="320" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="405" y1="240" x2="405" y2="320" stroke="#ddd0c4" stroke-width="1"/>
+  <line x1="495" y1="240" x2="495" y2="320" stroke="#ddd0c4" stroke-width="1"/>
+
+  <!-- Mirror frame -->
+  <rect x="130" y="30" width="280" height="310" rx="6" ry="6" fill="#c8b89a" filter="url(#softShadow)"/>
+  <!-- Mirror glass -->
+  <rect x="138" y="38" width="264" height="294" rx="3" ry="3" fill="url(#mirrorGrad)"/>
+  <!-- Mirror reflection sheen -->
+  <rect x="138" y="38" width="264" height="294" rx="3" ry="3" fill="url(#mirrorReflGrad)"/>
+  <!-- Mirror highlight -->
+  <rect x="142" y="42" width="60" height="280" rx="2" fill="white" opacity="0.12"/>
+
+  <!-- Mirror reflection - person in mirror (faint) -->
+  <!-- Reflected face in mirror -->
+  <ellipse cx="270" cy="160" rx="52" ry="62" fill="#f0b890" opacity="0.6"/>
+  <!-- Reflected hair -->
+  <ellipse cx="270" cy="122" rx="54" ry="42" fill="#2a1808" opacity="0.6"/>
+  <rect x="218" y="122" width="20" height="70" rx="10" fill="#2a1808" opacity="0.6"/>
+  <rect x="302" y="122" width="20" height="70" rx="10" fill="#2a1808" opacity="0.6"/>
+  <!-- Reflected foam on face -->
+  <ellipse cx="260" cy="180" rx="22" ry="14" fill="white" opacity="0.7"/>
+  <ellipse cx="280" cy="172" rx="16" ry="10" fill="white" opacity="0.6"/>
+
+  <!-- Light bar above mirror -->
+  <rect x="130" y="18" width="280" height="18" rx="4" fill="url(#lightGrad)" filter="url(#softShadow)"/>
+  <!-- Light glow -->
+  <ellipse cx="270" cy="27" rx="130" ry="20" fill="#fff8e0" opacity="0.4"/>
+
+  <!-- Counter / vanity -->
+  <rect x="0" y="470" width="540" height="200" fill="url(#counterGrad)" filter="url(#softShadow)"/>
+  <!-- Counter edge highlight -->
+  <rect x="0" y="470" width="540" height="8" fill="#ede4d8"/>
+  <!-- Counter surface shadow -->
+  <rect x="0" y="468" width="540" height="4" fill="#b8afa0" opacity="0.4"/>
+
+  <!-- Under-cabinet shadow -->
+  <rect x="0" y="670" width="540" height="290" fill="#c0b5a8"/>
+  <!-- Cabinet doors -->
+  <rect x="0" y="670" width="268" height="290" fill="#d8cfc4"/>
+  <rect x="272" y="670" width="268" height="290" fill="#d8cfc4"/>
+  <line x1="0" y1="670" x2="540" y2="670" stroke="#b0a898" stroke-width="2"/>
+  <line x1="270" y1="670" x2="270" y2="960" stroke="#b0a898" stroke-width="2"/>
+  <!-- Cabinet handles -->
+  <rect x="238" y="780" width="28" height="6" rx="3" fill="#b0a090"/>
+  <rect x="274" y="780" width="28" height="6" rx="3" fill="#b0a090"/>
+
+  <!-- Sink basin -->
+  <ellipse cx="270" cy="520" rx="155" ry="60" fill="url(#sinkGrad)" filter="url(#softShadow)"/>
+  <!-- Sink bowl interior -->
+  <ellipse cx="270" cy="526" rx="138" ry="48" fill="#e8e0d8"/>
+  <ellipse cx="270" cy="530" rx="120" ry="38" fill="#f5f2ee"/>
+  <!-- Drain -->
+  <ellipse cx="270" cy="545" rx="18" ry="8" fill="#c8c0b8"/>
+  <ellipse cx="270" cy="545" rx="12" ry="5" fill="#a8a0a0"/>
+  <!-- Sink water reflection -->
+  <ellipse cx="255" cy="522" rx="60" ry="18" fill="white" opacity="0.3"/>
+
+  <!-- Faucet -->
+  <rect x="250" y="455" width="40" height="18" rx="5" fill="#d0d0d0"/>
+  <!-- Faucet neck -->
+  <rect x="262" y="435" width="16" height="26" rx="6" fill="#c8c8c8"/>
+  <!-- Faucet spout -->
+  <path d="M270 435 Q310 430 318 455" stroke="#c8c8c8" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <!-- Water stream -->
+  <path d="M316 458 Q320 480 318 510 Q316 525 314 535" stroke="#b8d8f0" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <!-- Water splash -->
+  <ellipse cx="315" cy="538" rx="10" ry="4" fill="#c8e4f5" opacity="0.6"/>
+  <!-- Hot/cold handles -->
+  <ellipse cx="240" cy="463" rx="12" ry="9" fill="#e0e0e0"/>
+  <ellipse cx="300" cy="463" rx="12" ry="9" fill="#e0e0e0"/>
+
+  <!-- Solara Skincare product bottle on counter -->
+  <!-- Bottle body -->
+  <rect x="420" y="440" width="54" height="88" rx="10" ry="10" fill="url(#bottleGrad)" filter="url(#softShadow)"/>
+  <!-- Bottle pump top -->
+  <rect x="438" y="418" width="18" height="26" rx="4" fill="#d0d0d0"/>
+  <rect x="444" y="410" width="6" height="14" rx="3" fill="#b8b8b8"/>
+  <!-- Pump head -->
+  <ellipse cx="447" cy="410" rx="12" ry="6" fill="#c8c8c8"/>
+  <!-- Bottle label -->
+  <rect x="424" y="460" width="46" height="52" rx="4" fill="#f2e8e0"/>
+  <!-- Brand name on bottle -->
+  <text x="447" y="479" font-family="Arial" font-size="5.5" font-weight="bold" fill="#7a4a28" text-anchor="middle">Solara</text>
+  <text x="447" y="488" font-family="Arial" font-size="5.5" font-weight="bold" fill="#7a4a28" text-anchor="middle">Skincare</text>
+  <!-- Small decorative line -->
+  <line x1="428" y1="493" x2="466" y2="493" stroke="#c0a080" stroke-width="0.8"/>
+  <text x="447" y="503" font-family="Arial" font-size="4" fill="#9a7a60" text-anchor="middle">Gentle Cleanser</text>
+  <!-- Bottle highlight -->
+  <rect x="425" y="442" width="10" height="70" rx="4" fill="white" opacity="0.35"/>
+
+  <!-- Small soap dish / second product -->
+  <ellipse cx="100" cy="488" rx="42" ry="16" fill="#e8e0d8"/>
+  <ellipse cx="100" cy="484" rx="38" ry="12" fill="#f5efe8"/>
+  <!-- Bar of soap -->
+  <rect x="72" y="475" width="56" height="20" rx="8" fill="#f0d8c8"/>
+  <!-- Soap foam on soap -->
+  <ellipse cx="95" cy="474" rx="14" ry="5" fill="white" opacity="0.7"/>
+
+  <!-- Person's body / torso -->
+  <!-- Shirt -->
+  <path d="M120 620 Q160 590 270 582 Q380 590 420 620 L430 700 L110 700 Z" fill="url(#shirtGrad)"/>
+  <!-- Shirt collar -->
+  <path d="M230 582 Q270 570 310 582 Q295 600 270 608 Q245 600 230 582 Z" fill="#9ab8d8"/>
+  
+  <!-- Neck -->
+  <rect x="248" y="530" width="44" height="60" rx="10" fill="url(#skinGrad)"/>
+  
+  <!-- Head -->
+  <ellipse cx="270" cy="480" rx="78" ry="88" fill="url(#skinGrad)"/>
+  
+  <!-- Hair - long dark hair -->
+  <!-- Back hair -->
+  <path d="M195 450 Q180 380 190 300 Q200 250 270 235 Q340 250 350 300 Q360 380 345 450" fill="url(#hairGrad)" opacity="0.95"/>
+  <!-- Hair sides flowing down -->
+  <path d="M192 460 Q172 500 170 570 Q168 610 180 650 Q200 630 210 600 Q215 560 220 520 Q210 490 205 470 Z" fill="#2a1808"/>
+  <path d="M348 460 Q368 500 370 570 Q372 610 360 650 Q340 630 330 600 Q325 560 320 520 Q330 490 335 470 Z" fill="#2a1808"/>
+  <!-- Top hair -->
+  <ellipse cx="270" cy="398" rx="80" ry="62" fill="#2a1808"/>
+  <!-- Hair parting highlight -->
+  <path d="M260 398 Q265 380 270 370" stroke="#3a2818" stroke-width="3" fill="none"/>
+
+  <!-- Face features -->
+  <!-- Eyebrows -->
+  <path d="M228 440 Q242 432 256 436" stroke="#2a1808" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M284 436 Q298 432 312 440" stroke="#2a1808" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Eyes - looking down at sink -->
+  <!-- Left eye -->
+  <ellipse cx="242" cy="455" rx="16" ry="10" fill="white"/>
+  <ellipse cx="244" cy="458" rx="9" ry="8" fill="#4a3020"/>
+  <ellipse cx="244" cy="458" rx="5" ry="5" fill="#1a0c08"/>
+  <ellipse cx="248" cy="454" rx="2" ry="2" fill="white"/>
+  <!-- Eye lid (looking down) -->
+  <path d="M226 455 Q242 448 258 455" stroke="#d0a070" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Eyelashes left -->
+  <path d="M226 455 Q224 451 226 448" stroke="#1a1008" stroke-width="1.5" fill="none"/>
+  <path d="M258 455 Q260 451 258 448" stroke="#1a1008" stroke-width="1.5" fill="none"/>
+  
+  <!-- Right eye -->
+  <ellipse cx="298" cy="455" rx="16" ry="10" fill="white"/>
+  <ellipse cx="296" cy="458" rx="9" ry="8" fill="#4a3020"/>
+  <ellipse cx="296" cy="458" rx="5" ry="5" fill="#1a0c08"/>
+  <ellipse cx="300" cy="454" rx="2" ry="2" fill="white"/>
+  <!-- Eye lid (looking down) -->
+  <path d="M282 455 Q298 448 314 455" stroke="#d0a070" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M282 455 Q280 451 282 448" stroke="#1a1008" stroke-width="1.5" fill="none"/>
+  <path d="M314 455 Q316 451 314 448" stroke="#1a1008" stroke-width="1.5" fill="none"/>
+
+  <!-- Nose -->
+  <path d="M262 462 Q258 480 256 490 Q263 496 270 496 Q277 496 284 490 Q282 480 278 462" stroke="#d09060" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="258" cy="491" rx="6" ry="4" fill="#e8a070" opacity="0.4"/>
+  <ellipse cx="282" cy="491" rx="6" ry="4" fill="#e8a070" opacity="0.4"/>
+
+  <!-- Mouth / lips - slight smile -->
+  <path d="M250 508 Q262 516 270 516 Q278 516 290 508" stroke="#c07050" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Lip volume -->
+  <path d="M250 508 Q270 504 290 508" stroke="#d88060" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Cheek blush / cleanser foam on cheeks -->
+  <ellipse cx="230" cy="490" rx="20" ry="14" fill="#f0f5ff" opacity="0.65"/>
+  <ellipse cx="310" cy="490" rx="20" ry="14" fill="#f0f5ff" opacity="0.65"/>
+  <!-- More foam blobs on face -->
+  <ellipse cx="245" cy="475" rx="12" ry="8" fill="white" opacity="0.75"/>
+  <ellipse cx="295" cy="478" rx="14" ry="9" fill="white" opacity="0.7"/>
+  <ellipse cx="268" cy="500" rx="10" ry="6" fill="white" opacity="0.6"/>
+  <!-- Foam bubble details -->
+  <circle cx="240" cy="471" r="5" fill="white" opacity="0.8"/>
+  <circle cx="252" cy="468" r="3.5" fill="white" opacity="0.7"/>
+  <circle cx="295" cy="472" r="4" fill="white" opacity="0.75"/>
+  <circle cx="308" cy="482" r="5" fill="white" opacity="0.7"/>
+  <circle cx="262" cy="496" r="4" fill="white" opacity="0.65"/>
+
+  <!-- Left arm / hand applying cleanser -->
+  <!-- Left forearm -->
+  <path d="M120 620 Q100 580 130 540 Q148 510 168 530 Q155 560 160 600 Q140 612 120 620 Z" fill="url(#skinGrad)"/>
+  <!-- Left hand with foam -->
+  <ellipse cx="165" cy="528" rx="30" ry="22" fill="#f0b890"/>
+  <!-- Fingers left hand -->
+  <rect x="145" y="505" width="12" height="28" rx="6" fill="#f0b890"/>
+  <rect x="158" y="500" width="12" height="32" rx="6" fill="#f0b890"/>
+  <rect x="171" y="498" width="12" height="32" rx="6" fill="#f0b890"/>
+  <rect x="184" y="502" width="12" height="28" rx="6" fill="#f0b890"/>
+  <!-- Thumb left -->
+  <ellipse cx="142" cy="530" rx="9" ry="15" fill="#f0b890" transform="rotate(-20,142,530)"/>
+  <!-- Foam on left hand -->
+  <ellipse cx="165" cy="508" rx="24" ry="14" fill="white" opacity="0.8"/>
+  <circle cx="155" cy="502" r="7" fill="white" opacity="0.75"/>
+  <circle cx="170" cy="498" r="8" fill="white" opacity="0.7"/>
+  <circle cx="183" cy="504" r="6" fill="white" opacity="0.75"/>
+  
+  <!-- Right arm / hand on face applying cleanser -->
+  <!-- Right forearm -->
+  <path d="M420 620 Q440 580 410 540 Q392 510 372 530 Q385 560 380 600 Q400 612 420 620 Z" fill="url(#skinGrad)"/>
+  <!-- Right hand on cheek -->
+  <ellipse cx="335" cy="495" rx="32" ry="24" fill="#f0b890" opacity="0.9"/>
+  <!-- Fingers right hand -->
+  <rect x="348" y="470" width="12" height="32" rx="6" fill="#f0b890"/>
+  <rect x="336" y="466" width="12" height="32" rx="6" fill="#f0b890"/>
+  <rect x="323" y="470" width="12" height="30" rx="6" fill="#f0b890"/>
+  <rect x="312" y="476" width="11" height="26" rx="6" fill="#f0b890"/>
+  <!-- Thumb right -->
+  <ellipse cx="362" cy="507" rx="9" ry="14" fill="#f0b890" transform="rotate(15,362,507)"/>
+  <!-- Foam on right hand / face contact -->
+  <ellipse cx="333" cy="482" rx="22" ry="12" fill="white" opacity="0.75"/>
+  <circle cx="322" cy="476" r="6" fill="white" opacity="0.7"/>
+  <circle cx="338" cy="470" r="7" fill="white" opacity="0.8"/>
+  <circle cx="352" cy="475" r="5" fill="white" opacity="0.7"/>
+
+  <!-- Lighting effect - overhead light glow -->
+  <ellipse cx="270" cy="50" rx="200" ry="80" fill="white" opacity="0.15"/>
+  
+  <!-- Subtle shadow under chin/neck -->
+  <ellipse cx="270" cy="535" rx="42" ry="12" fill="#c8a070" opacity="0.25"/>
+  
+  <!-- Counter shadow -->
+  <rect x="0" y="470" width="540" height="20" fill="#a8a098" opacity="0.2"/>
+
+</svg>

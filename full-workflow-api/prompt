@@ -1,0 +1,22 @@
+<goal>
+We need to build a api (with a ui version) we can use python, but if there are another and better oiption highligh before continue;
+The api should contain the follow pipeli
+</goal>
+<pipeline>
+1.- Ingest. Load the existing CSVs plus each video's media folder. (use as example those mock datasets that are in /data-example)
+2.- Preprocess the media. Pull out keyframes (every second for the first 3 seconds, then every 3 seconds). Turn the audio into a timestamped transcript (use claude if it has this tool). Read on-screen text from the frames.
+3.- Visual analysis. A vision model (Claude, using images) looks at the keyframes and returns structured content features as JSON: how strong the hook is, when the product first appears, whether the content matches the brand, whether there's a call to action, and any safety problems.
+4.- Merge. Add a 7th section, "CONTENT FEATURES", to the flatten() output, next to the engagement metrics. If a feature is blank, show it as "not available", the same rule your notebook already uses for metrics.
+6.- core. A new prompt, P6, is P5 plus that content section. Its reasons must cite timestamps or frames. Your rules stay in charge: a video under 48 hours old or with missing metrics still goes to DEFER, whatever the visuals look like.
+7.- Injection guard. Treat the transcript and on-screen text as untrusted data, just like comments.
+8.- Multimedia output: the review card. Video player, keyframe strip with the AI's notes, score with its confidence range, engagement chart, the transcript as captions (accessibility) and an optional spoken summary (TTS).
+9 .- Human decision. Scale, don't scale or override, with the decision logged.
+Evaluate. Compare text-only P5 with multimodal P6 against ground truth, and time how long a reviewer takes to decide with and without the card.
+10.- Campaign recap video (per campaign, generated when the campaign ends). Build a ~45-second mp4 for the brand:
+   a. Select clips: the top-scored video plus one instructive "do not scale" example, cut at the timestamps the AI cited in step 6.
+   b. Script: Claude writes the narration from the scores and reasons, using only numbers present in the data (same rule as P5).
+   c. Voice: text-to-speech reads the script.
+   d. Overlays: score badges, verdict labels and a reach/save-rate chart image.
+   e. Assemble with ffmpeg: clips + overlays + voice + burned-in captions (also export a .vtt file).
+   For the prototype, generate one recap for cmp_101 (Solara Skincare), using the synthetic keyframes as clips.
+</pipeline>

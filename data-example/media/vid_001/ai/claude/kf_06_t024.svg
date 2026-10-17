@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960">
+  <!-- Background wall -->
+  <rect width="540" height="960" fill="#f5ede4"/>
+  
+  <!-- Wall gradient for depth -->
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ede0d4"/>
+      <stop offset="100%" stop-color="#f9f2ed"/>
+    </linearGradient>
+    <linearGradient id="counterGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4c5b5"/>
+      <stop offset="100%" stop-color="#b8a898"/>
+    </linearGradient>
+    <linearGradient id="bottle1Grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c8a882"/>
+      <stop offset="100%" stop-color="#e8ccaa"/>
+    </linearGradient>
+    <linearGradient id="bottle2Grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8fb8c8"/>
+      <stop offset="100%" stop-color="#b8d8e8"/>
+    </linearGradient>
+    <linearGradient id="bottle3Grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c4a8c8"/>
+      <stop offset="100%" stop-color="#e0c8e4"/>
+    </linearGradient>
+    <linearGradient id="capGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d8d0cc"/>
+    </linearGradient>
+    <linearGradient id="shadowGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00000033"/>
+      <stop offset="100%" stop-color="#00000000"/>
+    </linearGradient>
+    <linearGradient id="counterTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8dcd0"/>
+      <stop offset="100%" stop-color="#cfc0b0"/>
+    </linearGradient>
+    <linearGradient id="trayGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0e8e0"/>
+      <stop offset="100%" stop-color="#d8cdc4"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#00000025"/>
+    </filter>
+  </defs>
+
+  <!-- Wall -->
+  <rect width="540" height="960" fill="url(#wallGrad)"/>
+  
+  <!-- Subtle wall texture lines -->
+  <line x1="0" y1="200" x2="540" y2="200" stroke="#e0d0c5" stroke-width="1" opacity="0.5"/>
+  
+  <!-- Decorative shelf bracket shadow -->
+  <ellipse cx="270" cy="598" rx="260" ry="12" fill="#00000018"/>
+
+  <!-- Counter surface -->
+  <rect x="0" y="580" width="540" height="60" fill="url(#counterTop)"/>
+  <rect x="0" y="638" width="540" height="322" fill="url(#counterGrad)"/>
+  
+  <!-- Counter front edge highlight -->
+  <rect x="0" y="580" width="540" height="4" fill="#ede4dc"/>
+  
+  <!-- Marble-like veins on counter -->
+  <path d="M60 600 Q150 595 200 605 Q280 615 350 600" stroke="#c8bab0" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M300 590 Q380 585 450 595" stroke="#c8bab0" stroke-width="1" fill="none" opacity="0.4"/>
+
+  <!-- Decorative tray/plate under products -->
+  <ellipse cx="270" cy="580" rx="220" ry="16" fill="url(#trayGrad)" stroke="#c8bab0" stroke-width="1.5"/>
+  <ellipse cx="270" cy="578" rx="218" ry="14" fill="none" stroke="#e8ddd5" stroke-width="1" opacity="0.8"/>
+
+  <!-- ============ PRODUCT 1 - Left: Serum bottle (amber/warm) ============ -->
+  <!-- Bottle shadow -->
+  <ellipse cx="130" cy="582" rx="38" ry="8" fill="#00000020"/>
+  
+  <!-- Bottle body -->
+  <rect x="100" y="340" width="60" height="240" rx="10" fill="url(#bottle1Grad)" filter="url(#softShadow)"/>
+  
+  <!-- Bottle highlight -->
+  <rect x="108" y="350" width="14" height="200" rx="5" fill="#ffffff40"/>
+  
+  <!-- Bottle neck -->
+  <rect x="112" y="300" width="36" height="50" rx="6" fill="#d4a870"/>
+  <rect x="118" y="300" width="10" height="40" rx="3" fill="#e8c090" opacity="0.6"/>
+  
+  <!-- Cap -->
+  <rect x="108" y="270" width="44" height="38" rx="8" fill="url(#capGrad)"/>
+  <rect x="112" y="274" width="36" height="10" rx="3" fill="#ffffff80"/>
+  
+  <!-- Label background on bottle 1 -->
+  <rect x="104" y="390" width="52" height="130" rx="4" fill="#fff8f0" opacity="0.95"/>
+  <rect x="106" y="392" width="48" height="126" rx="3" fill="none" stroke="#c8a070" stroke-width="1"/>
+  
+  <!-- Solara Skincare text on bottle 1 -->
+  <text x="130" y="418" text-anchor="middle" font-family="Arial" font-size="6" font-weight="bold" fill="#8b5a2b">Solara</text>
+  <text x="130" y="428" text-anchor="middle" font-family="Arial" font-size="6" font-weight="bold" fill="#8b5a2b">Skincare</text>
+  <line x1="110" y1="433" x2="150" y2="433" stroke="#c8a070" stroke-width="0.5"/>
+  <text x="130" y="445" text-anchor="middle" font-family="Arial" font-size="5" fill="#a0784a">VITAMIN C</text>
+  <text x="130" y="455" text-anchor="middle" font-family="Arial" font-size="5" fill="#a0784a">SERUM</text>
+  <!-- Small decorative sun icon -->
+  <circle cx="130" cy="468" r="5" fill="none" stroke="#c8a070" stroke-width="1"/>
+  <line x1="130" y1="461" x2="130" y2="459" stroke="#c8a070" stroke-width="1"/>
+  <line x1="130" y1="475" x2="130" y2="477" stroke="#c8a070" stroke-width="1"/>
+  <line x1="123" y1="468" x2="121" y2="468" stroke="#c8a070" stroke-width="1"/>
+  <line x1="137" y1="468" x2="139" y2="468" stroke="#c8a070" stroke-width="1"/>
+  <text x="130" y="502" text-anchor="middle" font-family="Arial" font-size="4.5" fill="#b89070">30ml</text>
+
+  <!-- ============ PRODUCT 2 - Center: Moisturizer jar (blue) ============ -->
+  <!-- Jar shadow -->
+  <ellipse cx="270" cy="584" rx="52" ry="10" fill="#00000025"/>
+  
+  <!-- Jar body - wide flat jar -->
+  <rect x="218" y="430" width="104" height="155" rx="12" fill="url(#bottle2Grad)" filter="url(#softShadow)"/>
+  
+  <!-- Jar highlight -->
+  <rect x="226" y="438" width="22" height="130" rx="6" fill="#ffffff35"/>
+  
+  <!-- Jar lid -->
+  <rect x="214" y="395" width="112" height="45" rx="10" fill="#78a8c0"/>
+  <rect x="218" y="398" width="104" height="20" rx="6" fill="#a8d0e0" opacity="0.6"/>
+  <rect x="222" y="400" width="30" height="8" rx="3" fill="#ffffff50"/>
+  
+  <!-- Label on jar -->
+  <rect x="222" y="445" width="96" height="120" rx="6" fill="#eef6fa" opacity="0.95"/>
+  <rect x="224" y="447" width="92" height="116" rx="5" fill="none" stroke="#78a8c0" stroke-width="1"/>
+  
+  <!-- Solara Skincare text on center jar -->
+  <text x="270" y="475" text-anchor="middle" font-family="Arial" font-size="7.5" font-weight="bold" fill="#2a6a8a">Solara</text>
+  <text x="270" y="487" text-anchor="middle" font-family="Arial" font-size="7.5" font-weight="bold" fill="#2a6a8a">Skincare</text>
+  <line x1="228" y1="492" x2="312" y2="492" stroke="#78a8c0" stroke-width="0.8"/>
+  <text x="270" y="506" text-anchor="middle" font-family="Arial" font-size="6" fill="#4a90a8">DEEP HYDRATION</text>
+  <text x="270" y="518" text-anchor="middle" font-family="Arial" font-size="6" fill="#4a90a8">MOISTURIZER</text>
+  <!-- Water drop icons -->
+  <path d="M258 530 Q258 525 262 528 Q258 534 258 530Z" fill="#78a8c0"/>
+  <path d="M268 530 Q268 525 272 528 Q268 534 268 530Z" fill="#78a8c0"/>
+  <path d="M278 530 Q278 525 282 528 Q278 534 278 530Z" fill="#78a8c0"/>
+  <text x="270" y="548" text-anchor="middle" font-family="Arial" font-size="5" fill="#6898b0">50ml</text>
+
+  <!-- ============ PRODUCT 3 - Right: Face oil (purple) ============ -->
+  <!-- Dropper bottle shadow -->
+  <ellipse cx="415" cy="582" rx="38" ry="8" fill="#00000020"/>
+  
+  <!-- Bottle body - tall slim -->
+  <rect x="388" y="350" width="54" height="232" rx="9" fill="url(#bottle3Grad)" filter="url(#softShadow)"/>
+  
+  <!-- Bottle highlight -->
+  <rect x="395" y="360" width="12" height="195" rx="4" fill="#ffffff38"/>
+  
+  <!-- Dropper neck -->
+  <rect x="400" y="308" width="30" height="50" rx="5" fill="#b898c0"/>
+  <rect x="405" y="310" width="8" height="38" rx="3" fill="#d4b8d8" opacity="0.6"/>
+  
+  <!-- Dropper bulb -->
+  <ellipse cx="415" cy="298" rx="18" ry="22" fill="#8a6a90"/>
+  <ellipse cx="411" cy="290" rx="7" ry="8" fill="#b898c0" opacity="0.6"/>
+  
+  <!-- Label on bottle 3 -->
+  <rect x="391" y="375" width="48" height="152" rx="4" fill="#faf5fc" opacity="0.95"/>
+  <rect x="393" y="377" width="44" height="148" rx="3" fill="none" stroke="#9870a0" stroke-width="1"/>
+  
+  <!-- Solara Skincare text on bottle 3 -->
+  <text x="415" y="402" text-anchor="middle" font-family="Arial" font-size="6" font-weight="bold" fill="#6a3a7a">Solara</text>
+  <text x="415" y="412" text-anchor="middle" font-family="Arial" font-size="6" font-weight="bold" fill="#6a3a7a">Skincare</text>
+  <line x1="396" y1="417" x2="434" y2="417" stroke="#9870a0" stroke-width="0.5"/>
+  <text x="415" y="430" text-anchor="middle" font-family="Arial" font-size="5" fill="#8855a0">ROSEHIP</text>
+  <text x="415" y="440" text-anchor="middle" font-family="Arial" font-size="5" fill="#8855a0">FACE OIL</text>
+  <!-- Flower/leaf decoration -->
+  <path d="M415 455 Q418 449 422 453 Q418 460 415 455Z" fill="#9870a0" opacity="0.7"/>
+  <path d="M415 455 Q412 449 408 453 Q412 460 415 455Z" fill="#9870a0" opacity="0.7"/>
+  <path d="M415 455 Q421 455 420 460 Q415 462 415 455Z" fill="#9870a0" opacity="0.7"/>
+  <path d="M415 455 Q409 455 410 460 Q415 462 415 455Z" fill="#9870a0" opacity="0.7"/>
+  <circle cx="415" cy="455" r="3" fill="#c898d0"/>
+  <text x="415" y="490" text-anchor="middle" font-family="Arial" font-size="5" fill="#9870a0">PURE &amp; ORGANIC</text>
+  <text x="415" y="502" text-anchor="middle" font-family="Arial" font-size="5" fill="#9870a0">30ml</text>
+  
+  <!-- Decorative botanical sprig on counter left -->
+  <path d="M40 560 Q50 530 55 510" stroke="#b0c8a0" stroke-width="2" fill="none"/>
+  <ellipse cx="48" cy="535" rx="10" ry="6" fill="#90b880" transform="rotate(-30 48 535)"/>
+  <ellipse cx="56" cy="518" rx="9" ry="5" fill="#a0c890" transform="rotate(20 56 518)"/>
+  <ellipse cx="52" cy="505" rx="8" ry="5" fill="#90b880" transform="rotate(-10 52 505)"/>
+
+  <!-- Decorative botanical sprig on counter right -->
+  <path d="M500 558 Q490 528 487 508" stroke="#b0c8a0" stroke-width="2" fill="none"/>
+  <ellipse cx="494" cy="533" rx="10" ry="6" fill="#a0c890" transform="rotate(30 494 533)"/>
+  <ellipse cx="487" cy="516" rx="9" ry="5" fill="#90b880" transform="rotate(-20 487 516)"/>
+  <ellipse cx="489" cy="503" rx="8" ry="5" fill="#a0c890" transform="rotate(10 489 503)"/>
+
+  <!-- Small decorative pebble/stone accents -->
+  <ellipse cx="78" cy="576" rx="14" ry="8" fill="#d4c8bc"/>
+  <ellipse cx="76" cy="574" rx="10" ry="5" fill="#ddd0c8" opacity="0.7"/>
+  
+  <ellipse cx="462" cy="576" rx="12" ry="7" fill="#c8bab0"/>
+  <ellipse cx="460" cy="574" rx="8" ry="4" fill="#d4c8c0" opacity="0.7"/>
+
+  <!-- Soft ambient light/glow behind products -->
+  <ellipse cx="270" cy="450" rx="200" ry="180" fill="#ffffff" opacity="0.08"/>
+  
+  <!-- Counter front face -->
+  <rect x="0" y="640" width="540" height="320" fill="#c0b0a0"/>
+  <rect x="0" y="640" width="540" height="3" fill="#a89888"/>
+  
+  <!-- Counter panel lines -->
+  <line x1="135" y1="645" x2="135" y2="900" stroke="#b0a090" stroke-width="1" opacity="0.5"/>
+  <line x1="270" y1="645" x2="270" y2="900" stroke="#b0a090" stroke-width="1" opacity="0.5"/>
+  <line x1="405" y1="645" x2="405" y2="900" stroke="#b0a090" stroke-width="1" opacity="0.5"/>
+</svg>
