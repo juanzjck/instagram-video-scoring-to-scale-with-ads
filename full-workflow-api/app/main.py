@@ -7,7 +7,7 @@ import json
 from datetime import datetime, timezone
 from typing import Literal, Optional
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -29,6 +29,15 @@ class Decision(BaseModel):
     elapsed_ms: Optional[int] = Field(default=None, ge=0)
 
 
+class GroundTruthRows(BaseModel):
+    rows: list[dict[str, Optional[str | int | float]]]   # one per video: video_id + the result columns
+
+
+class ManualReviewRows(BaseModel):
+    reviewer: str
+    rows: list[dict[str, Optional[str | int | float]]]   # one per video: video_id + decision, reason, minutes_spent
+
+
 class VideoUrl(BaseModel):
     url: str = ""                                   # blank clears it
 
@@ -38,8 +47,9 @@ class StartJob(BaseModel):
     urls: dict[str, str] = Field(default_factory=dict)   # video_id -> URL, saved before the run
 
 
-class UseDataset(BaseModel):
-    id: Optional[str] = None                        # None = the example dataset
+class DatasetForm(BaseModel):
+    tables: dict[str, list[dict[str, Optional[str | int | float]]]]   # file name -> rows from the form
+    name: Optional[str] = None                      # the session's name
 
 
 def _check(video_id):
@@ -69,29 +79,174 @@ def get_dataset():
     return dataset.describe()
 
 
+@app.get("/api/dataset/schema")
+def get_schema():
+    """The form's tables and columns, mirroring data-template/ (answer keys excluded)."""
+    return dataset.schema()
+
+
 @app.post("/api/dataset")
-def upload_dataset(files: list[UploadFile] = File(...)):
-    """Upload the dataset CSVs. They become the active dataset, with their own runs/ folder."""
+def create_dataset(body: DatasetForm):
+    """Build a dataset from the form rows. It becomes the active dataset, with a fresh runs/ folder."""
     _not_while_running()
-    blobs = []
-    for f in files:
-        data = f.file.read(dataset.MAX_FILE_BYTES + 1)
-        if len(data) > dataset.MAX_FILE_BYTES:
-            raise HTTPException(413, f"{f.filename} is larger than {dataset.MAX_FILE_BYTES // 2**20} MB")
-        blobs.append((f.filename, data))
     try:
-        return dataset.save(blobs)
+        return dataset.create(body.tables, body.name)
+    except dataset.DatasetError as e:
+        raise HTTPException(422, {"message": str(e), "errors": e.errors}) from e
+
+
+@app.post("/api/dataset/reset")
+def reset_dataset():
+    """New session: close the open one (it stays saved) and start from an empty form."""
+    _not_while_running()
+    return dataset.reset()
+
+
+@app.get("/api/sessions")
+def list_sessions():
+    """Saved sessions, most recently changed first."""
+    return dataset.list_sessions()
+
+
+@app.get("/api/session")
+def get_session():
+    """The open session's memory (name, timestamps, form rows), or null."""
+    return dataset.current_session()
+
+
+@app.api_route("/api/session", methods=["PUT", "POST"])
+def save_session(body: DatasetForm):
+    """Autosave the form. Opens a new session when none is open. POST is for sendBeacon on page close."""
+    if dataset.current_session() is None:
+        _not_while_running()
+    return dataset.save_draft(body.tables, body.name)
+
+
+@app.post("/api/sessions/{session_id}/copy")
+def copy_session(session_id: str):
+    """Duplicate a saved session, results included. The open session stays open."""
+    _not_while_running()
+    try:
+        return dataset.copy_session(session_id)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from e
+
+
+@app.delete("/api/sessions/{session_id}")
+def delete_session(session_id: str):
+    """Delete a saved session and everything in its folder. Closes it if it is open."""
+    _not_while_running()
+    try:
+        return dataset.delete_session(session_id)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from e
+
+
+@app.post("/api/sessions/{session_id}/open")
+def open_session(session_id: str):
+    _not_while_running()
+    try:
+        return dataset.open_session(session_id)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from e
+
+
+def _read_upload(f, limit):
+    data = f.file.read(limit + 1)
+    if len(data) > limit:
+        raise HTTPException(413, f"{f.filename} is larger than {limit // 2**20} MB")
+    return f.filename, data
+
+
+def _gt(call):
+    try:
+        return call()
+    except dataset.GroundTruthLocked as e:
+        raise HTTPException(409, str(e)) from e
+    except dataset.DatasetError as e:
+        raise HTTPException(422, {"message": str(e), "errors": e.errors}) from e
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from e
+
+
+@app.get("/api/ground-truth")
+def get_ground_truth():
+    """The open campaign's real results per video: draft, or locked with its SHA-256."""
+    return _gt(dataset.ground_truth)
+
+
+@app.put("/api/ground-truth")
+def save_ground_truth(body: GroundTruthRows):
+    """Autosave the draft. Refused (409) once locked."""
+    return _gt(lambda: dataset.save_ground_truth_draft(body.rows))
+
+
+@app.post("/api/ground-truth/lock")
+def lock_ground_truth(body: GroundTruthRows):
+    """Write ground_truth.csv and lock it for good. Evaluation measures against it."""
+    return _gt(lambda: dataset.lock_ground_truth(body.rows))
+
+
+@app.get("/api/manual-review")
+def get_manual_review(reviewer: str):
+    """One reviewer's blind sheet: each video's videos.csv signals (no AI output) and their decisions."""
+    return _gt(lambda: dataset.manual_review(reviewer))
+
+
+@app.get("/api/reviews")
+def get_reviews():
+    """Every reviewer of the open campaign, with their submitted decisions per video."""
+    return _gt(dataset.reviews)
+
+
+@app.delete("/api/manual-review")
+def delete_manual_review(reviewer: str):
+    """Delete one reviewer's sheet (draft or submitted); manual_review.csv is rewritten without it."""
+    return _gt(lambda: dataset.delete_manual_review(reviewer))
+
+
+@app.put("/api/manual-review")
+def save_manual_review(body: ManualReviewRows):
+    """Autosave the reviewer's draft. Refused (409) once submitted."""
+    return _gt(lambda: dataset.save_manual_review_draft(body.reviewer, body.rows))
+
+
+@app.post("/api/manual-review/submit")
+def submit_manual_review(body: ManualReviewRows):
+    """Freeze the reviewer's sheet and rewrite manual_review.csv. Evaluation compares it with the AI."""
+    return _gt(lambda: dataset.submit_manual_review(body.reviewer, body.rows))
+
+
+@app.post("/api/dataset/answer-keys")
+def upload_answer_keys(files: list[UploadFile] = File(...)):
+    """ground_truth.csv and/or ground_truth_media.csv for the Evaluation tab."""
+    try:
+        return dataset.save_answer_keys([_read_upload(f, dataset.MAX_FILE_BYTES) for f in files])
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
 
 
-@app.post("/api/dataset/use")
-def use_dataset(body: UseDataset):
+@app.post("/api/videos/{video_id}/clip")
+def upload_clip(video_id: str, file: UploadFile = File(...)):
+    """Upload the video file itself, instead of giving a URL. Re-scores the video on the next run."""
+    _check(video_id)
     _not_while_running()
     try:
-        return dataset.use(body.id)
+        dataset.save_clip(video_id, file.file)
     except ValueError as e:
-        raise HTTPException(404, str(e)) from e
+        raise HTTPException(422, f"{video_id}: {e}") from e
+    pipeline.invalidate(video_id)
+    return pipeline.status(video_id)
+
+
+@app.post("/api/video-files")
+def upload_video_file(file: UploadFile = File(...)):
+    """Upload a video to this machine instead of linking it. Returns a file:// URL for the
+    form's Video URL column; the pipeline reads the file from there like any other URL."""
+    try:
+        return {"url": dataset.save_video_file(file.file, file.filename)}
+    except ValueError as e:
+        raise HTTPException(422, f"{file.filename}: {e}") from e
 
 
 @app.put("/api/videos/{video_id}/url")
@@ -278,12 +433,28 @@ def decisions():
     return evaluate.read_decisions()
 
 
-@app.get("/api/evaluate")
-def get_evaluation(run_missing: bool = False):
-    """P5 vs P6 against ground truth, feature accuracy, reviewer timing.
-    run_missing=true scores any video that has not been processed yet (API calls)."""
+@app.get("/api/thresholds")
+def get_thresholds():
+    """The rule guard thresholds of the open session, and their defaults."""
+    return dataset.get_thresholds()
+
+
+@app.put("/api/thresholds")
+def put_thresholds(body: dict):
+    """Change the rule guard thresholds; cached P5/P6 verdicts follow at once, no model call."""
     try:
-        return evaluate.run(run_missing=run_missing)
+        return dataset.set_thresholds(body)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.get("/api/evaluate")
+def get_evaluation(run_missing: bool = False, reviewer: Optional[list[str]] = Query(None)):
+    """P5 vs P6 vs the blind manual review against ground truth, feature accuracy, reviewer timing.
+    run_missing=true scores any video that has not been processed yet (API calls).
+    reviewer (repeatable) limits the human side to those reviewers; omitted = everyone."""
+    try:
+        return evaluate.run(run_missing=run_missing, reviewers=reviewer)
     except Exception as e:
         raise HTTPException(502, f"{type(e).__name__}: {e}") from e
 
@@ -296,6 +467,8 @@ def verdicts():
 @app.get("/artifacts/{path:path}")
 def artifact(path: str):
     """Pipeline artifacts (keyframes) of the active dataset."""
+    if config.RUNS is None:
+        raise HTTPException(404, "not found")
     root = config.RUNS.resolve()
     p = (root / path).resolve()
     if not p.is_relative_to(root) or not p.is_file():

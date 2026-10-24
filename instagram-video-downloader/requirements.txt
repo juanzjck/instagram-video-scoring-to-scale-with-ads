@@ -1,0 +1,4 @@
+yt-dlp>=2026.8.19        # video download, public metrics, first page of comments
+imageio-ffmpeg>=0.5      # bundled ffmpeg to merge video+audio streams
+requests>=2.31           # Instagram Graph API calls (optional)
+python-dotenv>=1.0

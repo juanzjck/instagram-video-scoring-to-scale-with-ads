@@ -1,0 +1,107 @@
+file,id,column,source,method
+creators.csv,cr_fernandollanos,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_sebastiansant27,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_joaquin.valcarcel,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_samlabanquera,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_bernardo.jijon,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_domina_la_inversion,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_lluisjimenez.ugc,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_beresitt.lara,followers,collected,browser: profile page + reels grid (2026-10-17)
+creators.csv,cr_pablolopez.1,followers,collected,browser: profile page + reels grid (2026-10-17)
+videos.csv,DTeGa9EjiI0,views,collected,web_media_info
+videos.csv,DVxRyoLjX6s,views,collected,web_media_info
+videos.csv,DXaEhNOFQqL,views,collected,web_media_info
+videos.csv,DaLmpLXJOCb,views,collected,web_media_info
+videos.csv,DcKfxVEJX9i,views,collected,web_media_info
+videos.csv,DcPlUEIgCwK,views,collected,web_media_info
+videos.csv,DdjR28fsQQV,views,collected,web_media_info
+videos.csv,DeRzA3hqJRN,views,collected,web_media_info
+videos.csv,DeZ1Dylynuh,views,collected,web_media_info
+videos.csv,DefW4d3R3vb,views,collected,web_media_info
+videos.csv,DTeGa9EjiI0,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DVxRyoLjX6s,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DXaEhNOFQqL,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DaLmpLXJOCb,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DcKfxVEJX9i,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DcPlUEIgCwK,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DdjR28fsQQV,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DeRzA3hqJRN,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DeZ1Dylynuh,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+videos.csv,DefW4d3R3vb,reach,forecast,views x 0.7 (typical unique-accounts/plays ratio)
+creators.csv,cr_fernandollanos,niche,derived,caption/bio keywords
+creators.csv,cr_fernandollanos,primary_language,derived,caption words
+creators.csv,cr_sebastiansant27,niche,derived,caption/bio keywords
+creators.csv,cr_sebastiansant27,primary_language,derived,caption words
+creators.csv,cr_joaquin.valcarcel,niche,derived,caption/bio keywords
+creators.csv,cr_joaquin.valcarcel,primary_language,derived,caption words
+creators.csv,cr_samlabanquera,niche,derived,caption/bio keywords
+creators.csv,cr_samlabanquera,primary_language,derived,caption words
+creators.csv,cr_bernardo.jijon,primary_language,derived,caption words
+creators.csv,cr_domina_la_inversion,niche,derived,caption/bio keywords
+creators.csv,cr_domina_la_inversion,primary_language,derived,caption words
+creators.csv,cr_lluisjimenez.ugc,niche,derived,caption/bio keywords
+creators.csv,cr_lluisjimenez.ugc,primary_language,derived,caption words
+creators.csv,cr_beresitt.lara,niche,derived,caption/bio keywords
+creators.csv,cr_beresitt.lara,primary_language,derived,caption words
+creators.csv,cr_pablolopez.1,niche,derived,caption/bio keywords
+creators.csv,cr_pablolopez.1,primary_language,derived,caption words
+creators.csv,cr_bernardo.jijon,niche,derived,most common niche in this dataset
+creators.csv,cr_fernandollanos,follower_demographics_country,dummy,
+creators.csv,cr_sebastiansant27,follower_demographics_country,dummy,
+creators.csv,cr_joaquin.valcarcel,follower_demographics_country,dummy,
+creators.csv,cr_samlabanquera,follower_demographics_country,dummy,
+creators.csv,cr_bernardo.jijon,follower_demographics_country,dummy,
+creators.csv,cr_domina_la_inversion,follower_demographics_country,dummy,
+creators.csv,cr_lluisjimenez.ugc,follower_demographics_country,dummy,
+creators.csv,cr_beresitt.lara,follower_demographics_country,dummy,
+creators.csv,cr_pablolopez.1,follower_demographics_country,dummy,
+videos.csv,DTeGa9EjiI0,shares,dummy,
+videos.csv,DTeGa9EjiI0,saved,dummy,
+videos.csv,DTeGa9EjiI0,avg_watch_time_ms,dummy,
+videos.csv,DTeGa9EjiI0,skip_rate_pct,dummy,
+videos.csv,DTeGa9EjiI0,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DVxRyoLjX6s,shares,dummy,
+videos.csv,DVxRyoLjX6s,saved,dummy,
+videos.csv,DVxRyoLjX6s,avg_watch_time_ms,dummy,
+videos.csv,DVxRyoLjX6s,skip_rate_pct,dummy,
+videos.csv,DVxRyoLjX6s,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DXaEhNOFQqL,shares,dummy,
+videos.csv,DXaEhNOFQqL,saved,dummy,
+videos.csv,DXaEhNOFQqL,avg_watch_time_ms,dummy,
+videos.csv,DXaEhNOFQqL,skip_rate_pct,dummy,
+videos.csv,DXaEhNOFQqL,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DaLmpLXJOCb,shares,dummy,
+videos.csv,DaLmpLXJOCb,saved,dummy,
+videos.csv,DaLmpLXJOCb,avg_watch_time_ms,dummy,
+videos.csv,DaLmpLXJOCb,skip_rate_pct,dummy,
+videos.csv,DaLmpLXJOCb,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DcKfxVEJX9i,shares,dummy,
+videos.csv,DcKfxVEJX9i,saved,dummy,
+videos.csv,DcKfxVEJX9i,avg_watch_time_ms,dummy,
+videos.csv,DcKfxVEJX9i,skip_rate_pct,dummy,
+videos.csv,DcKfxVEJX9i,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DcPlUEIgCwK,shares,dummy,
+videos.csv,DcPlUEIgCwK,saved,dummy,
+videos.csv,DcPlUEIgCwK,avg_watch_time_ms,dummy,
+videos.csv,DcPlUEIgCwK,skip_rate_pct,dummy,
+videos.csv,DcPlUEIgCwK,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DdjR28fsQQV,shares,dummy,
+videos.csv,DdjR28fsQQV,saved,dummy,
+videos.csv,DdjR28fsQQV,avg_watch_time_ms,dummy,
+videos.csv,DdjR28fsQQV,skip_rate_pct,dummy,
+videos.csv,DdjR28fsQQV,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DeRzA3hqJRN,shares,dummy,
+videos.csv,DeRzA3hqJRN,saved,dummy,
+videos.csv,DeRzA3hqJRN,avg_watch_time_ms,dummy,
+videos.csv,DeRzA3hqJRN,skip_rate_pct,dummy,
+videos.csv,DeRzA3hqJRN,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DeZ1Dylynuh,shares,dummy,
+videos.csv,DeZ1Dylynuh,saved,dummy,
+videos.csv,DeZ1Dylynuh,avg_watch_time_ms,dummy,
+videos.csv,DeZ1Dylynuh,skip_rate_pct,dummy,
+videos.csv,DeZ1Dylynuh,total_interactions,derived,likes + comments + shares + saved
+videos.csv,DefW4d3R3vb,shares,dummy,
+videos.csv,DefW4d3R3vb,saved,dummy,
+videos.csv,DefW4d3R3vb,avg_watch_time_ms,dummy,
+videos.csv,DefW4d3R3vb,skip_rate_pct,dummy,
+videos.csv,DefW4d3R3vb,total_interactions,derived,likes + comments + shares + saved

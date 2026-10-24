@@ -4,6 +4,8 @@
 2. Content features: the vision output against ground_truth_media.csv.
 3. Reviewer time: how long a human took to decide with the card vs with text only,
    read from the decision log.
+4. Manual review: the blind human decisions (manual_review.csv) vs P5 / P6 on the same videos,
+   both against the ground truth's verdict and against its CAC outcome.
 """
 
 import json
@@ -16,6 +18,8 @@ from .ingest import num, val
 
 
 def _key(name):
+    if config.DATA is None:
+        return {}
     p = config.DATA / name
     if not p.exists():
         return {}
@@ -54,8 +58,94 @@ def _feature_checks(feats, gt):
     return out
 
 
+def _manual():
+    if config.DATA is None or not (config.DATA / "manual_review.csv").exists():
+        return []
+    df = pd.read_csv(config.DATA / "manual_review.csv", dtype={"video_id": str, "reviewer": str})
+    return [{k: val(v) for k, v in r.items()} for _, r in df.iterrows()]
+
+
+def _scale(verdict):
+    """A verdict as the reviewer's two choices: SCALE, or anything else (defer, flag) = DO_NOT_SCALE."""
+    return None if verdict is None else ("SCALE" if verdict == "SCALE" else "DO_NOT_SCALE")
+
+
+def _cac_call(gt):
+    """The call the real CAC supports: scale when it performed well (CAC ≤ target), blank if never scaled."""
+    return {"yes": "SCALE", "no": "DO_NOT_SCALE"}.get(str((gt or {}).get("performed_well_after_scaling") or "").lower())
+
+
+def manual_vs_ai(rows, manual):
+    """Per reviewer: their accuracy and the AI's on exactly the videos they reviewed, plus minutes spent."""
+    by_vid = {r["video_id"]: r for r in rows}
+    out = []
+    for name in dict.fromkeys(m["reviewer"] for m in manual):
+        mine = [m for m in manual if m["reviewer"] == name and m["video_id"] in by_vid]
+        mins = [x for x in (num(m.get("minutes_spent")) for m in mine) if x is not None]
+        entry = {"reviewer": name, "videos": len(mine),
+                 "mean_minutes": round(mean(mins), 1) if mins else None,
+                 "total_minutes": round(sum(mins), 1) if mins else None}
+        for measure, key in (("expected_verdict", "expected_scale"), ("cac_outcome", "cac_call")):
+            judged = [(m, by_vid[m["video_id"]]) for m in mine if by_vid[m["video_id"]][key] is not None]
+
+            def acc(pick):
+                got = [(pick(m, v), v[key]) for m, v in judged]
+                got = [(g, e) for g, e in got if g is not None]
+                ok = sum(g == e for g, e in got)
+                return {"correct": ok, "n": len(got), "accuracy": round(ok / len(got), 3) if got else None}
+
+            entry[measure] = {"human": acc(lambda m, v: m.get("decision")),
+                              "p5_final": acc(lambda m, v: _scale(v["p5_final"])),
+                              "p6_final": acc(lambda m, v: _scale(v["p6_final"]))}
+        out.append(entry)
+    return out
+
+
+def confusion(pairs):
+    """Precision, recall, F1 and accuracy for (decision, truth) pairs, SCALE being the positive class:
+    a winner is a video the truth says to scale. Pairs where either side is missing are skipped."""
+    pairs = [(p, t) for p, t in pairs if p is not None and t is not None]
+    tp = sum(p == "SCALE" and t == "SCALE" for p, t in pairs)
+    fp = sum(p == "SCALE" and t != "SCALE" for p, t in pairs)
+    fn = sum(p != "SCALE" and t == "SCALE" for p, t in pairs)
+    tn = len(pairs) - tp - fp - fn
+    ratio = lambda a, b: round(a / b, 3) if b else None
+    precision, recall = ratio(tp, tp + fp), ratio(tp, tp + fn)
+    f1 = ratio(2 * tp, 2 * tp + fp + fn)      # = 2PR/(P+R), and 0 when no winner is caught
+    return {"n": len(pairs), "tp": tp, "fp": fp, "fn": fn, "tn": tn, "recall": recall, "precision": precision,
+            "f1": f1, "accuracy": ratio(tp + tn, len(pairs)), "winners": tp + fn}
+
+
+def classification(rows, manual):
+    """The three methods (blind human, P5, P6 after the rule guard) as scale / don't-scale classifiers.
+
+    Measured against the same truth for all three: the ground truth's expected verdict, and the CAC
+    outcome. Two scopes: every video each method decided, and only the videos the reviewers decided,
+    where each human decision is paired with the AI's call on that same video (n is equal once both
+    AI prompts have scored every reviewed video).
+    """
+    by_vid = {r["video_id"]: r for r in rows}
+    human = [(m, by_vid[m["video_id"]]) for m in manual
+             if m["video_id"] in by_vid and m.get("decision")]
+    out = {}
+    for measure, key in (("expected_verdict", "expected_scale"), ("cac_outcome", "cac_call")):
+        truths = [r[key] for r in rows if r[key] is not None]
+        winners = sum(t == "SCALE" for t in truths)
+        out[measure] = {
+            "all": {"Human (blind)": confusion((m["decision"], v[key]) for m, v in human),
+                    "P5 text-only": confusion((_scale(r["p5_final"]), r[key]) for r in rows),
+                    "P6 multimodal": confusion((_scale(r["p6_final"]), r[key]) for r in rows)},
+            "same": {"Human (blind)": confusion((m["decision"], v[key]) for m, v in human),
+                     "P5 text-only": confusion((_scale(v["p5_final"]), v[key]) for m, v in human),
+                     "P6 multimodal": confusion((_scale(v["p6_final"]), v[key]) for m, v in human)},
+            "videos": len(truths), "winners": winners,
+            # what accuracy a method gets by never scaling anything: the reason accuracy carries a warning
+            "never_scale_accuracy": round(1 - winners / len(truths), 3) if truths else None}
+    return out
+
+
 def read_decisions():
-    if not config.DECISIONS_LOG.exists():
+    if config.DECISIONS_LOG is None or not config.DECISIONS_LOG.exists():
         return []
     return [json.loads(l) for l in config.DECISIONS_LOG.read_text(encoding="utf-8").splitlines() if l.strip()]
 
@@ -75,11 +165,34 @@ def reviewer_timing():
     return out
 
 
-def run(run_missing=True):
-    """Build the evaluation report. With run_missing, videos not yet scored are processed."""
+def _stats(xs):
+    return {"n": len(xs), "mean_s": round(mean(xs), 1) if xs else None,
+            "median_s": round(median(xs), 1) if xs else None, "total_s": round(sum(xs), 1) if xs else None}
+
+
+def pipeline_timing(video_ids, manual):
+    """Seconds per pipeline stage across the campaign's videos, and the end-to-end time per video
+    (download when there was one + preprocess + analyse + P6), next to the blind reviewers' minutes."""
+    timings = {vid: pipeline.load(vid, "timing") or {} for vid in video_ids}
+    stages = {s: _stats([t[s] for t in timings.values() if t.get(s) is not None]) for s in pipeline.TIMED_STAGES}
+    full = {vid: round(sum(t.get(s) or 0 for s in ("download", "preprocess", "analyse", "score_p6")), 1)
+            for vid, t in timings.items() if all(t.get(s) is not None for s in ("preprocess", "analyse", "score_p6"))}
+    human = [x for x in (num(m.get("minutes_spent")) for m in manual) if x is not None]
+    return {"stages": stages, "per_video": full, "end_to_end": _stats(list(full.values())),
+            "human": {"n": len(human), "mean_s": round(mean(human) * 60, 1) if human else None,
+                      "median_s": round(median(human) * 60, 1) if human else None}}
+
+
+def run(run_missing=True, reviewers=None):
+    """Build the evaluation report. With run_missing, videos not yet scored are processed.
+    reviewers: names whose blind decisions count as "Human"; None means every submitted reviewer."""
     videos, _ = ingest.load_inputs()
     gt = _key("ground_truth.csv")
     gt_media = _key("ground_truth_media.csv")
+    every = _manual()
+    names = list(dict.fromkeys(m["reviewer"] for m in every))
+    picked = names if reviewers is None else [n for n in names if n in set(reviewers)]
+    manual = [m for m in every if m["reviewer"] in picked]
 
     rows, feat_totals = [], {}
     for vid in videos:
@@ -114,22 +227,46 @@ def run(run_missing=True):
             "p5_score": p5 and p5.get("score"),
             "p6_score": p6 and p6.get("score"),
             "features": checks,
+            "expected_scale": _scale(expected),
+            "cac_call": _cac_call(gt.get(vid)),
+            "cac": num((gt.get(vid) or {}).get("cac")),
+            "manual": {m["reviewer"]: m.get("decision") for m in manual if m["video_id"] == vid},
         })
+
+    def _recall(scored, col, truth):
+        """Of the winners (truth says SCALE), how many the verdict scaled."""
+        winners = [r for r in scored if truth(r) == "SCALE"]
+        tp = sum(r[col] == "SCALE" for r in winners)
+        return {"tp": tp, "winners": len(winners), "recall": round(tp / len(winners), 3) if winners else None}
 
     def acc(col, exp):
         scored = [r for r in rows if r[col] is not None and r[exp] is not None]
         ok = sum(r[col] == r[exp] for r in scored)
-        return {"correct": ok, "n": len(scored), "accuracy": round(ok / len(scored), 3) if scored else None}
+        return {"correct": ok, "n": len(scored), "accuracy": round(ok / len(scored), 3) if scored else None,
+                **_recall(scored, col, lambda r: r[exp])}
+
+    def vs_cac(col, exp):
+        """acc() against the expected verdict, plus the same verdicts against the real CAC outcome
+        (scale / don't scale; videos never scaled are left out)."""
+        scored = [r for r in rows if r[col] is not None and r["cac_call"] is not None]
+        ok = sum(_scale(r[col]) == r["cac_call"] for r in scored)
+        return dict(acc(col, exp), cac={"correct": ok, "n": len(scored),
+                                        "accuracy": round(ok / len(scored), 3) if scored else None,
+                                        **_recall(scored, col, lambda r: r["cac_call"])})
 
     return {
         "videos": rows,
         "verdict_accuracy": {
-            "P5 text-only, model verdict": acc("p5_model", "expected"),
-            "P5 text-only, after rule guard": acc("p5_final", "expected"),
-            "P6 multimodal, model verdict": acc("p6_model", "expected_multimodal"),
-            "P6 multimodal, after rule guard": acc("p6_final", "expected_multimodal"),
+            "P5 text-only, model verdict": vs_cac("p5_model", "expected"),
+            "P5 text-only, after rule guard": vs_cac("p5_final", "expected"),
+            "P6 multimodal, model verdict": vs_cac("p6_model", "expected_multimodal"),
+            "P6 multimodal, after rule guard": vs_cac("p6_final", "expected_multimodal"),
         },
         "feature_accuracy": {k: dict(v, accuracy=round(v["correct"] / v["n"], 3))
                              for k, v in feat_totals.items()},
+        "manual_review": manual_vs_ai(rows, manual),
         "reviewer_timing": reviewer_timing(),
+        "pipeline_timing": pipeline_timing(list(videos), manual),
+        "classification": classification(rows, manual),
+        "reviewers": {"all": names, "selected": picked},
     }

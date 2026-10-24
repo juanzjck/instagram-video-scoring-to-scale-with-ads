@@ -42,6 +42,8 @@ def num(x):
 
 
 def _read(name):
+    if config.DATA is None:
+        return pd.DataFrame()
     p = config.DATA / name
     return pd.read_csv(p, dtype=ID_DTYPES) if p.exists() else pd.DataFrame()
 
@@ -53,8 +55,14 @@ def load_inputs():
     Returns (videos_by_id: dict[str, dict], comments_by_video: dict[str, DataFrame]).
     """
     videos = _read("videos.csv")
+    if videos.empty:                         # no dataset yet: the session starts clean
+        return {}, {}
     df = videos.merge(_read("creators.csv"), on="creator_id", how="left", validate="many_to_one")
     df = df.merge(_read("campaigns.csv"), on="campaign_id", how="left", validate="many_to_one")
+    if "link_clicks" in df:                  # optional per-creator clicks span all their videos
+        g = df.groupby("creator_id")
+        df["creator_videos"] = g["video_id"].transform("count")
+        df["creator_views"] = g["views"].transform(lambda s: s.sum(min_count=1)) if "views" in df else None
 
     media = _read("media.csv")
     if not media.empty:
@@ -76,6 +84,8 @@ def load_inputs():
 
 
 def _url_overrides():
+    if config.RUNS is None:
+        return {}
     p = config.RUNS / "video_urls.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 

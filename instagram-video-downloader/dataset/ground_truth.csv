@@ -1,0 +1,11 @@
+video_id,scenario,expected_verdict,performed_well_after_scaling,ad_spend,conversions,cac,roas,notes
+DTeGa9EjiI0,clear_loser,DO_NOT_SCALE,no,720,14,51.43,1.17,"SIMULATED outcome. 2.8% engagement, 0.28% save rate, 0.18% share rate, 54% skip; 33% of 15 comments show buying intent. CAC 51.43 vs target 40."
+DVxRyoLjX6s,clear_loser,DO_NOT_SCALE,no,1230,24,51.25,1.17,"SIMULATED outcome. 3.6% engagement, 0.81% save rate, 0.48% share rate, 38% skip; 0% of 12 comments show buying intent. CAC 51.25 vs target 40."
+DXaEhNOFQqL,trap_high_engagement,DO_NOT_SCALE,no,1080,21,51.43,1.17,"SIMULATED outcome. 7.6% engagement, 1.31% save rate, 1.16% share rate, 29% skip; 0% of 5 comments show buying intent. CAC 51.43 vs target 40."
+DaLmpLXJOCb,trap_quiet_seller,SCALE,yes,1350,47,28.72,2.09,"SIMULATED outcome. 4.1% engagement, 0.50% save rate, 0.49% share rate, 24% skip; 27% of 15 comments show buying intent. CAC 28.72 vs target 40."
+DcKfxVEJX9i,borderline,SCALE,yes,620,16,38.75,1.55,"SIMULATED outcome. 8.7% engagement, 0.95% save rate, 1.05% share rate, 51% skip; 36% of 11 comments show buying intent. CAC 38.75 vs target 40."
+DcPlUEIgCwK,trap_high_engagement,DO_NOT_SCALE,no,1290,30,43,1.4,"SIMULATED outcome. 7.7% engagement, 0.85% save rate, 0.95% share rate, 30% skip; 25% of 8 comments show buying intent. CAC 43 vs target 40."
+DdjR28fsQQV,clear_loser,DO_NOT_SCALE,no,300,3,100,0.6,"SIMULATED outcome. 3.3% engagement, 0.26% save rate, 0.51% share rate, 35% skip; 0% of 0 comments show buying intent. CAC 100 vs target 40."
+DeRzA3hqJRN,trap_high_engagement,DO_NOT_SCALE,no,300,7,42.86,1.4,"SIMULATED outcome. 5.4% engagement, 0.90% save rate, 0.32% share rate, 24% skip; 0% of 1 comments show buying intent. CAC 42.86 vs target 40."
+DeZ1Dylynuh,clear_winner,SCALE,yes,2640,176,15,4,"SIMULATED outcome. 14.8% engagement, 2.04% save rate, 2.44% share rate, 16% skip; 7% of 15 comments show buying intent. CAC 15 vs target 40."
+DefW4d3R3vb,clear_loser,DO_NOT_SCALE,no,300,6,50,1.2,"SIMULATED outcome. 1.2% engagement, 0.23% save rate, 0.16% share rate, 32% skip; 0% of 1 comments show buying intent. CAC 50 vs target 40."
