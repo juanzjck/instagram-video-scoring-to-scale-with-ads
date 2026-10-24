@@ -1,0 +1,4 @@
+# One Instagram post/reel URL per line. Lines starting with # are ignored.
+# Or use a CSV with columns: url,campaign_id
+https://www.instagram.com/reel/XXXXXXXXXXX/
+https://www.instagram.com/p/YYYYYYYYYYY/

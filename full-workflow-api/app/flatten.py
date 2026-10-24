@@ -222,6 +222,13 @@ def flatten(video_row, comments=None, content=None):
         L.append(f"Audience share in campaign target countries: {fmt_pct(share)}")
         L.append("Top 3 audience countries: " +
                  ", ".join(f"{c} {fmt_pct(n / total)}" for c, n in top3))
+    clicks = num(r.get("link_clicks"))
+    if clicks is not None:                   # optional: only shown when tracked, so P5 is unchanged otherwise
+        n = int(num(r.get("creator_videos")) or 1)
+        L.append(f"Creator link clicks: {fmt_int(clicks)} (this creator's own code or link, "
+                 f"across all {n} of their video{'s' if n != 1 else ''} in the campaign)")
+        ccr = div(clicks, r.get("creator_views"))
+        L.append(f"Creator click ratio (link clicks / views of those videos): {fmt_pct(ccr)}")
 
     L.append("")
     L.append("=== COMMENTS (sample, not the full set) ===")

@@ -1,5 +1,6 @@
 """Paths, environment and the thresholds the rule guard enforces."""
 
+import json
 import os
 import re
 from pathlib import Path
@@ -32,50 +33,34 @@ else:
     os.environ.pop("ANTHROPIC_API_KEY", None)
 
 STATIC = ROOT / "app" / "static"
-UPLOADS = ROOT / "uploads"                  # one folder per uploaded dataset
-EXAMPLE_DATA = Path(_env("DATA_DIR") or ROOT.parent / "data-example").resolve()
-_ACTIVE = UPLOADS / "active.txt"
+UPLOADS = ROOT / "uploads"                  # one folder per dataset built in the Dataset form
 DATASET_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 
 # The active dataset. Set by activate(); read these as config.DATA etc. so a dataset
-# switch is seen everywhere (do not `from .config import DATA`).
-DATASET_ID = None       # None = the bundled example dataset
+# switch is seen everywhere (do not `from .config import DATA`). Every server start is a
+# clean session: no dataset until the user builds one in the form.
+DATASET_ID = None
 DATA = MEDIA = RUNS = DECISIONS_LOG = None
 
 
-def activate(dataset_id=None, remember=True):
-    """Point the app at an uploaded dataset, or at the example dataset when None.
+def activate(dataset_id=None):
+    """Point the app at a dataset under uploads/, or at no dataset when None.
 
-    Each uploaded dataset keeps its own runs/ (pipeline cache and decision log), so
-    datasets that reuse video ids never read each other's results.
+    Each dataset keeps its own runs/ (pipeline cache and decision log), so datasets that
+    reuse video ids never read each other's results.
     """
     global DATASET_ID, DATA, MEDIA, RUNS, DECISIONS_LOG
     if dataset_id is None:
-        data, runs = EXAMPLE_DATA, ROOT / "runs"
-    else:
-        if not DATASET_ID_RE.match(dataset_id) or not (UPLOADS / dataset_id).is_dir():
-            raise ValueError(f"unknown dataset {dataset_id!r}")
-        data = (UPLOADS / dataset_id).resolve()
-        runs = data / "runs"
+        DATASET_ID = DATA = MEDIA = RUNS = DECISIONS_LOG = None
+        return
+    if not DATASET_ID_RE.match(dataset_id) or not (UPLOADS / dataset_id).is_dir():
+        raise ValueError(f"unknown dataset {dataset_id!r}")
+    data = (UPLOADS / dataset_id).resolve()
+    runs = data / "runs"
     runs.mkdir(parents=True, exist_ok=True)
     DATASET_ID, DATA, MEDIA, RUNS = dataset_id, data, data / "media", runs
     DECISIONS_LOG = runs / "decisions.jsonl"
-    if remember:
-        UPLOADS.mkdir(exist_ok=True)
-        _ACTIVE.write_text(dataset_id or "", encoding="utf-8")
 
-
-def _remembered():
-    try:
-        return _ACTIVE.read_text(encoding="utf-8").strip() or None
-    except OSError:
-        return None
-
-
-try:
-    activate(_remembered(), remember=False)
-except ValueError:                           # the remembered upload was deleted by hand
-    activate(None, remember=False)
 
 MODEL = _env("LLM_MODEL") or "claude-opus-5-5"
 WORKSPACE_ID = _env("ANTHROPIC_WORKSPACE_ID")
@@ -95,6 +80,20 @@ NA = "not available"   # the single rendering of "we have no value" - never 0
 # amount of good-looking creative can talk a video past them.
 MIN_HOURS = 48          # Instagram insights can lag up to 48h
 MIN_REACH = 1000        # below this, rate metrics are not reliable
+DEFAULT_THRESHOLDS = {"min_hours": MIN_HOURS, "min_reach": MIN_REACH}
+
+
+def thresholds():
+    """The open session's rule guard thresholds: the defaults above unless changed in session.json."""
+    t = dict(DEFAULT_THRESHOLDS)
+    p = DATA / "session.json" if DATA is not None else None
+    if p is not None and p.exists():
+        try:
+            saved = json.loads(p.read_text(encoding="utf-8")).get("thresholds") or {}
+        except ValueError:
+            saved = {}
+        t.update({k: saved[k] for k in t if isinstance(saved.get(k), (int, float))})
+    return t
 CORE_METRICS = ["reach", "views", "total_interactions", "saved", "shares"]
 
 COMMENT_LIMIT = 10

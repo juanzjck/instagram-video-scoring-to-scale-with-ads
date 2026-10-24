@@ -8,7 +8,8 @@ whatever the model - or the video's own on-screen text - said.
 import re
 
 from . import llm, prompts
-from .config import CORE_METRICS, MIN_HOURS, MIN_REACH
+from . import config
+from .config import CORE_METRICS
 from .ingest import num
 
 VERDICTS = ["SCALE", "DO_NOT_SCALE", "DEFER_TO_HUMAN", "FLAG_AUTHENTICITY"]
@@ -76,17 +77,19 @@ def parse(text):
 def rule_check(row):
     """The reasons, if any, this video must be deferred regardless of the model."""
     hits = []
+    t = config.thresholds()
+    min_hours, min_reach = t["min_hours"], t["min_reach"]
     hrs = num(row.get("hours_since_post"))
     if hrs is None:
         hits.append("hours since posting is not available")
-    elif hrs < MIN_HOURS:
-        hits.append(f"posted {hrs:.0f}h ago, under the {MIN_HOURS}h insight-lag window")
+    elif hrs < min_hours:
+        hits.append(f"posted {hrs:.0f}h ago, under the {min_hours:g}h insight-lag window")
     missing = [m for m in CORE_METRICS if num(row.get(m)) is None]
     if missing:
         hits.append("metrics not available: " + ", ".join(missing))
     reach = num(row.get("reach"))
-    if reach is not None and reach < MIN_REACH:
-        hits.append(f"reach {reach:,.0f} is under the {MIN_REACH:,} floor")
+    if reach is not None and reach < min_reach:
+        hits.append(f"reach {reach:,.0f} is under the {min_reach:,.0f} floor")
     return hits
 
 
@@ -100,6 +103,13 @@ def apply_rules(parsed, row):
     elif model_verdict is None:
         out.update(verdict="DEFER_TO_HUMAN", confidence="LOW")   # unparseable -> a human looks
     return out
+
+
+def reguard(out, row):
+    """A cached score with the rule guard re-applied, so changed thresholds take effect without a new model call."""
+    if not out or not out.get("raw_output"):
+        return out
+    return dict(out, **apply_rules(parse(out["raw_output"]), row))
 
 
 def score(prompt_id, summary, row):

@@ -10,7 +10,7 @@ Source of truth is the dataset itself:
   media.csv       -> duration and audio type (videos with no voice get a quiet tone bed).
 
 These are stand-ins, not footage: the vision model reads a written scene description
-instead of seeing the scene. Drop a real clip.mp4 into data-example/media/<video_id>/
+instead of seeing the scene. Upload a real clip in the Dataset tab
 and the pipeline uses it unchanged.
 
 With --ai-images each still is generated from its scene description, so the vision step
@@ -19,9 +19,9 @@ looks at a picture instead of reading a sentence:
   --ai-images=openai     a raster image model paints it (needs OPENAI_API_KEY)
 The on-screen text is still drawn in code, on top of the generated picture, because the
 answer key depends on those strings being exact. Generated pictures are cached in
-data-example/media/<video_id>/ai/<provider>/ and reused on the next run.
+<dataset>/media/<video_id>/ai/<provider>/ and reused on the next run.
 
-Usage:  python scripts/make_synthetic_media.py [--force] [--ai-images[=claude|openai]]
+Usage:  python scripts/make_synthetic_media.py --dataset=<id|folder> [--force] [--ai-images[=claude|openai]]
                                                [--regen-images] [video_id ...]
 """
 
@@ -41,7 +41,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app import genmedia  # noqa: E402
-from app.config import DATA, MEDIA  # noqa: E402
+from app import config  # noqa: E402
+
+DATA = MEDIA = None     # set from --dataset: an id under uploads/ (shown in the Dataset tab) or a folder
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 W, H = 540, 960
@@ -191,6 +193,12 @@ def main():
     only = [a for a in sys.argv[1:] if not a.startswith("--")]
     force, regen, use_ai = "--force" in flags, "--regen-images" in flags, "--ai-images" in flags
     provider = flags.get("--ai-images") or "claude"
+    global DATA, MEDIA
+    ds = flags.get("--dataset")
+    DATA = Path(ds) if ds and Path(ds).is_dir() else config.UPLOADS / (ds or "")
+    if not ds or not (DATA / "videos.csv").exists():
+        sys.exit("--dataset=<id under uploads/ or a dataset folder> is required")
+    MEDIA = DATA / "media"
     if use_ai and provider not in ("claude", "openai"):
         sys.exit("--ai-images takes claude or openai")
     if use_ai and provider == "openai" and not genmedia.available():

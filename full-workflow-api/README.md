@@ -9,27 +9,63 @@ creator video from raw media to a logged human decision, with a review-card UI.
 # from the repo root, using the existing venv
 .venv/bin/pip install -r full-workflow-api/requirements.txt
 cd full-workflow-api
-../.venv/bin/python scripts/make_synthetic_media.py     # once: builds data-example/media/*/clip.mp4
 ../.venv/bin/uvicorn app.main:app --reload
 ```
 
 Open http://127.0.0.1:8000 (UI) or http://127.0.0.1:8000/docs (API).
 
-### Your own dataset
+### Building the dataset
 
-The **Dataset** tab is the starting point:
+No dataset is bundled: **every server start is clean**, with no session open.
+The **Dataset** tab is the starting point.
 
-1. **Upload** the CSVs (select them all at once). Required: `videos.csv`, `creators.csv`,
-   `campaigns.csv`. Optional: `comments.csv`, `media.csv`, `keyframes.csv`, `transcripts.csv`,
-   `ground_truth.csv`, `ground_truth_media.csv`. Each upload is stored in `uploads/<timestamp>/`
-   with its own `runs/` folder, and becomes the active dataset.
-2. **Video URLs**: one per video, typed in the table or pre-filled from a `video_url` column in
-   `videos.csv` or `media.csv`. A direct link to a media file is downloaded as-is; a page link
-   (Instagram, TikTok, YouTube) goes through `yt-dlp`. The download lands in
-   `runs/<video_id>/clip.mp4`. Changing a URL re-downloads and re-scores that video.
+**Sessions.** A session is **one campaign**, in one folder, `uploads/<id>/`, with a JSON memory file `session.json`
+(name, created / updated / generated times, and every row typed in the form). It is created the
+moment you type in the empty form and autosaved as you go (and on tab close). The same folder holds
+the generated CSVs and `runs/` (video URLs, clips, pipeline results, recaps, `decisions.jsonl`),
+so nothing is lost. **New session** closes the current one; the session list reopens any saved
+one with its form and results: each saved session is a toggle that expands to show its brands, row counts, scored videos, decisions, recaps and answer keys, with an Open button. Older dataset folders without `session.json` are listed too, their
+form rebuilt from their CSVs.
+
+1. **Form**: the campaign first, as a single record (campaign ID and brand required; the session
+   is named "brand · campaign ID" after it). Once those two are filled in, the campaign's
+   creators, videos and comments open as editable tables, same columns as `../data-template/`.
+   Videos take the campaign ID automatically. CSV import keeps one campaign (the open one, or the
+   file's first) with its videos, their creators and comments; other campaigns go in new sessions.
+   Comments have a **Bulk add** box: pick a video and paste one comment per line, or rows copied
+   from a spreadsheet (tab-separated: text, username, likes, posted at). Media details, keyframes
+   and transcripts are not entered: the pipeline produces them from each video's clip. Creator / campaign / video columns are dropdowns fed by the ids typed in the other
+   tables. "Import from CSV files…" fills the tables from CSVs shaped like the templates.
+   `comment_id` is filled in by the server; `click_ratio`, `hours_since_post` and `total_interactions` are
+   computed when left blank and their inputs are present. **Generate dataset** validates every
+   row (types, required cells, duplicate ids, ids that do not match) and marks problems in red;
+   on success it writes the CSVs into the session folder. **Regenerating** replaces them and
+   drops cached pipeline results and recaps (they came from the old rows); clips and decisions stay.
+2. **Videos**: per video, a URL (direct media link, or Instagram / TikTok / YouTube page via
+   `yt-dlp`) or an uploaded video file. Without either, the video is scored on its metrics and
+   comments only.
 3. **Start pipeline** runs every video in the background; the table shows each video's step.
 
-Same thing over the API: `POST /api/dataset` (multipart `files`), `PUT /api/videos/{id}/url`,
+### Ground truth (Evaluation tab)
+
+The **Evaluation** tab has two parts. **Ground truth**: for the open campaign, one row per video
+with the real results (columns of `data-template/ground_truth.csv`: scenario, expected verdict,
+performed well, ad spend, conversions, CAC, ROAS, notes). It autosaves as a draft in
+`session.json`. Left blank, CAC is ad spend ÷ conversions and "performed well" is CAC ≤ the
+campaign's target CAC. Videos with no results are left out. **Lock ground truth** (behind a
+confirmation checkbox) validates it, writes `ground_truth.csv` plus a dated copy
+`ground_truth.locked-<UTC time>.csv`, and records the lock time, the file's SHA-256 and how many
+videos were already scored (lock before looking at scores). After that it is read-only: the API
+refuses changes (409) and `ground_truth.csv` cannot be uploaded. **Results** measures P5 / P6
+against the locked file; `ground_truth_media.csv` (expected vision features) is still an optional
+upload there. `manual_review.csv` never enters the app.
+
+API: `GET|PUT /api/ground-truth`, `POST /api/ground-truth/lock` (body `{"rows": [{"video_id": …, …}]}`).
+
+API: `GET /api/dataset/schema`, `GET /api/sessions`, `GET|PUT /api/session` (autosave, same body as
+below), `POST /api/sessions/{id}/open`, `POST /api/dataset` (JSON `{"tables": {"videos.csv": [{...}], ...},
+"name": "…"}`), `POST /api/dataset/reset` (new session), `POST /api/dataset/answer-keys` (multipart `files`),
+`POST /api/videos/{id}/clip` (multipart `file`), `PUT /api/videos/{id}/url`,
 `POST /api/pipeline/start`, `GET /api/pipeline/status`.
 
 `ANTHROPIC_API_KEY` is read from `full-workflow-api/.env`, falling back to
@@ -75,12 +111,12 @@ Each stage is cached as JSON in `runs/<video_id>/`; `force=true` recomputes.
 
 Claude has no image or audio output. Two things are generated anyway (`app/genmedia.py`):
 
-- **Example clip pictures - Claude.** `python scripts/make_synthetic_media.py --ai-images --force vid_001`
+- **Example clip pictures - Claude.** `python scripts/make_synthetic_media.py --dataset=<id> --ai-images --force vid_001`
   has Claude draw each keyframe's scene description as an SVG illustration, rendered to PNG with
   `resvg-py`. The vision step then looks at a picture instead of reading a sentence. No extra key.
   They are drawings, not photographs; product labels are exact because SVG text is real text.
   On-screen text is still laid over the picture in code so it matches the answer key. Pictures and
-  their `.svg` source are cached in `data-example/media/<video_id>/ai/claude/`. Re-run the pipeline
+  their `.svg` source are cached in `uploads/<id>/media/<video_id>/ai/claude/`. Re-run the pipeline
   for that video afterwards. `--ai-images=openai` uses a raster image model instead (needs
   `OPENAI_API_KEY`).
 - **Recap voice.** OpenAI neural text-to-speech when `OPENAI_API_KEY` is in `.env`, the macOS `say`
@@ -92,13 +128,12 @@ Charts, score badges and captions are never generated: they must be exact, so th
 
 - **Claude does not take audio in or produce audio out.** Transcription is local Whisper;
   the spoken summary is the browser's `speechSynthesis`.
-- **The clips are synthetic.** `data-example` ships no media, so
-  `scripts/make_synthetic_media.py` renders each `keyframes.csv` row as a still (scene
+- **Synthetic clips.** For a dataset without real videos,
+  `scripts/make_synthetic_media.py --dataset=<id>` (id shown in the Dataset tab) renders each `keyframes.csv` row as a still (scene
   description as text, on-screen text as a burned-in caption) and voices `transcripts.csv`
   with macOS `say`. The extraction, transcription and vision steps are real, but the vision
   model is reading a written description of the scene, not seeing it. Feature accuracy on
-  these clips is therefore an upper bound. Real `clip.mp4` files dropped into
-  `data-example/media/<video_id>/` are used as-is.
+  these clips is therefore an upper bound. Real clips uploaded in the Dataset tab are used as-is.
 - **48 h, not 24 h.** P5 (unchanged, for a fair baseline) defers under roughly 24 h. P6 and
   the code-level rule guard use 48 h.
 - **Score range** is stated by the model in P6 (`SCORE_RANGE`). It is a self-report, not a
@@ -107,3 +142,19 @@ Charts, score badges and captions are never generated: they must be exact, so th
   header. Until both have data the comparison is empty.
 - **Model** comes from `LLM_MODEL` (default `claude-opus-5-5`). No sampling parameters are
   sent, so run-to-run variation is whatever the model's default is.
+
+## Command line and tests
+
+`scripts/score_video.py` runs the same pipeline without the web UI: input a session id and video
+ids, it calls the vision and scoring APIs, applies the rule guard, prints each verdict and saves
+`runs/cli_results.json`. Cached stages are reused unless `--force`; `--summary` prints the text
+the model receives without calling the API.
+
+```bash
+python scripts/score_video.py --list
+python scripts/score_video.py <session_id> --all
+```
+
+`tests/` checks the integration offline (fake Anthropic client, no key, no network): the request
+sent, structured-output requests, refusal handling, response parsing, the rule guard and the
+injection guard. `pip install pytest`, then `python -m pytest -q tests` (20 tests).
