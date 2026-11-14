@@ -3,6 +3,7 @@
 import json
 import os
 import re
+import shutil
 from pathlib import Path
 
 from dotenv import dotenv_values, load_dotenv
@@ -70,6 +71,7 @@ LLM_PROVIDERS = {
     "gemini": "Google Gemini",
     "ollama": "Ollama (local)",
     "openai_compatible": "Local OpenAI-compatible server (LM Studio, llama.cpp, vLLM)",
+    "claude_code": "Claude Code CLI (claude -p, subscription login)",
 }
 LLM_PROVIDER = (_env("LLM_PROVIDER") or "anthropic").lower()
 if LLM_PROVIDER not in LLM_PROVIDERS:
@@ -81,6 +83,7 @@ DEFAULT_MODELS = {
     "gemini": _env("GEMINI_MODEL"),
     "ollama": _env("OLLAMA_MODEL"),
     "openai_compatible": _env("LOCAL_LLM_MODEL"),
+    "claude_code": _env("CLAUDE_CODE_MODEL") or "claude-opus-5-5",
 }
 if _env("LLM_MODEL"):
     DEFAULT_MODELS[LLM_PROVIDER] = _env("LLM_MODEL")
@@ -95,6 +98,11 @@ OLLAMA_BASE_URL = (_env("OLLAMA_BASE_URL") or "http://localhost:11434").rstrip("
 OLLAMA_NUM_CTX = int(_env("OLLAMA_NUM_CTX") or 16384)
 LOCAL_LLM_BASE_URL = (_env("LOCAL_LLM_BASE_URL") or "http://localhost:1234/v1").rstrip("/")
 LOCAL_LLM_API_KEY = _env("LOCAL_LLM_API_KEY") or "not-needed"   # most local servers ignore it
+# Claude Code CLI provider (app/llm.py _claude_code): runs `claude -p` headless on the user's own login.
+CLAUDE_CODE_BIN = _env("CLAUDE_CODE_BIN") or shutil.which("claude") or str(Path.home() / ".local" / "bin" / "claude")
+CLAUDE_CODE_TIMEOUT_S = float(_env("CLAUDE_CODE_TIMEOUT_S") or 600)    # per call
+CLAUDE_CODE_RETRIES = int(_env("CLAUDE_CODE_RETRIES") or 4)            # on rate limits / overload only
+CLAUDE_CODE_MAX_WAIT_S = float(_env("CLAUDE_CODE_MAX_WAIT_S") or 900)  # longer reset = give up, not sleep
 
 
 def default_llm():

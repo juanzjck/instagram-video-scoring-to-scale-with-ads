@@ -121,8 +121,8 @@ Each stage is cached as JSON in `runs/<video_id>/` (model answers in `runs/<vide
 ## Choosing the LLM
 
 Every model call goes through `app/llm.py`. Providers: `anthropic` (default), `openai`, `gemini`,
-`ollama` (local, native API) and `openai_compatible` (any local OpenAI-style server: LM Studio,
-llama.cpp, vLLM).
+`ollama` (local, native API), `openai_compatible` (any local OpenAI-style server: LM Studio,
+llama.cpp, vLLM) and `claude_code` (the Claude Code CLI on the user's own subscription login, below).
 
 - **Env default:** `LLM_PROVIDER` plus `LLM_MODEL` (the model for that provider). Per-provider defaults:
   `ANTHROPIC_MODEL` (default `claude-opus-5-5`), `OPENAI_MODEL`, `GEMINI_MODEL`, `OLLAMA_MODEL`,
@@ -149,6 +149,86 @@ llama.cpp, vLLM).
   and injection guard run on every provider's answer. No sampling parameters are sent to any provider.
 - **SDKs are optional.** `openai` and `google-genai` are imported only when used; without them the
   app starts and that provider says which package to install.
+
+### Claude Code CLI (`claude_code`)
+
+Runs each call as `claude -p` in a subprocess, on the login of the `claude` CLI (a Claude
+subscription), not an API key. Settings: `CLAUDE_CODE_MODEL` (default `claude-opus-5-5`),
+`CLAUDE_CODE_BIN` (default: `claude` on `PATH`, else `~/.local/bin/claude`), `CLAUDE_CODE_TIMEOUT_S`
+(per call, default 600), `CLAUDE_CODE_RETRIES` (default 4) and `CLAUDE_CODE_MAX_WAIT_S` (default 900).
+
+- **Clean context.** This machine's Claude Code has user hooks (e.g. a "caveman mode"
+  SessionStart / UserPromptSubmit hook), plugins, CLAUDE.md files and memory. None of it may reach
+  a scoring call. `--bare` would be the clean switch, but it ignores the subscription login, so the
+  call uses `--safe-mode --setting-sources "" --strict-mcp-config --tools "" --disable-slash-commands
+  --no-session-persistence`, replaces Claude Code's agent prompt with `--system-prompt` (empty when the
+  caller has none), runs in an empty temp directory and passes only `PATH`, `HOME`, `USER`, `TMPDIR`,
+  `LANG` and the like: no `ANTHROPIC_API_KEY` (an API key would win over the login) and no
+  `CLAUDECODE` / `CLAUDE_CODE_*` of a parent session. Checked with a probe prompt asking the model to
+  list everything it was given. Without the flags it lists the caveman hooks, memory instructions,
+  10 tools and the skills list. With them it lists no hooks, CLAUDE.md, memory, skills or tools
+  (`system/init` reports `tools: []`, `mcp_servers: []`, `skills: []`). What remains is added by the CLI
+  itself and no flag removes it while the subscription login is used: the one-line identity
+  "You are a Claude agent, built on Anthropic's Claude Agent SDK.", a reminder carrying the account's
+  e-mail, and an environment block (the temp cwd, OS, date, model id). None of it is about the video.
+- **Images.** The message goes in on stdin with `--input-format stream-json`, so the keyframes are
+  ordinary base64 image blocks, exactly as for the API. JSON-schema calls (vision) add `--json-schema`;
+  the CLI answers through its `StructuredOutput` tool and `structured_output` is then parsed strictly
+  against the schema as for every provider.
+- **Errors.** An error result, an empty answer, a refusal, a missing login (`ProviderUnavailable`) or a
+  timeout raises. Rate limits and overload (429, 5xx, "usage limit") are retried with backoff
+  (30 s, 60 s, …); a usage limit that resets later than `CLAUDE_CODE_MAX_WAIT_S` raises `RateLimited` at
+  once so a batch can stop rather than sleep for hours. `max_tokens` is not sent (the CLI has no such
+  flag), and there are no sampling flags.
+- **Usage.** Each stage's `usage` gets the tokens (input includes cache reads and writes), latency and
+  `cost_usd`: the CLI's list-price figure. A subscription is not billed per call; it has a 5-hour and a
+  7-day usage window instead.
+
+## Collections (many runs of one campaign)
+
+A **collection** is a parent that groups copies ("runs") of one saved session, to repeat the whole
+workflow on the same campaign and measure how stable the verdicts are (`app/collection.py`). Each run is
+an ordinary session made by *Copy session* (`dataset.copy_session`, an APFS copy-on-write clone on
+macOS, so 100 runs of a 100 MB session take almost no disk), named "<collection> · run 001", with
+`"collection": {"id", "name", "index"}` in its `session.json`. The source is only read. The parent lives in
+`uploads/_collections/<id>/collection.json`, next to the batch's `test_summary.json`, `report.json` /
+`report.md`, `shared_features/` and `logs/`. The Dataset tab's session list shows a collection as one
+toggle with its summary (source, runs, test progress) and its runs inside. A copy of a run is a plain
+session again.
+
+API: `GET /api/collections`, `POST /api/collections {"source", "name", "children"}`,
+`GET /api/collections/{id}`, `POST /api/collections/{id}/children {"n"}`. `GET /api/sessions` gives
+each session's `collection` (or null).
+
+### Collection test harness
+
+`scripts/run_collection_test.py` creates or resumes a collection (default: "Test 1 - XTB campaign" from
+session `20261017-192847-808860`, "XTB · 1") and runs each run in a worker subprocess, K at a time:
+
+1. sets the run's LLM (default `claude_code` / `claude-opus-5-5`);
+2. checks the copied preprocessing (keyframes, Whisper transcript) is there; it is never re-run;
+3. vision features: `--vision shared` (default) computes them once, in run 001, and copies them into
+   every run, so the runs sample the scoring prompts only (P5 never sees the features, so per-run vision
+   noise would only blur P6); `--vision per-child` makes each run compute its own;
+4. clears the run's own P6 / P5 answers and runs one iteration of the active prompt against P5
+   (fresh scoring: each run is an independent sample), then asks the adoption gate.
+
+Accuracy comes from each run's iteration comparison (`evaluate.compare_iteration`, the only code that
+opens the answer keys); the script reads only the iteration records. Progress is saved after every run:
+finished runs are skipped on the next start, failed or interrupted ones retried (`--skip-errors` not to).
+A usage limit stops new runs; start again after the reset. The report (`report.json`, `report.md`, also
+printed) has each video's verdict distribution across runs, accuracy vs the CAC outcome (mean ± stdev),
+false SCALE, winners caught, P5 / P6 agreement, the gate pass rate, timing per run and per call,
+list-price cost and failures.
+
+```bash
+../.venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2 --limit 2   # pilot
+../.venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2           # all, or resume
+../.venv/bin/python scripts/run_collection_test.py --report-only
+```
+
+Options: `--source`, `--name`, `--provider`, `--model`, `--prompt` (default: each run's active prompt),
+`--vision shared|per-child`, `--limit`, `--concurrency`, `--skip-errors`, `--report-only`.
 
 ## Prompt versions and iterations
 
@@ -225,6 +305,8 @@ python scripts/score_video.py --list
 python scripts/score_video.py <session_id> --all
 ```
 
-`tests/` checks the integration offline (fake Anthropic client, no key, no network): the request
-sent, structured-output requests, refusal handling, response parsing, the rule guard and the
-injection guard. `pip install pytest`, then `python -m pytest -q tests` (20 tests).
+`tests/` checks the integration offline (fake clients, no key, no network): the request sent,
+structured-output requests, refusal handling, response parsing, the rule guard and the injection guard;
+the other providers, prompt versions and iterations; and the Claude Code CLI provider (a fake
+subprocess: flags, environment, images, retries, errors), collections and the collection harness
+(`tests/test_claude_code.py`). `pip install pytest`, then `python -m pytest -q tests` (90 tests).

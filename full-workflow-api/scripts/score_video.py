@@ -22,7 +22,7 @@ from app import config, ingest, pipeline  # noqa: E402
 
 
 def list_sessions():
-    for d in sorted(p for p in config.UPLOADS.iterdir() if p.is_dir()):
+    for d in sorted(p for p in config.UPLOADS.iterdir() if p.is_dir() and config.DATASET_ID_RE.match(p.name)):
         try:
             config.activate(d.name)
             ingest.load_inputs.cache_clear()

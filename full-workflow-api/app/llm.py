@@ -2,7 +2,8 @@
 (the open session's choice, else LLM_PROVIDER / LLM_MODEL).
 
 Providers: anthropic (default), openai, gemini, ollama, openai_compatible (LM Studio, llama.cpp,
-vLLM...). Callers always pass Anthropic-style content (a string, or a list of text and base64 image
+vLLM...), claude_code (the Claude Code CLI, `claude -p`, on the user's subscription login).
+Callers always pass Anthropic-style content (a string, or a list of text and base64 image
 blocks); each adapter translates it. No sampling parameters are sent to any provider.
 
 The OpenAI and Gemini SDKs are optional imports: the app starts without them, and choosing a
@@ -12,7 +13,10 @@ provider whose SDK is missing raises ProviderUnavailable with the pip command.
 import base64
 import importlib.util
 import json
+import os
 import re
+import subprocess
+import tempfile
 import time
 from functools import lru_cache
 
@@ -259,8 +263,123 @@ def _ollama(model, content, system, max_tokens, json_schema, stream):
             "detail": None}
 
 
+# ---------------------------------------------------------------- claude code CLI (subscription login)
+
+class RateLimited(LLMError):
+    """The Claude Code login hit a rate or usage limit. resets_at: epoch seconds, when known."""
+
+    def __init__(self, msg, resets_at=None):
+        super().__init__(msg)
+        self.resets_at = resets_at
+
+
+# Clean context: the scoring call must see only our prompt. --bare would be cleaner but drops the
+# subscription (OAuth) login, so each source of user context is switched off one by one instead:
+# --safe-mode (CLAUDE.md, user/plugin hooks, skills, MCP, memory, output styles), no settings files,
+# no MCP servers, no tools, no slash commands, nothing saved to disk. --system-prompt replaces Claude
+# Code's agent prompt (an empty one when the caller has none). What still reaches the model is what
+# the CLI always adds and no flag removes: a one-line identity ("You are a Claude agent, built on
+# Anthropic's Claude Agent SDK."), the account e-mail reminder and an environment block (cwd = an
+# empty temp dir, OS, date, model id). See README "Claude Code CLI" for the probe that checked this.
+_CC_FLAGS = ["-p", "--safe-mode", "--setting-sources", "", "--strict-mcp-config", "--tools", "",
+             "--disable-slash-commands", "--no-session-persistence",
+             "--input-format", "stream-json", "--output-format", "stream-json", "--verbose"]
+# Only what the CLI needs to run and find its login. Never ANTHROPIC_API_KEY (an API key wins over
+# the subscription login: a dead key would 401) nor CLAUDECODE / CLAUDE_CODE_* of a parent session.
+_CC_ENV = ("PATH", "HOME", "USER", "LOGNAME", "TMPDIR", "LANG", "LC_ALL", "SHELL", "TERM")
+_CC_LIMIT_RE = re.compile(r"rate.?limit|usage limit|limit reached|hit your limit|overloaded|too many requests",
+                          re.IGNORECASE)
+_CC_LOGIN_RE = re.compile(r"not logged in|/login|invalid api key|authentication|oauth", re.IGNORECASE)
+
+
+def _cc_env():
+    return {k: os.environ[k] for k in _CC_ENV if k in os.environ}
+
+
+def _cc_command(model, system, json_schema):
+    cmd = [config.CLAUDE_CODE_BIN, *_CC_FLAGS, "--system-prompt", system or "", "--model", model]
+    if json_schema:
+        cmd += ["--json-schema", json.dumps(json_schema)]
+    return cmd
+
+
+def _cc_input(content):
+    """One stream-json user message. Content blocks (text, base64 images) are Anthropic-shaped already."""
+    blocks = [b for b in _blocks(content) if b.get("type") in ("text", "image")]
+    return json.dumps({"type": "user", "message": {"role": "user", "content": blocks}}) + "\n"
+
+
+def _cc_once(model, content, system, json_schema):
+    """One `claude -p` run. Returns the adapter dict; raises LLMError / RateLimited / ProviderUnavailable."""
+    if not os.path.isfile(config.CLAUDE_CODE_BIN):
+        raise ProviderUnavailable(f"Claude Code CLI not found at {config.CLAUDE_CODE_BIN}: install it or set CLAUDE_CODE_BIN")
+    with tempfile.TemporaryDirectory(prefix="partgram-cc-") as cwd:          # no CLAUDE.md / AGENTS.md / git here
+        try:
+            proc = subprocess.run(_cc_command(model, system, json_schema), input=_cc_input(content),
+                                  capture_output=True, text=True, cwd=cwd, env=_cc_env(),
+                                  timeout=config.CLAUDE_CODE_TIMEOUT_S)
+        except subprocess.TimeoutExpired:
+            raise LLMError(f"claude -p did not answer within {config.CLAUDE_CODE_TIMEOUT_S:g}s") from None
+    events = []
+    for line in proc.stdout.splitlines():
+        try:
+            events.append(json.loads(line))
+        except ValueError:
+            continue                                                      # stray non-JSON output
+    limit = next((e.get("rate_limit_info") or {} for e in reversed(events) if e.get("type") == "rate_limit_event"), {})
+    result = next((e for e in reversed(events) if e.get("type") == "result"), None)
+    if result is None:
+        tail = (proc.stderr or proc.stdout or "").strip()[-400:]
+        if _CC_LOGIN_RE.search(tail):
+            raise ProviderUnavailable(f"Claude Code CLI is not logged in (run `claude`, then /login): {tail}")
+        raise LLMError(f"claude -p exited {proc.returncode} without a result: {tail or 'no output'}")
+    text = (result.get("result") or "").strip()
+    status = result.get("api_error_status")
+    if result.get("is_error") or result.get("subtype") != "success":
+        msg = f"claude -p error (status {status}, {result.get('subtype')}): {text[:300] or 'no message'}"
+        if status == 429 or (status or 0) >= 500 or _CC_LIMIT_RE.search(text) or limit.get("status") == "rejected":
+            raise RateLimited(msg, limit.get("resetsAt"))
+        if status in (401, 403) or _CC_LOGIN_RE.search(text):
+            raise ProviderUnavailable(f"Claude Code CLI login problem (run `claude`, then /login): {msg}")
+        if status == 404:
+            raise ProviderUnavailable(f"Claude Code cannot use model {model!r}: {msg}")
+        raise LLMError(msg)
+    stop = result.get("stop_reason")
+    if json_schema:
+        structured = result.get("structured_output")
+        if structured is not None:
+            text, stop = json.dumps(structured, ensure_ascii=False), "end_turn"   # parse_json still validates it
+    if stop != "refusal" and not text:
+        raise LLMError("claude -p returned an empty answer")
+    u = result.get("usage") or {}
+    pin = None if u.get("input_tokens") is None else sum(
+        u.get(k) or 0 for k in ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens"))
+    return {"text": text, "input_tokens": pin, "output_tokens": u.get("output_tokens"),
+            "stop_reason": {"end_turn": "end_turn", "max_tokens": "max_tokens", "refusal": "refusal",
+                            None: "end_turn"}.get(stop, stop),
+            "detail": text[:300] if stop == "refusal" else None,
+            "cost_usd": result.get("total_cost_usd")}    # list-price equivalent; a subscription is not billed per call
+
+
+def _claude_code(model, content, system, max_tokens, json_schema, stream):
+    """The CLI has no output cap flag (max_tokens is not sent) and no sampling flags; stream is moot.
+    Rate limits and overload are retried with backoff; a usage limit that resets later than
+    CLAUDE_CODE_MAX_WAIT_S is raised at once so a batch can stop instead of sleeping for hours."""
+    for attempt in range(config.CLAUDE_CODE_RETRIES + 1):
+        try:
+            return _cc_once(model, content, system, json_schema)
+        except RateLimited as e:
+            wait = min(30 * 2 ** attempt, 300)
+            if e.resets_at and e.resets_at - time.time() > config.CLAUDE_CODE_MAX_WAIT_S:
+                raise
+            if attempt == config.CLAUDE_CODE_RETRIES:
+                raise
+            time.sleep(wait)
+
+
 _ADAPTERS = {"anthropic": _anthropic, "openai": _openai, "gemini": _gemini, "ollama": _ollama,
-             "openai_compatible": lambda *a: _openai(*a, provider="openai_compatible")}
+             "openai_compatible": lambda *a: _openai(*a, provider="openai_compatible"),
+             "claude_code": _claude_code}
 
 
 def complete(content, system=None, max_tokens=1500, json_schema=None, stream=False):
@@ -269,8 +388,9 @@ def complete(content, system=None, max_tokens=1500, json_schema=None, stream=Fal
     stream=True is for long outputs on Anthropic: the reply arrives as it is written, so a
     request that takes minutes is not dropped as an idle connection. Other providers ignore it.
 
-    Returns {"text", "input_tokens", "output_tokens", "latency_s", "provider", "model", "stop_reason"}.
-    Token counts are None when a local server does not report them (never 0).
+    Returns {"text", "input_tokens", "output_tokens", "latency_s", "provider", "model", "stop_reason",
+    "cost_usd"}. Token counts are None when a local server does not report them (never 0); cost_usd is
+    None unless the provider reports it (the Claude Code CLI does).
     """
     choice = config.llm_choice()
     provider, model = choice["provider"], choice["model"]
@@ -288,10 +408,10 @@ def complete(content, system=None, max_tokens=1500, json_schema=None, stream=Fal
                        "(reasoning models count their thinking against it)")
     return {"text": out["text"], "input_tokens": out["input_tokens"], "output_tokens": out["output_tokens"],
             "latency_s": round(time.time() - t0, 2), "provider": provider, "model": model,
-            "stop_reason": out["stop_reason"]}
+            "stop_reason": out["stop_reason"], "cost_usd": out.get("cost_usd")}
 
 
-USAGE_KEYS = ("input_tokens", "output_tokens", "latency_s", "provider", "model")
+USAGE_KEYS = ("input_tokens", "output_tokens", "latency_s", "provider", "model", "cost_usd")
 
 
 def usage(resp):
@@ -366,6 +486,11 @@ def _models(provider):
     if provider == "gemini":
         return [{"id": m.name.removeprefix("models/"), "vision": True} for m in gemini_client().models.list()
                 if "generateContent" in (m.supported_actions or [])]
+    if provider == "claude_code":
+        # The CLI has no model listing; these are the ids it accepts (aliases work too: opus, sonnet).
+        ids = dict.fromkeys([config.DEFAULT_MODELS["claude_code"], "claude-opus-5-5", "claude-sonnet-5-5",
+                             "claude-haiku-5-5", "claude-fable-5-2"])
+        return [{"id": i, "vision": True} for i in ids]
     if provider == "ollama":
         out = []
         for m in _ollama_http("/api/tags", timeout=5.0).get("models", []):
@@ -385,6 +510,8 @@ def _configured(provider):
         return bool(config.GEMINI_API_KEY), "GEMINI_API_KEY or GOOGLE_API_KEY"
     if provider == "ollama":
         return True, "OLLAMA_BASE_URL"
+    if provider == "claude_code":
+        return os.path.isfile(config.CLAUDE_CODE_BIN), "CLAUDE_CODE_BIN (the `claude` CLI, logged in)"
     return True, "LOCAL_LLM_BASE_URL"
 
 

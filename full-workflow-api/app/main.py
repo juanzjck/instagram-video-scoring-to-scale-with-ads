@@ -13,7 +13,7 @@ from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import config, dataset, evaluate, export, fetch, genmedia, ingest, iterations, jobs, llm, pipeline, recap, scoring
+from . import collection, config, dataset, evaluate, export, fetch, genmedia, ingest, iterations, jobs, llm, pipeline, recap, scoring
 from . import prompt_versions as pv
 from .config import STATIC
 
@@ -64,6 +64,16 @@ class StartIteration(BaseModel):
     prompt_id: str
     force: bool = False                             # re-score even when an answer for this exact prompt is cached
     note: str = ""
+
+
+class NewCollection(BaseModel):
+    source: str
+    name: str = Field(min_length=1, max_length=100)
+    children: int = Field(0, ge=0, le=collection.MAX_CHILDREN)
+
+
+class MoreChildren(BaseModel):
+    n: int = Field(ge=1, le=collection.MAX_CHILDREN)
 
 
 class DatasetForm(BaseModel):
@@ -125,6 +135,45 @@ def reset_dataset():
 def list_sessions():
     """Saved sessions, most recently changed first."""
     return dataset.list_sessions()
+
+
+@app.get("/api/collections")
+def list_collections():
+    """Parent collections of sessions (runs of one source session), newest first, with a summary each."""
+    return collection.listing()
+
+
+@app.post("/api/collections")
+def create_collection(body: NewCollection):
+    """New collection of a saved session, with `children` copies of it ("<name> · run 001", ...).
+    The source is only read. Copies are APFS clones on macOS, plain copies elsewhere."""
+    _not_while_running()
+    try:
+        return collection.create(body.source, body.name, body.children)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+
+
+@app.get("/api/collections/{cid}")
+def get_collection(cid: str):
+    """One collection: its runs' session ids and, once a batch has run, its test summary and report."""
+    try:
+        return collection.get(cid)
+    except KeyError as e:
+        raise HTTPException(404, f"unknown collection {cid!r}") from e
+
+
+@app.post("/api/collections/{cid}/children")
+def add_collection_children(cid: str, body: MoreChildren):
+    """Add n more runs to a collection."""
+    _not_while_running()
+    try:
+        collection.add_children(cid, body.n)
+        return collection.get(cid)
+    except KeyError as e:
+        raise HTTPException(404, f"unknown collection {cid!r}") from e
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
 
 
 @app.get("/api/session")

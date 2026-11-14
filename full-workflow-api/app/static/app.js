@@ -89,9 +89,12 @@ const campaignReady = () => !!(String(campaign().campaign_id ?? "").trim() && St
 const GENERATED = ["media.csv", "keyframes.csv", "transcripts.csv"];   // pipeline output, not form input
 const form = { schema: null, data: null, errors: [] };
 state.openSessions = new Set();
+state.openCollections = new Set();
+state.collections = [];
 document.addEventListener("toggle", (ev) => {
   const d = ev.target;
   if (d.matches?.("details.sess")) state.openSessions[d.open ? "add" : "delete"](d.dataset.session);
+  else if (d.matches?.("details.coll")) state.openCollections[d.open ? "add" : "delete"](d.dataset.collection);
 }, true);
 
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
@@ -166,7 +169,9 @@ window.addEventListener("pagehide", () => {
 async function refreshSessionList() {
   const el = $("#session-list");
   if (!el) return;
-  el.innerHTML = sessionList(await api("/api/sessions").catch(() => []));
+  const [list, colls] = await Promise.all([api("/api/sessions").catch(() => []), api("/api/collections").catch(() => [])]);
+  state.collections = colls;
+  el.innerHTML = sessionList(list);
 }
 
 async function copySession(btn) {
@@ -238,10 +243,44 @@ async function askDeleteSession(id) {
   input.focus();
 }
 
-// Every saved session as a toggle: the summary line, and its contents when expanded.
+// Every saved session as a toggle: the summary line, and its contents when expanded. Runs of a
+// collection (session.json "collection") are grouped under their parent, which is a toggle too.
 function sessionList(list) {
   if (!list.length) return '<p class="hint">No saved sessions yet.</p>';
-  return list.map((x) => {
+  const groups = new Map(), loose = [];
+  for (const x of list) {
+    const cid = x.collection?.id;
+    if (!cid) { loose.push(x); continue; }
+    if (!groups.has(cid)) groups.set(cid, []);
+    groups.get(cid).push(x);
+  }
+  const meta = new Map((state.collections || []).map((c) => [c.id, c]));
+  return [...groups].map(([cid, kids]) => collectionGroup(cid, kids, meta.get(cid))).join("")
+    + loose.map(sessionItem).join("");
+}
+
+function collectionGroup(cid, kids, c) {
+  kids.sort((a, b) => (a.collection.index || 0) - (b.collection.index || 0));
+  const t = c?.test, scored = kids.filter((k) => k.scored).length;
+  const open = state.openCollections.has(cid) || kids.some((k) => k.id === state.session?.id);
+  return `<details class="coll" data-collection="${esc(cid)}" ${open ? "open" : ""}>
+    <summary><b>${esc(c?.name || kids[0].collection.name)}</b>
+      <span class="chip">collection</span>
+      <span class="hint">${plural(kids.length, "run")} of ${esc(c?.source_name || c?.source || "another session")} ·
+        ${t ? `test: ${t.done} done, ${t.error} failed${t.running ? `, ${t.running} running` : ""}` : "no test run yet"}</span></summary>
+    <dl class="features sess-body">
+      <dt>Source</dt><dd>${esc(c?.source_name || "—")} · <code>uploads/${esc(c?.source || "?")}/</code> (copied, never changed)</dd>
+      <dt>Runs</dt><dd>${plural(kids.length, "run")} · ${scored} with scored videos</dd>
+      <dt>Test</dt><dd>${t ? `${esc(t.llm?.provider || "?")} / ${esc(t.llm?.model || "?")} · vision ${esc(t.vision || "?")} ·
+        updated ${esc(localTime(t.updated_at) || "—")}${t.report ? " · report in the folder below" : ""}`
+        : "not run yet (scripts/run_collection_test.py)"}</dd>
+      <dt>Saved in</dt><dd><code>uploads/_collections/${esc(cid)}/</code></dd>
+    </dl>
+    <div class="coll-kids">${kids.map(sessionItem).join("")}</div>
+  </details>`;
+}
+
+function sessionItem(x) {
     const current = x.id === state.session?.id;
     const r = x.rows || {};
     return `<details class="sess${current ? " current" : ""}" data-session="${esc(x.id)}" ${state.openSessions?.has(x.id) ? "open" : ""}>
@@ -276,7 +315,6 @@ function sessionList(list) {
         <button class="btn danger small" data-delete-session="${esc(x.id)}">Delete session</button>
         <span class="hint" data-copy-msg="${esc(x.id)}"></span></div>
     </details>`;
-  }).join("");
 }
 
 async function openSession(id) {
@@ -565,8 +603,8 @@ async function renderSetup() {
   main.innerHTML = `<p class="empty">Loading…</p>`;
   let ds, vids, job, sessions;
   try {
-    [ds, vids, job, sessions] = await Promise.all([api("/api/dataset"), api("/api/videos"), api("/api/pipeline/status"),
-      api("/api/sessions"), loadForm()]);
+    [ds, vids, job, sessions, state.collections] = await Promise.all([api("/api/dataset"), api("/api/videos"),
+      api("/api/pipeline/status"), api("/api/sessions"), api("/api/collections").catch(() => []), loadForm()]);
   } catch (e) { main.innerHTML = `<p class="empty">Error: ${esc(e.message)}</p>`; return; }
   if (state.view !== "setup") return;
   state.job = job;

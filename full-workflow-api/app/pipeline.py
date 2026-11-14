@@ -164,6 +164,20 @@ def run_prompt(video_id, prompt_id, force=False):
         prompt_id, summary(video_id, True), row, template=None if v["builtin"] else v["text"])))
 
 
+def analyse(video_id, force=False, progress=None):
+    """Step 3 on its own: the vision features for the current model, from the cached preprocess.
+    Raises KeyError when the video has not been preprocessed (this never runs Whisper)."""
+    feats = None if force else load(video_id, "features")
+    if feats is None:
+        row, _ = _row(video_id)
+        pre = load(video_id, "preprocess")
+        if pre is None:
+            raise KeyError(f"{video_id} has no preprocess.json yet")
+        (progress or (lambda name: None))("analysing")
+        feats = _save(video_id, "features", _timed(video_id, "analyse", lambda: vision.analyse(video_id, row, pre)) or {})
+    return feats
+
+
 def process(video_id, force=False, progress=None, prompt_id=None):
     """Fetch -> preprocess -> visual analysis -> merge -> P6 (the active version, or prompt_id) -> rule guard.
     Returns the card.
@@ -182,10 +196,7 @@ def process(video_id, force=False, progress=None, prompt_id=None):
         step("preprocessing")
         pre = _save(video_id, "preprocess", _timed(video_id, "preprocess", lambda: media.preprocess(video_id, row)))
 
-    feats = None if force else load(video_id, "features")
-    if feats is None:
-        step("analysing")
-        feats = _save(video_id, "features", _timed(video_id, "analyse", lambda: vision.analyse(video_id, row, pre)) or {})
+    analyse(video_id, force=force, progress=step)
 
     step("scoring")
     run_prompt(video_id, prompt_id or pv.active(), force=force)

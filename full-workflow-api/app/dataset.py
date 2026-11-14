@@ -17,6 +17,8 @@ import io
 import json
 import re
 import shutil
+import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import PurePath
 
@@ -393,7 +395,7 @@ def campaign_name(form):
 
 def _summary(session, details=False):
     form = session.get("form", {})
-    out = {k: session.get(k) for k in ("id", "name", "created_at", "updated_at", "generated_at")} | {
+    out = {k: session.get(k) for k in ("id", "name", "created_at", "updated_at", "generated_at", "collection")} | {
         "generated": bool(session.get("generated_at") or session.get("generated")),
         "videos_in_form": _filled(form.get("videos.csv"))}
     if details:                              # what the session list shows when a row is expanded
@@ -437,6 +439,8 @@ def save_draft(tables, name=None):
     session = current_session() or _new_session(name)
     session["form"] = _sanitize_form(tables)
     auto = campaign_name(session["form"])
+    if session.get("collection"):                # a collection's runs keep their "<collection> · run 001" name
+        auto = None
     session["name"] = ((name or "").strip() or (auto and auto + session.get("name_suffix", "")) or session["name"])[:120]
     return _save_session(session)
 
@@ -561,7 +565,7 @@ def copy_session(session_id):
     src = config.UPLOADS / session_id
     new_id = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     dst = config.UPLOADS / new_id
-    shutil.copytree(src, dst)
+    _copytree(src, dst)
     old_uri, new_uri = src.resolve().as_uri(), dst.resolve().as_uri()
     for p in dst.rglob("*"):
         if p.is_file() and p.suffix in (".json", ".csv", ".txt", ".jsonl") and p.stat().st_size < MAX_FILE_BYTES:
@@ -569,11 +573,24 @@ def copy_session(session_id):
             if old_uri in text:
                 p.write_text(text.replace(old_uri, new_uri), encoding="utf-8")
     session = _load_session(dst)
+    session.pop("collection", None)          # a copy of a collection's run is a plain session
     suffix = session.get("name_suffix", "") + " (copy)"      # kept when autosave renames it after its campaign
     session.update(id=new_id, name=((campaign_name(session.get("form")) or session.get("name") or "Campaign") + suffix)[:120],
                    name_suffix=suffix, created_at=_now(), copied_from=session_id)
     _save_session(session)
     return _summary(session)
+
+
+def _copytree(src, dst):
+    """shutil.copytree, but on macOS first try an APFS clone (`cp -c`): copy-on-write, so a copy of a
+    session's clips and frames takes no extra disk until a file changes, and the copies stay independent."""
+    if sys.platform == "darwin":
+        try:
+            subprocess.run(["cp", "-cR", str(src), str(dst)], check=True, capture_output=True, timeout=600)
+            return
+        except (OSError, subprocess.SubprocessError):
+            shutil.rmtree(dst, ignore_errors=True)       # e.g. not an APFS volume: plain copy below
+    shutil.copytree(src, dst)
 
 
 def delete_session(session_id):

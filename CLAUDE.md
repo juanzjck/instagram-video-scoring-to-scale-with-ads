@@ -40,6 +40,10 @@ cd full-workflow-api && ../.venv/bin/python -m pytest -q tests
 ../.venv/bin/python scripts/score_video.py <session_id> --all [--force] [--summary]
 ../.venv/bin/python scripts/make_synthetic_media.py --dataset=<id> [--ai-images] [--force] vid_001
 
+# full-workflow-api: collection test (N runs of one session via the `claude` CLI, subscription login)
+../.venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2 [--limit 2]   # resumable
+../.venv/bin/python scripts/run_collection_test.py --report-only
+
 # bias study (Module 9)
 cd bias-fairness-module9
 MOCK=1 ../.venv/bin/python bias_study.py      # free dry run, fake scorer with a planted gender penalty
@@ -89,6 +93,11 @@ evaluation (`evaluate.py`).
   `OPENAI_API_KEY` is set, else macOS `say`. Charts, badges and captions are drawn with Pillow, never generated.
 - No sampling parameters are sent to the model (any provider). `app/llm.py` is the only module that talks to
   an LLM; `openai` / `google-genai` are optional imports.
+- **`claude_code` provider** runs `claude -p` with clean-context flags (`--safe-mode`, no settings / MCP /
+  tools, its own `--system-prompt`, an empty temp cwd, no `ANTHROPIC_API_KEY` in its env). Not `--bare`: that
+  drops the subscription login. Images go in on stdin via `--input-format stream-json`.
+- **Collections** (`app/collection.py`): a parent in `uploads/_collections/<id>/` groups copies ("runs") of one
+  session; each run's `session.json` has `"collection"`. `scripts/run_collection_test.py` drives them.
 
 **bias-fairness-module9.** Single script `bias_study.py`: 10 videos × 6 personas (3 women / 3 men,
 surname-matched) with identical metrics; only name + gender line differ. Conditions: `baseline`,
