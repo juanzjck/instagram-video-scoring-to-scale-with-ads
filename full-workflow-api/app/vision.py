@@ -5,7 +5,6 @@ injection guard and section 7 of flatten() all draw on one response.
 """
 
 import base64
-import json
 
 from . import config, guard, llm
 from .config import NA
@@ -126,8 +125,8 @@ def analyse(video_id, row, pre):
                     "Return the content features for this video."})
 
     resp = llm.complete(content, system=SYSTEM, max_tokens=4000, json_schema=SCHEMA)
-    features = json.loads(resp["text"])
-    features["_usage"] = {k: resp[k] for k in ("input_tokens", "output_tokens", "latency_s", "model")}
+    features = llm.parse_json(resp["text"], SCHEMA)     # strict: a local model may ignore the format
+    features["_usage"] = llm.usage(resp)
 
     # Attach frame ids / files so the card can show each note under its picture.
     by_t = {int(f["t_s"]): f for f in frames}

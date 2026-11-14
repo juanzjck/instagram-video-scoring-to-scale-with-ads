@@ -1,0 +1,5 @@
+anthropic
+pandas
+numpy
+matplotlib
+python-dotenv

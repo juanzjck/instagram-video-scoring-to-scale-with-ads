@@ -146,6 +146,7 @@ main, .top > div, .grid2 > *, .panel { min-width: 0; }
 
 /* dataset tab */
 .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.row.llm input { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font: inherit; width: 240px; }
 .row select, .urls input.url { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font: inherit; }
 .urls input.url { width: 100%; min-width: 260px; }
 .urls td { vertical-align: middle; }
@@ -177,7 +178,7 @@ textarea.fc { min-width: 220px; resize: vertical; display: block; }
 .url-cell label.btn { white-space: nowrap; }
 .ferrs { color: var(--danger); font-size: 13px; margin: 8px 0 0; padding-left: 18px; }
 .req { color: var(--danger); font-weight: 700; }
-label.btn { display: inline-block; }
+label.btn, a.btn { display: inline-block; text-decoration: none; }
 .bulk { border-top: 1px dashed var(--border); margin-top: 12px; padding-top: 10px; display: grid; gap: 8px; }
 .bulk h4 { margin: 0; color: var(--heading); font-size: 13px; }
 .bulk select, .bulk textarea { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 13px; }
@@ -258,3 +259,12 @@ table.cls td.cls-scope { background: var(--bg-mint); color: var(--heading); font
 .thresholds .row { align-items: flex-end; gap: 10px 16px; }
 .th-field { display: inline-flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--heading); }
 .th-field input { width: 130px; }
+/* Prompt versions */
+.pv-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.pv-note { max-width: 260px; }
+.pv-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; margin: 10px 0; }
+.pv-field input, .pv-field textarea, textarea.pv-text { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 13px; }
+textarea.pv-text { width: 100%; box-sizing: border-box; font: 12px/1.5 ui-monospace, Menlo, monospace; resize: vertical; margin-bottom: 10px; }
+pre.pv-pre { max-height: 60vh; overflow: auto; margin-top: 10px; }
+.pv-log { margin: 6px 0 0; padding-left: 18px; font-size: 13px; }
+.tablewrap { overflow-x: auto; }

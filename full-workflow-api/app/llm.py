@@ -1,27 +1,82 @@
-"""One shared Anthropic client. No sampling parameters are sent: current models reject them."""
+"""Every LLM call goes through complete(). The provider and model come from config.llm_choice()
+(the open session's choice, else LLM_PROVIDER / LLM_MODEL).
 
+Providers: anthropic (default), openai, gemini, ollama, openai_compatible (LM Studio, llama.cpp,
+vLLM...). Callers always pass Anthropic-style content (a string, or a list of text and base64 image
+blocks); each adapter translates it. No sampling parameters are sent to any provider.
+
+The OpenAI and Gemini SDKs are optional imports: the app starts without them, and choosing a
+provider whose SDK is missing raises ProviderUnavailable with the pip command.
+"""
+
+import base64
+import importlib.util
+import json
+import re
 import time
 from functools import lru_cache
 
 import anthropic
+import httpx
 
-from .config import MODEL, WORKSPACE_ID
+from . import config
+from .config import WORKSPACE_ID
 
+
+class LLMError(RuntimeError):
+    """A call that cannot produce a usable answer (refusal, truncation, malformed JSON...)."""
+
+
+class ProviderUnavailable(LLMError):
+    """The provider cannot be used as configured: missing SDK, key, server or model."""
+
+
+class VisionUnsupported(LLMError):
+    """Images were sent to a model that cannot read them."""
+
+
+_SDK = {"openai": ("openai", "openai"), "openai_compatible": ("openai", "openai"),
+        "gemini": ("google.genai", "google-genai")}
+
+
+def sdk_missing(provider):
+    """The pip package a provider needs and lacks, or None."""
+    mod, pip = _SDK.get(provider, (None, None))
+    if mod is None:
+        return None
+    try:
+        found = importlib.util.find_spec(mod) is not None
+    except ModuleNotFoundError:                  # find_spec("google.genai") without "google"
+        found = False
+    return None if found else pip
+
+
+def _require(provider):
+    pip = sdk_missing(provider)
+    if pip:
+        raise ProviderUnavailable(f"{config.LLM_PROVIDERS[provider]} needs the {pip!r} package: "
+                                  f"../.venv/bin/pip install {pip}")
+
+
+# ---------------------------------------------------------------- content helpers
+
+def _blocks(content):
+    return [{"type": "text", "text": content}] if isinstance(content, str) else list(content)
+
+
+def _has_images(content):
+    return not isinstance(content, str) and any(b.get("type") == "image" for b in content)
+
+
+# ---------------------------------------------------------------- anthropic
 
 @lru_cache(maxsize=1)
 def client():
     return anthropic.Anthropic(max_retries=4)
 
 
-def complete(content, system=None, max_tokens=1500, json_schema=None, stream=False):
-    """Single user turn. `content` is a string or a list of content blocks (text + images).
-
-    stream=True is for long outputs: the reply arrives as it is written, so a request that
-    takes minutes is not dropped as an idle connection. The return value is the same.
-
-    Returns {"text", "input_tokens", "output_tokens", "latency_s", "model", "stop_reason"}.
-    """
-    kwargs = dict(model=MODEL, max_tokens=max_tokens,
+def _anthropic(model, content, system, max_tokens, json_schema, stream):
+    kwargs = dict(model=model, max_tokens=max_tokens,
                   messages=[{"role": "user", "content": content}])
     if system:
         kwargs["system"] = system
@@ -29,20 +84,337 @@ def complete(content, system=None, max_tokens=1500, json_schema=None, stream=Fal
         kwargs["output_config"] = {"format": {"type": "json_schema", "schema": json_schema}}
     if WORKSPACE_ID:
         kwargs["workspace_id"] = WORKSPACE_ID
-
-    t0 = time.time()
     if stream:
         with client().messages.stream(**kwargs) as s:
             resp = s.get_final_message()
     else:
         resp = client().messages.create(**kwargs)
-    if resp.stop_reason == "refusal":
-        raise RuntimeError("the model declined this request (stop_reason=refusal)")
-    return {
-        "text": "".join(b.text for b in resp.content if b.type == "text"),
-        "input_tokens": resp.usage.input_tokens,
-        "output_tokens": resp.usage.output_tokens,
-        "latency_s": round(time.time() - t0, 2),
-        "model": MODEL,
-        "stop_reason": resp.stop_reason,
-    }
+    return {"text": "".join(b.text for b in resp.content if b.type == "text"),
+            "input_tokens": resp.usage.input_tokens, "output_tokens": resp.usage.output_tokens,
+            "stop_reason": resp.stop_reason, "detail": None}
+
+
+# ---------------------------------------------------------------- openai + openai-compatible
+
+@lru_cache(maxsize=4)
+def openai_client(base_url=None, api_key=None):
+    _require("openai")
+    import openai
+    return openai.OpenAI(base_url=base_url, api_key=api_key, max_retries=4)
+
+
+def _openai_conn(provider):
+    if provider == "openai":
+        if not config.OPENAI_API_KEY:
+            raise ProviderUnavailable("OpenAI needs OPENAI_API_KEY in full-workflow-api/.env")
+        return openai_client(None, config.OPENAI_API_KEY)
+    return openai_client(config.LOCAL_LLM_BASE_URL, config.LOCAL_LLM_API_KEY)
+
+
+_OPENAI_STOP = {"stop": "end_turn", "length": "max_tokens", "content_filter": "refusal",
+                "tool_calls": "tool_use"}
+
+
+def _openai(model, content, system, max_tokens, json_schema, stream, provider="openai"):
+    parts = []
+    for b in _blocks(content):
+        if b["type"] == "text":
+            parts.append({"type": "text", "text": b["text"]})
+        elif b["type"] == "image":
+            src = b["source"]
+            parts.append({"type": "image_url",
+                          "image_url": {"url": f"data:{src['media_type']};base64,{src['data']}"}})
+    messages = ([{"role": "system", "content": system}] if system else []) + [
+        {"role": "user", "content": content if isinstance(content, str) else parts}]
+    kwargs = dict(model=model, messages=messages)
+    # OpenAI's current name for the cap; local servers mostly still read max_tokens.
+    kwargs["max_completion_tokens" if provider == "openai" else "max_tokens"] = max_tokens
+    if json_schema:
+        kwargs["response_format"] = {"type": "json_schema",
+                                     "json_schema": {"name": "output", "schema": json_schema, "strict": True}}
+    try:
+        resp = _openai_conn(provider).chat.completions.create(**kwargs)
+    except Exception as e:
+        if type(e).__name__ == "APIConnectionError":
+            raise ProviderUnavailable(f"no OpenAI-compatible server at {config.LOCAL_LLM_BASE_URL} "
+                                      "(start LM Studio's server, or set LOCAL_LLM_BASE_URL)") from e
+        raise
+    if not resp.choices:
+        return {"text": "", "input_tokens": None, "output_tokens": None, "stop_reason": "refusal",
+                "detail": "no choices returned"}
+    ch = resp.choices[0]
+    refusal = getattr(ch.message, "refusal", None)
+    u = resp.usage
+    return {"text": ch.message.content or "",
+            "input_tokens": getattr(u, "prompt_tokens", None), "output_tokens": getattr(u, "completion_tokens", None),
+            "stop_reason": "refusal" if refusal else _OPENAI_STOP.get(ch.finish_reason, ch.finish_reason),
+            "detail": refusal}
+
+
+# ---------------------------------------------------------------- gemini
+
+@lru_cache(maxsize=1)
+def gemini_client():
+    _require("gemini")
+    if not config.GEMINI_API_KEY:
+        raise ProviderUnavailable("Gemini needs GEMINI_API_KEY (or GOOGLE_API_KEY) in full-workflow-api/.env")
+    from google import genai
+    return genai.Client(api_key=config.GEMINI_API_KEY)
+
+
+_GEMINI_BLOCKED = {"SAFETY", "RECITATION", "BLOCKLIST", "PROHIBITED_CONTENT", "SPII", "IMAGE_SAFETY",
+                   "IMAGE_PROHIBITED_CONTENT", "MODEL_ARMOR", "LANGUAGE"}
+
+
+def _name(enum):
+    return None if enum is None else getattr(enum, "name", str(enum))
+
+
+def _gemini(model, content, system, max_tokens, json_schema, stream):
+    gc = gemini_client()
+    from google.genai import types
+    parts = []
+    for b in _blocks(content):
+        if b["type"] == "text":
+            parts.append(types.Part.from_text(text=b["text"]))
+        elif b["type"] == "image":
+            parts.append(types.Part.from_bytes(data=base64.b64decode(b["source"]["data"]),
+                                               mime_type=b["source"]["media_type"]))
+    cfg = dict(max_output_tokens=max_tokens)
+    if system:
+        cfg["system_instruction"] = system
+    if json_schema:
+        cfg.update(response_mime_type="application/json", response_json_schema=json_schema)
+    resp = gc.models.generate_content(model=model, contents=[types.Content(role="user", parts=parts)],
+                                      config=types.GenerateContentConfig(**cfg))
+    u = resp.usage_metadata
+    usage = {"input_tokens": getattr(u, "prompt_token_count", None),
+             "output_tokens": (getattr(u, "candidates_token_count", None) or 0) + (getattr(u, "thoughts_token_count", None) or 0)
+             if u else None}
+    blocked = _name(getattr(resp.prompt_feedback, "block_reason", None)) if resp.prompt_feedback else None
+    if blocked or not resp.candidates:
+        return {"text": "", **usage, "stop_reason": "refusal", "detail": f"prompt blocked: {blocked}"}
+    cand = resp.candidates[0]
+    finish = _name(cand.finish_reason)
+    text = "".join(p.text for p in ((cand.content and cand.content.parts) or [])
+                   if getattr(p, "text", None) and not getattr(p, "thought", False))
+    stop = ("refusal" if finish in _GEMINI_BLOCKED else "max_tokens" if finish == "MAX_TOKENS"
+            else "end_turn" if finish in (None, "STOP") else finish.lower())
+    return {"text": text, **usage, "stop_reason": stop, "detail": finish if stop == "refusal" else None}
+
+
+# ---------------------------------------------------------------- ollama (native API)
+
+def _ollama_http(path, body=None, timeout=600.0):
+    url = config.OLLAMA_BASE_URL + path
+    try:
+        r = (httpx.post(url, json=body, timeout=timeout) if body is not None
+             else httpx.get(url, timeout=timeout))
+    except httpx.HTTPError as e:
+        raise ProviderUnavailable(f"Ollama is not reachable at {config.OLLAMA_BASE_URL} "
+                                  "(start the Ollama app or `ollama serve`, or set OLLAMA_BASE_URL)") from e
+    if r.status_code == 404 and body and body.get("model"):
+        raise ProviderUnavailable(f"Ollama has no model {body['model']!r}: run `ollama pull {body['model']}`")
+    if r.status_code >= 400:
+        raise LLMError(f"Ollama {path} returned {r.status_code}: {r.text[:300]}")
+    return r.json()
+
+
+def ollama_capabilities(model):
+    """Ollama's capability list for a model (e.g. ["completion", "vision"]), or None if it does not say."""
+    return _ollama_http("/api/show", {"model": model}, timeout=30.0).get("capabilities")
+
+
+def _ollama(model, content, system, max_tokens, json_schema, stream):
+    if _has_images(content):
+        caps = ollama_capabilities(model)
+        if caps is not None and "vision" not in caps:
+            raise VisionUnsupported(f"Ollama model {model!r} cannot read images (capabilities: "
+                                    f"{', '.join(caps)}); pick a vision model, e.g. `ollama pull qwen2.5vl`")
+    # Ollama takes one string plus a list of images, so mark where each image sat in the text.
+    texts, images = [], []
+    for b in _blocks(content):
+        if b["type"] == "text":
+            texts.append(b["text"])
+        elif b["type"] == "image":
+            images.append(b["source"]["data"])
+            texts.append(f"[image {len(images)}]")
+    user = {"role": "user", "content": "\n".join(texts)}
+    if images:
+        user["images"] = images
+    body = {"model": model, "stream": False,
+            "messages": ([{"role": "system", "content": system}] if system else []) + [user],
+            # output cap and context size, not sampling settings
+            "options": {"num_predict": max_tokens, "num_ctx": config.OLLAMA_NUM_CTX}}
+    if json_schema:
+        body["format"] = json_schema
+    r = _ollama_http("/api/chat", body)
+    pin, pout = r.get("prompt_eval_count"), r.get("eval_count")
+    if pin is not None and pin + (pout or 0) >= config.OLLAMA_NUM_CTX:
+        raise LLMError(f"the prompt filled Ollama's {config.OLLAMA_NUM_CTX}-token context and was cut; "
+                       "raise OLLAMA_NUM_CTX")
+    done = r.get("done_reason")
+    return {"text": (r.get("message") or {}).get("content") or "", "input_tokens": pin, "output_tokens": pout,
+            "stop_reason": {"stop": "end_turn", "length": "max_tokens", None: "end_turn"}.get(done, done),
+            "detail": None}
+
+
+_ADAPTERS = {"anthropic": _anthropic, "openai": _openai, "gemini": _gemini, "ollama": _ollama,
+             "openai_compatible": lambda *a: _openai(*a, provider="openai_compatible")}
+
+
+def complete(content, system=None, max_tokens=1500, json_schema=None, stream=False):
+    """Single user turn. `content` is a string or a list of content blocks (text + images).
+
+    stream=True is for long outputs on Anthropic: the reply arrives as it is written, so a
+    request that takes minutes is not dropped as an idle connection. Other providers ignore it.
+
+    Returns {"text", "input_tokens", "output_tokens", "latency_s", "provider", "model", "stop_reason"}.
+    Token counts are None when a local server does not report them (never 0).
+    """
+    choice = config.llm_choice()
+    provider, model = choice["provider"], choice["model"]
+    if not model:
+        raise ProviderUnavailable(f"no model chosen for {config.LLM_PROVIDERS[provider]}: pick one in the "
+                                  "Run panel, or set LLM_MODEL")
+    _require(provider)
+    t0 = time.time()
+    out = _ADAPTERS[provider](model, content, system, max_tokens, json_schema, stream)
+    if out["stop_reason"] == "refusal":
+        why = f": {out['detail']}" if out.get("detail") else ""
+        raise RuntimeError(f"the model declined this request (stop_reason=refusal){why}")
+    if out["stop_reason"] == "max_tokens" and not out["text"].strip():
+        raise LLMError(f"{model} used its whole {max_tokens}-token output budget without answering "
+                       "(reasoning models count their thinking against it)")
+    return {"text": out["text"], "input_tokens": out["input_tokens"], "output_tokens": out["output_tokens"],
+            "latency_s": round(time.time() - t0, 2), "provider": provider, "model": model,
+            "stop_reason": out["stop_reason"]}
+
+
+USAGE_KEYS = ("input_tokens", "output_tokens", "latency_s", "provider", "model")
+
+
+def usage(resp):
+    """The part of a complete() result that is saved with each stage."""
+    return {k: resp.get(k) for k in USAGE_KEYS}
+
+
+# ---------------------------------------------------------------- strict JSON output
+
+_FENCE_RE = re.compile(r"^```(?:json)?\s*(.*?)\s*```$", re.DOTALL)
+
+
+def _check(value, schema, path="$"):
+    """A small JSON-schema check (type, enum, required, properties, items, anyOf): enough to
+    reject a local model that ignored the requested format. Returns the first problem or None."""
+    if "anyOf" in schema:
+        return None if any(_check(value, s, path) is None for s in schema["anyOf"]) else f"{path}: matches no allowed type"
+    t = schema.get("type")
+    ok = {"object": isinstance(value, dict), "array": isinstance(value, list), "string": isinstance(value, str),
+          "boolean": isinstance(value, bool), "null": value is None,
+          "number": isinstance(value, (int, float)) and not isinstance(value, bool),
+          "integer": isinstance(value, int) and not isinstance(value, bool)}.get(t, True)
+    if not ok:
+        return f"{path}: expected {t}, got {type(value).__name__}"
+    if "enum" in schema and value not in schema["enum"]:
+        return f"{path}: {value!r} is not one of {schema['enum']}"
+    if t == "object":
+        missing = [k for k in schema.get("required", []) if k not in value]
+        if missing:
+            return f"{path}: missing {', '.join(missing)}"
+        for k, sub in schema.get("properties", {}).items():
+            if k in value and (err := _check(value[k], sub, f"{path}.{k}")):
+                return err
+    if t == "array" and "items" in schema:
+        for i, item in enumerate(value):
+            if err := _check(item, schema["items"], f"{path}[{i}]"):
+                return err
+    return None
+
+
+def parse_json(text, schema=None):
+    """Parse a structured reply strictly. Raises LLMError on malformed JSON or a schema mismatch."""
+    s = (text or "").strip()
+    m = _FENCE_RE.match(s)
+    if m:
+        s = m.group(1)
+    try:
+        data = json.loads(s)
+    except ValueError as e:
+        raise LLMError(f"the model returned malformed JSON ({e}): {s[:200]!r}") from None
+    if schema and (err := _check(data, schema)):
+        raise LLMError(f"the model's JSON does not match the expected schema: {err}")
+    return data
+
+
+# ---------------------------------------------------------------- model lists (for the UI)
+
+_OPENAI_SKIP = re.compile(r"embed|tts|whisper|dall-e|image|audio|realtime|moderation|transcribe|davinci|babbage|search",
+                          re.IGNORECASE)
+
+
+def _models(provider):
+    """[{"id", "vision"}] for one provider. vision is True / False / None (unknown)."""
+    if provider == "anthropic":
+        return [{"id": m.id, "vision": True} for m in client().models.list()]   # free call
+    if provider in ("openai", "openai_compatible"):
+        _require(provider)
+        ids = sorted(m.id for m in _openai_conn(provider).models.list())
+        if provider == "openai":
+            ids = [i for i in ids if not _OPENAI_SKIP.search(i)]
+        return [{"id": i, "vision": None} for i in ids]
+    if provider == "gemini":
+        return [{"id": m.name.removeprefix("models/"), "vision": True} for m in gemini_client().models.list()
+                if "generateContent" in (m.supported_actions or [])]
+    if provider == "ollama":
+        out = []
+        for m in _ollama_http("/api/tags", timeout=5.0).get("models", []):
+            caps = ollama_capabilities(m["name"])
+            if caps is None or "completion" in caps:          # leave embedding-only models out
+                out.append({"id": m["name"], "vision": None if caps is None else "vision" in caps})
+        return out
+    raise ValueError(f"unknown provider {provider!r}")
+
+
+def _configured(provider):
+    if provider == "anthropic":
+        return bool(config._env("ANTHROPIC_API_KEY")), "ANTHROPIC_API_KEY"
+    if provider == "openai":
+        return bool(config.OPENAI_API_KEY), "OPENAI_API_KEY"
+    if provider == "gemini":
+        return bool(config.GEMINI_API_KEY), "GEMINI_API_KEY or GOOGLE_API_KEY"
+    if provider == "ollama":
+        return True, "OLLAMA_BASE_URL"
+    return True, "LOCAL_LLM_BASE_URL"
+
+
+def providers():
+    """Every provider with whether it is set up. No network calls."""
+    out = []
+    for pid, label in config.LLM_PROVIDERS.items():
+        ok, env = _configured(pid)
+        pip = sdk_missing(pid)
+        out.append({"id": pid, "label": label, "configured": ok and not pip, "env": env,
+                    "missing_sdk": pip, "default_model": config.DEFAULT_MODELS.get(pid),
+                    "base_url": {"ollama": config.OLLAMA_BASE_URL,
+                                 "openai_compatible": config.LOCAL_LLM_BASE_URL}.get(pid)})
+    return out
+
+
+def list_models(provider):
+    """The models a provider offers right now. Errors come back as a message, not an exception,
+    so one unreachable provider does not break the picker."""
+    if provider not in config.LLM_PROVIDERS:
+        raise ValueError(f"unknown provider {provider!r}")
+    info = next(p for p in providers() if p["id"] == provider)
+    if info["missing_sdk"]:
+        return dict(info, models=[], error=f"install it: ../.venv/bin/pip install {info['missing_sdk']}")
+    if not info["configured"]:
+        return dict(info, models=[], error=f"set {info['env']} in full-workflow-api/.env")
+    try:
+        return dict(info, models=_models(provider), error=None)
+    except Exception as e:                       # unreachable server, bad key...
+        msg = f"{type(e).__name__}: {e}"
+        if provider == "openai_compatible" and type(e).__name__ == "APIConnectionError":
+            msg = f"no server at {config.LOCAL_LLM_BASE_URL} (start LM Studio's server, or set LOCAL_LLM_BASE_URL)"
+        return dict(info, models=[], error=msg)

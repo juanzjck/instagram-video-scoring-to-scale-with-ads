@@ -9,11 +9,13 @@ from typing import Literal, Optional
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
+from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import config, dataset, evaluate, fetch, genmedia, ingest, jobs, pipeline, recap, scoring
-from .config import MODEL, STATIC
+from . import config, dataset, evaluate, export, fetch, genmedia, ingest, iterations, jobs, llm, pipeline, recap, scoring
+from . import prompt_versions as pv
+from .config import STATIC
 
 app = FastAPI(title="PartGram scale-worthiness review", version="1.0")
 
@@ -45,6 +47,23 @@ class VideoUrl(BaseModel):
 class StartJob(BaseModel):
     force: bool = False                             # re-run videos that are already scored
     urls: dict[str, str] = Field(default_factory=dict)   # video_id -> URL, saved before the run
+
+
+class PromptVersion(BaseModel):
+    parent: str = "P6"                              # the version this one is derived from
+    text: str                                       # the full template; {video_summary} exactly once
+    note: str = ""                                  # what changed and why (from the error report)
+
+
+class Adopt(BaseModel):
+    id: str
+    override_reason: str = ""                       # required when the version has not beaten P5
+
+
+class StartIteration(BaseModel):
+    prompt_id: str
+    force: bool = False                             # re-score even when an answer for this exact prompt is cached
+    note: str = ""
 
 
 class DatasetForm(BaseModel):
@@ -140,6 +159,34 @@ def delete_session(session_id: str):
         return dataset.delete_session(session_id)
     except ValueError as e:
         raise HTTPException(404, str(e)) from e
+
+
+@app.get("/api/sessions/{session_id}/export")
+def export_session(session_id: str, media: bool = False):
+    """Download a session's results as a ZIP: results.csv (one row per video), the decision log,
+    every stage's JSON, the dataset, and - once locked - ground truth and the evaluation report.
+    media=true also packs clips, audio, keyframes and recap videos (can be large)."""
+    try:
+        path, name = export.build(session_id, media=media)
+    except export.ExportError as e:
+        raise HTTPException(404, str(e)) from e
+    return FileResponse(path, media_type="application/zip", filename=name,
+                        background=BackgroundTask(path.unlink, missing_ok=True))
+
+
+@app.get("/api/sessions/{session_id}/prompt-pack", response_class=PlainTextResponse)
+def prompt_pack(session_id: str):
+    """One Markdown file to hand another AI for tuning P6: the brief and constraints, the current P6,
+    the evaluation, and per video the exact input, the model's answer, human decisions and the real
+    CAC outcome (misses first). The session must be open; outcomes appear once ground truth is locked."""
+    try:
+        text, name = export.prompt_pack(session_id)
+    except export.NotOpen as e:
+        raise HTTPException(409, str(e)) from e
+    except export.ExportError as e:
+        raise HTTPException(404, str(e)) from e
+    return PlainTextResponse(text, media_type="text/markdown; charset=utf-8",
+                             headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 
 @app.post("/api/sessions/{session_id}/open")
@@ -273,7 +320,7 @@ def pipeline_status():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "model": MODEL, "videos": len(ingest.load_inputs()[0]),
+    return {"ok": True, "llm": config.llm_choice(), "model": config.llm_choice()["model"], "videos": len(ingest.load_inputs()[0]),
             "tts": genmedia.tts_engine(), "image_generation": genmedia.available()}
 
 
@@ -283,7 +330,7 @@ def list_videos():
     decided = {d["video_id"] for d in evaluate.read_decisions()}
     out = []
     for vid, row in ingest.load_inputs()[0].items():
-        s = pipeline.load(vid, "score_p6") or {}
+        s = pipeline.load(vid, pipeline.active_stage()) or {}
         out.append({"video_id": vid, "brand": row.get("brand"), "creator": row.get("handle"),
                     "caption": row.get("caption"), "verdict": s.get("verdict"),
                     "score": s.get("score"), "decided": vid in decided,
@@ -407,7 +454,7 @@ def decide(video_id: str, body: Decision):
     if body.action == "override" and not body.note.strip():
         raise HTTPException(422, "override needs a note explaining why")
 
-    s = pipeline.load(video_id, "score_p6") or {}
+    s = pipeline.load(video_id, pipeline.active_stage()) or {}
     human = {"scale": "SCALE", "do_not_scale": "DO_NOT_SCALE"}.get(body.action, body.override_verdict)
     record = {
         "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -418,6 +465,7 @@ def decide(video_id: str, body: Decision):
         "ai_verdict": s.get("verdict"),
         "ai_model_verdict": s.get("model_verdict"),
         "ai_score": s.get("score"),
+        "ai_prompt": s.get("prompt_id"),
         "agrees_with_ai": human == s.get("verdict"),
         "note": body.note.strip(),
         "mode": body.mode,
@@ -448,6 +496,33 @@ def put_thresholds(body: dict):
         raise HTTPException(400, str(e))
 
 
+@app.get("/api/llm")
+def get_llm():
+    """The provider + model the open session runs on, the env default, and which providers are set up."""
+    return dataset.get_llm()
+
+
+@app.get("/api/llm/models")
+def llm_models(provider: str):
+    """The models one provider offers now (Anthropic / OpenAI / Gemini list calls are free; local
+    servers are asked directly). vision: true, false, or null when the provider does not say."""
+    try:
+        return llm.list_models(provider)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from e
+
+
+@app.put("/api/llm")
+def put_llm(body: dict):
+    """Choose the provider + model for the open session. Cached answers of each model are kept apart,
+    so the Review and Evaluation tabs show the chosen model's results."""
+    _not_while_running()
+    try:
+        return dataset.set_llm(body)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+
+
 @app.get("/api/evaluate")
 def get_evaluation(run_missing: bool = False, reviewer: Optional[list[str]] = Query(None)):
     """P5 vs P6 vs the blind manual review against ground truth, feature accuracy, reviewer timing.
@@ -457,6 +532,89 @@ def get_evaluation(run_missing: bool = False, reviewer: Optional[list[str]] = Qu
         return evaluate.run(run_missing=run_missing, reviewers=reviewer)
     except Exception as e:
         raise HTTPException(502, f"{type(e).__name__}: {e}") from e
+
+
+# --- Prompt versions and iterations (the Section 6 tuning loop) -----------------------------------
+
+def _pv(call):
+    try:
+        return call()
+    except KeyError as e:
+        raise HTTPException(404, f"unknown {e.args[0]!r}") from e
+    except pv.Conflict as e:
+        raise HTTPException(409, str(e)) from e
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+
+
+@app.get("/api/prompts")
+def list_prompts():
+    """Every prompt version (P5 baseline, built-in P6, P6.2, ...), the active one and the adoption log."""
+    return _pv(pv.listing)
+
+
+@app.get("/api/prompts/{prompt_id}")
+def get_prompt(prompt_id: str):
+    return _pv(lambda: pv.get(prompt_id))
+
+
+@app.get("/api/prompts/{prompt_id}/diff", response_class=PlainTextResponse)
+def diff_prompt(prompt_id: str, against: Optional[str] = None):
+    """Unified diff of a version against its parent, or against ?against=<id>."""
+    return _pv(lambda: pv.diff(prompt_id, against))
+
+
+@app.post("/api/prompts", status_code=201)
+def create_prompt(body: PromptVersion):
+    """Save a new, immutable version derived from body.parent."""
+    _not_while_running()
+    return _pv(lambda: pv.create(body.parent, body.text, body.note))
+
+
+@app.delete("/api/prompts/{prompt_id}")
+def delete_prompt(prompt_id: str):
+    _not_while_running()
+    _pv(lambda: pv.delete(prompt_id))
+    return pv.listing()
+
+
+@app.put("/api/prompts/active")
+def adopt_prompt(body: Adopt):
+    """Adopt a version for the review card. Refused (409) unless its latest iteration on the current
+    model beats P5, or a written override reason is given (logged). P6 can always be restored."""
+    _not_while_running()
+
+    def go():
+        check = None if body.id in (pv.DEFAULT_ACTIVE, pv.BASELINE) else iterations.adoption_check(body.id)
+        return pv.set_active(body.id, check, body.override_reason, (check or {}).get("iteration"))
+    return _pv(go)
+
+
+@app.get("/api/prompts/{prompt_id}/adoption")
+def adoption_check(prompt_id: str):
+    """What the gate would say for this version right now, without adopting it."""
+    return _pv(lambda: iterations.adoption_check(prompt_id))
+
+
+@app.get("/api/iterations")
+def list_iterations():
+    """Every iteration, newest first, each compared with P5 against the ground truth."""
+    return _pv(iterations.listing)
+
+
+@app.get("/api/iterations/{n}")
+def get_iteration(n: int):
+    return _pv(lambda: iterations.get(n))
+
+
+@app.post("/api/iterations")
+def start_iteration(body: StartIteration):
+    """Score every video with body.prompt_id and with P5 in the background (poll /api/pipeline/status),
+    then freeze the verdicts as a new iteration."""
+    started = _pv(lambda: iterations.start(body.prompt_id, force=body.force, note=body.note))
+    if started is False:
+        raise HTTPException(409, "the pipeline is already running")
+    return started
 
 
 @app.get("/api/verdicts")

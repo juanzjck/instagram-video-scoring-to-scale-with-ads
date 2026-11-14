@@ -124,10 +124,10 @@ def claude_image(prompt, path, width=540, height=960):
     m = _SVG_RE.search(resp["text"])
     if not m:
         why = "ran out of tokens" if resp["stop_reason"] == "max_tokens" else "no <svg> in the reply"
-        raise RuntimeError(f"Claude did not return a complete SVG ({why})")
+        raise RuntimeError(f"the model did not return a complete SVG ({why})")
     svg = m.group(0)
     if _SVG_BANNED.search(svg):
         raise RuntimeError("the SVG uses an element that is not allowed (script, image or external reference)")
     path.with_suffix(".svg").write_text(svg, encoding="utf-8")
     path.write_bytes(resvg_py.svg_to_bytes(svg_string=svg, width=width, height=height, background="#ffffff"))
-    return {k: resp[k] for k in ("input_tokens", "output_tokens", "latency_s", "model")}
+    return llm.usage(resp)

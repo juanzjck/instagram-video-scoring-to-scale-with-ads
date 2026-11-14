@@ -22,7 +22,7 @@ from pathlib import PurePath
 
 import pandas as pd
 
-from . import config, flatten, ingest, jobs, media, pipeline
+from . import config, flatten, ingest, jobs, llm, media, pipeline
 
 _SAFE_ID = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]*$")     # video ids become folder names
 MAX_FILE_BYTES = 20 * 1024 * 1024
@@ -401,7 +401,8 @@ def _summary(session, details=False):
         runs = folder / "runs"
         log = runs / "decisions.jsonl"
         out |= {"rows": {name: _filled(form.get(name)) for name in SCHEMA},
-                "scored": len(list(runs.glob("*/score_p6.json"))) if runs.is_dir() else 0,
+                "scored": len({p.parent.name for p in runs.glob("*/score_p6*.json")}      # by any model / version
+                              | {p.parents[2].name for p in runs.glob("*/llm/*/score_p6*.json")}) if runs.is_dir() else 0,
                 "decisions": sum(1 for l in log.read_text(encoding="utf-8").splitlines() if l.strip())
                              if log.exists() else 0,
                 "recaps": len(list((runs / "recaps").glob("*/recap.mp4"))) if runs.is_dir() else 0,
@@ -468,6 +469,35 @@ def set_thresholds(values):
         session.pop("thresholds", None)
     _save_session(session)
     return get_thresholds()
+
+
+_MODEL_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,199}$")
+
+
+def get_llm():
+    """The open session's provider + model, the env default, and every provider's setup state."""
+    return {"current": config.llm_choice(), "default": config.default_llm(), "providers": llm.providers()}
+
+
+def set_llm(values):
+    """Choose the provider + model the open session runs on. Each model keeps its own cached answers,
+    so switching back and forth costs nothing. An empty provider goes back to the env default."""
+    session = current_session()
+    if session is None:
+        raise ValueError("open a campaign first")
+    provider = str((values or {}).get("provider") or "").strip()
+    model = str((values or {}).get("model") or "").strip()
+    if not provider:
+        session.pop("llm", None)
+    else:
+        if provider not in config.LLM_PROVIDERS:
+            raise ValueError(f"unknown provider {provider!r}: use one of {', '.join(config.LLM_PROVIDERS)}")
+        model = model or config.DEFAULT_MODELS.get(provider) or ""
+        if not _MODEL_ID_RE.match(model):
+            raise ValueError("choose a model" if not model else f"{model!r} is not a valid model id")
+        session["llm"] = {"provider": provider, "model": model}
+    _save_session(session)
+    return get_llm()
 
 
 def list_sessions():

@@ -1,30 +1,86 @@
 """Orchestrates steps 1-8 for one video and caches each stage as JSON under runs/<video_id>/.
 
-Stages: preprocess.json -> features.json -> score_p6.json (+ score_p5.json for evaluation).
-A stage is recomputed only when its file is missing or force=True. timing.json keeps how many
+Stages: preprocess.json -> features.json -> score_<prompt>.json for the active prompt version
+(score_p6.json for the built-in P6, score_p6.2.json for version P6.2, ...; app/prompt_versions.py),
+plus score_p5.json for evaluation.
+A stage is recomputed only when its file is missing or force=True. The stages a model answers
+(features and every score_*) live under runs/<video_id>/llm/<provider>--<model>/, so each model
+keeps its own answers and switching models never reuses another model's output. timing.json keeps how many
 seconds each stage took the last time it actually ran (a cached stage keeps its old time).
 """
 
 import json
+import re
+import shutil
 import time
 from datetime import datetime, timezone
 
 from . import flatten as fl
 from . import config, fetch, guard, ingest, media, scoring, vision
+from . import prompt_versions as pv
 from .config import NA
 from .ingest import num, val
 
 
+MODEL_STAGES = ("features", "score_p5", "score_p6")     # plus score_p6.<n> for prompt versions
+
+
+def is_model_stage(stage):
+    return stage == "features" or stage.startswith("score_")
+
+
+def active_stage():
+    """The score stage of the open session's active prompt version (what the review card shows)."""
+    return pv.stage(pv.active())
+
+
+def llm_slug(choice):
+    """Folder name for one provider + model, e.g. "ollama--qwen2.5vl_7b"."""
+    return re.sub(r"[^A-Za-z0-9._-]", "_", f"{choice['provider']}--{choice['model'] or 'none'}")
+
+
+def stage_file(runs, video_id, stage, choice):
+    """Where a stage's JSON is read from, or None. Model stages look in the model's own folder;
+    a file from before models were selectable (runs/<video_id>/<stage>.json) is still read when
+    it was made by this same model - it is never written again."""
+    if not is_model_stage(stage):
+        p = runs / video_id / f"{stage}.json"
+        return p if p.exists() else None
+    p = runs / video_id / "llm" / llm_slug(choice) / f"{stage}.json"
+    if p.exists():
+        return p
+    legacy = runs / video_id / f"{stage}.json"
+    if legacy.exists() and _legacy_llm(legacy) == choice:
+        return legacy
+    return None
+
+
+def _legacy_llm(p):
+    try:
+        data = json.loads(p.read_text(encoding="utf-8")) or {}
+    except ValueError:
+        return None
+    u = data.get("usage") or data.get("_usage") or {}
+    return {"provider": u.get("provider") or "anthropic", "model": u.get("model") or config.MODEL}
+
+
 def _path(video_id, stage):
+    """Where a stage is written for the current model."""
+    if is_model_stage(stage):
+        return config.RUNS / video_id / "llm" / llm_slug(config.llm_choice()) / f"{stage}.json"
     return config.RUNS / video_id / f"{stage}.json"
 
 
+def _exists(video_id, stage):
+    return stage_file(config.RUNS, video_id, stage, config.llm_choice()) is not None
+
+
 def load(video_id, stage):
-    p = _path(video_id, stage)
-    if not p.exists():
+    p = stage_file(config.RUNS, video_id, stage, config.llm_choice())
+    if p is None:
         return None
     data = json.loads(p.read_text(encoding="utf-8"))
-    if stage in ("score_p5", "score_p6"):    # verdicts follow the session's current thresholds
+    if stage.startswith("score_"):           # verdicts follow the session's current thresholds
         try:
             data = scoring.reguard(data, _row(video_id)[0])
         except KeyError:
@@ -56,7 +112,8 @@ def _timed(video_id, stage, fn):
 def invalidate(video_id):
     """Drop every cached stage of one video, e.g. after a new clip is uploaded."""
     for stage in ("preprocess", "features", "score_p6", "score_p5", "timing"):
-        _path(video_id, stage).unlink(missing_ok=True)
+        (config.RUNS / video_id / f"{stage}.json").unlink(missing_ok=True)
+    shutil.rmtree(config.RUNS / video_id / "llm", ignore_errors=True)    # every model's answers
 
 
 def _row(video_id):
@@ -92,8 +149,24 @@ def fetch_clip(video_id):
     return True
 
 
-def process(video_id, force=False, progress=None):
-    """Fetch -> preprocess -> visual analysis -> merge -> P6 -> rule guard. Returns the card.
+def run_prompt(video_id, prompt_id, force=False):
+    """Score one video with one P6-family prompt version (multimodal summary). A cached answer is
+    reused only when it was made from this exact prompt text (its SHA-256 matches)."""
+    row, _ = _row(video_id)
+    v = pv.get(prompt_id)
+    st = pv.stage(prompt_id)
+    cached = None if force else load(video_id, st)
+    if cached and cached.get("prompt_sha256") not in (None, v["sha256"]):
+        cached = None
+    if cached:
+        return cached
+    return _save(video_id, st, _timed(video_id, "score_p6", lambda: scoring.score(
+        prompt_id, summary(video_id, True), row, template=None if v["builtin"] else v["text"])))
+
+
+def process(video_id, force=False, progress=None, prompt_id=None):
+    """Fetch -> preprocess -> visual analysis -> merge -> P6 (the active version, or prompt_id) -> rule guard.
+    Returns the card.
 
     `progress` is called with the name of each step as it starts.
     """
@@ -114,9 +187,8 @@ def process(video_id, force=False, progress=None):
         step("analysing")
         feats = _save(video_id, "features", _timed(video_id, "analyse", lambda: vision.analyse(video_id, row, pre)) or {})
 
-    if force or load(video_id, "score_p6") is None:
-        step("scoring")
-        _save(video_id, "score_p6", _timed(video_id, "score_p6", lambda: scoring.score("P6", summary(video_id, True), row)))
+    step("scoring")
+    run_prompt(video_id, prompt_id or pv.active(), force=force)
     return card(video_id)
 
 
@@ -124,9 +196,9 @@ def status(video_id):
     return {
         "has_clip": ingest.clip_path(video_id) is not None,
         "source_url": ingest.video_url(video_id),
-        "preprocessed": _path(video_id, "preprocess").exists(),
-        "analysed": _path(video_id, "features").exists(),
-        "scored": _path(video_id, "score_p6").exists(),
+        "preprocessed": _exists(video_id, "preprocess"),
+        "analysed": _exists(video_id, "features"),
+        "scored": _exists(video_id, active_stage()),
         "seconds": seconds(video_id),
     }
 
@@ -170,7 +242,7 @@ def card(video_id):
     row, comments = _row(video_id)
     pre = load(video_id, "preprocess") or {}
     feats = load(video_id, "features") or {}
-    s = load(video_id, "score_p6")
+    s = load(video_id, active_stage())
     d = fl.derived_metrics(row)
 
     clip = ingest.clip_path(video_id)
@@ -211,6 +283,7 @@ def card(video_id):
                                 else num(row.get("avg_watch_time_ms")) / 1000,
         },
         "score": s,
+        "prompt_id": pv.active(),
         "injection_flags": flags,
         "spoken_summary": _spoken_summary(row, s),
         "text_summary": summary(video_id, False),      # the "without the card" view

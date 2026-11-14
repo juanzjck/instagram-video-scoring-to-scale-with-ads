@@ -5,6 +5,7 @@ so a video under 48h old, with tiny reach or with missing metrics ends as DEFER_
 whatever the model - or the video's own on-screen text - said.
 """
 
+import hashlib
 import re
 
 from . import llm, prompts
@@ -112,10 +113,12 @@ def reguard(out, row):
     return dict(out, **apply_rules(parse(out["raw_output"]), row))
 
 
-def score(prompt_id, summary, row):
-    """Run one prompt over one summary and return parsed + rule-guarded output."""
-    resp = llm.complete(prompts.render(prompt_id, summary), max_tokens=1200)
+def score(prompt_id, summary, row, template=None):
+    """Run one prompt over one summary and return parsed + rule-guarded output.
+    template: the prompt text for a versioned prompt (P6.2, ...); built-ins come from prompts.TEMPLATES."""
+    template = prompts.TEMPLATES[prompt_id] if template is None else template
+    resp = llm.complete(template.format(video_summary=summary), max_tokens=1200)
     out = apply_rules(parse(resp["text"]), row)
-    out.update(prompt_id=prompt_id, raw_output=resp["text"],
-               usage={k: resp[k] for k in ("input_tokens", "output_tokens", "latency_s", "model")})
+    out.update(prompt_id=prompt_id, prompt_sha256=hashlib.sha256(template.encode("utf-8")).hexdigest(),
+               raw_output=resp["text"], usage=llm.usage(resp))
     return out

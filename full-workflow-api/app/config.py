@@ -62,12 +62,57 @@ def activate(dataset_id=None):
     DECISIONS_LOG = runs / "decisions.jsonl"
 
 
-MODEL = _env("LLM_MODEL") or "claude-opus-5-5"
+# Which LLM runs the pipeline (app/llm.py). LLM_PROVIDER picks the default provider and
+# LLM_MODEL its model; a session can override both from the UI (session.json "llm").
+LLM_PROVIDERS = {
+    "anthropic": "Anthropic Claude",
+    "openai": "OpenAI",
+    "gemini": "Google Gemini",
+    "ollama": "Ollama (local)",
+    "openai_compatible": "Local OpenAI-compatible server (LM Studio, llama.cpp, vLLM)",
+}
+LLM_PROVIDER = (_env("LLM_PROVIDER") or "anthropic").lower()
+if LLM_PROVIDER not in LLM_PROVIDERS:
+    raise ValueError(f"LLM_PROVIDER={LLM_PROVIDER!r}: use one of {', '.join(LLM_PROVIDERS)}")
+# Per-provider default model. None = pick one in the UI (the list comes from the provider).
+DEFAULT_MODELS = {
+    "anthropic": _env("ANTHROPIC_MODEL") or "claude-opus-5-5",
+    "openai": _env("OPENAI_MODEL"),
+    "gemini": _env("GEMINI_MODEL"),
+    "ollama": _env("OLLAMA_MODEL"),
+    "openai_compatible": _env("LOCAL_LLM_MODEL"),
+}
+if _env("LLM_MODEL"):
+    DEFAULT_MODELS[LLM_PROVIDER] = _env("LLM_MODEL")
+MODEL = DEFAULT_MODELS["anthropic"]          # the Claude model when Anthropic is the provider
 WORKSPACE_ID = _env("ANTHROPIC_WORKSPACE_ID")
 WHISPER_MODEL = _env("WHISPER_MODEL") or "base"
 
+OPENAI_API_KEY = _env("OPENAI_API_KEY")      # OpenAI LLM, and the recap's TTS / images below
+GEMINI_API_KEY = _env("GEMINI_API_KEY") or _env("GOOGLE_API_KEY")
+OLLAMA_BASE_URL = (_env("OLLAMA_BASE_URL") or "http://localhost:11434").rstrip("/")
+# Ollama's own default context is small and it truncates long prompts silently, so ask for room.
+OLLAMA_NUM_CTX = int(_env("OLLAMA_NUM_CTX") or 16384)
+LOCAL_LLM_BASE_URL = (_env("LOCAL_LLM_BASE_URL") or "http://localhost:1234/v1").rstrip("/")
+LOCAL_LLM_API_KEY = _env("LOCAL_LLM_API_KEY") or "not-needed"   # most local servers ignore it
+
+
+def default_llm():
+    return {"provider": LLM_PROVIDER, "model": DEFAULT_MODELS.get(LLM_PROVIDER)}
+
+
+def llm_choice():
+    """{"provider", "model"} the open session runs on: session.json's "llm", else the env default."""
+    return resolve_llm(_session_value("llm"))
+
+
+def resolve_llm(saved):
+    """A session.json "llm" entry (or None) -> {"provider", "model"}."""
+    if isinstance(saved, dict) and saved.get("provider") in LLM_PROVIDERS:
+        return {"provider": saved["provider"], "model": saved.get("model") or DEFAULT_MODELS.get(saved["provider"])}
+    return default_llm()
+
 # Generated media (app/genmedia.py). Optional: without a key the voice is macOS `say`.
-OPENAI_API_KEY = _env("OPENAI_API_KEY")
 TTS_PROVIDER = (_env("TTS_PROVIDER") or "auto").lower()      # auto | openai | say
 TTS_MODEL = _env("OPENAI_TTS_MODEL") or "gpt-4o-mini-tts"
 TTS_VOICE = _env("OPENAI_TTS_VOICE") or "marin"
@@ -83,16 +128,22 @@ MIN_REACH = 1000        # below this, rate metrics are not reliable
 DEFAULT_THRESHOLDS = {"min_hours": MIN_HOURS, "min_reach": MIN_REACH}
 
 
+def _session_value(key):
+    """One key of the open session's session.json, or None."""
+    p = DATA / "session.json" if DATA is not None else None
+    if p is None or not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8")).get(key)
+    except ValueError:
+        return None
+
+
 def thresholds():
     """The open session's rule guard thresholds: the defaults above unless changed in session.json."""
     t = dict(DEFAULT_THRESHOLDS)
-    p = DATA / "session.json" if DATA is not None else None
-    if p is not None and p.exists():
-        try:
-            saved = json.loads(p.read_text(encoding="utf-8")).get("thresholds") or {}
-        except ValueError:
-            saved = {}
-        t.update({k: saved[k] for k in t if isinstance(saved.get(k), (int, float))})
+    saved = _session_value("thresholds") or {}
+    t.update({k: saved[k] for k in t if isinstance(saved.get(k), (int, float))})
     return t
 CORE_METRICS = ["reach", "views", "total_interactions", "saved", "shares"]
 

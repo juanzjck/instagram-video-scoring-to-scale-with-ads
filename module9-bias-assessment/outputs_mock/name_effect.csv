@@ -1,0 +1,3 @@
+condition,resumes_same_decision,resumes_same_score,max_score_spread,rows_off_mode_score,mean_feedback_words
+baseline,5,0,49,54,3.5
+blind,8,8,0,0,3.0

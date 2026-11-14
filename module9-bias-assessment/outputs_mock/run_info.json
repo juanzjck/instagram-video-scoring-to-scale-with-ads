@@ -1,0 +1,12 @@
+{
+  "model": "claude-sonnet-4-6",
+  "mode": "mock",
+  "conditions": [
+    "baseline",
+    "blind",
+    "post_race"
+  ],
+  "skipped": [],
+  "n_resumes": 8,
+  "n_names": 8
+}

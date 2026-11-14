@@ -76,3 +76,8 @@ To collect real data, see [instagram-video-downloader](instagram-video-downloade
 `.env` files are git-ignored; only `.env.example` files are committed. Keys used:
 `ANTHROPIC_API_KEY` (required), `OPENAI_API_KEY` (optional, recap voice / raster images),
 `IG_ACCESS_TOKEN` and `IG_USER_ID` (optional, Instagram Graph API).
+
+
+# Ideas
+Implement a AI governance verification plataform: 
+https://info.langchain.com/agent-governance?utm_campaign=evergreen_agent_governance_cv&utm_campaign_id=23854337979&utm_ad_group_id=198180514682&utm_ad_id=809328355829&utm_network=g&utm_term=ai%20agent%20governance%20platform&utm_campaign=evergreen_agents_cv&utm_source=google&utm_medium=cpc&hsa_acc=7906965105&hsa_cam=23854337979&hsa_grp=198180514682&hsa_ad=809328355829&hsa_src=g&hsa_tgt=kwd-2398341065643&hsa_kw=ai%20agent%20governance%20platform&hsa_mt=p&hsa_net=adwords&hsa_ver=3&gad_source=1&gad_campaignid=23854337979&gbraid=0AAAAA-Pkies0uvXThM6SgpYt_k7ashlnp&gclid=CjwKCAiAtbvXBhB_EiwAjwv9Jr6WxhZFsGRRQC9X68p7DI1XRWJK8qazcwh-CQyW_N2HqqBuvSZZmRoCIQQQAvD_BwE

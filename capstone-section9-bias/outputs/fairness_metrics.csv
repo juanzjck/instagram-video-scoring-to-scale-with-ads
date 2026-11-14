@@ -1,0 +1,5 @@
+condition,attribute,rate_man,rate_woman,score_gap,accuracy,dp_diff,di_ratio,tpr_gap,fpr_gap,rate_CO,rate_EC
+baseline,gender,0.4,0.4,1.1000000000000014,0.9,,,,,,
+baseline,country,,,0.14999999999999858,0.9,,,,,0.4,0.4
+blind,gender,0.4,0.4,0.0,0.9,,,,,,
+blind,country,,,0.0,0.9,,,,,0.4,0.4

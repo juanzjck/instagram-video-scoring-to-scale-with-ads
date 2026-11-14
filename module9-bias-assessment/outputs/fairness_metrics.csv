@@ -1,0 +1,5 @@
+condition,attribute,rate_man,rate_woman,score_gap,accuracy,dp_diff,di_ratio,tpr_gap,fpr_gap,rate_black,rate_white
+baseline,gender,0.5,0.5,0.125,1.0,,,,,,
+baseline,race,,,0.125,1.0,,,,,0.5,0.5
+blind,gender,0.5,0.5,0.0,1.0,,,,,,
+blind,race,,,0.0,1.0,,,,,0.5,0.5

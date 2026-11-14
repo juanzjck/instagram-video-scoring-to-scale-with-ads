@@ -1,0 +1,481 @@
+condition,video_id,reason,class
+baseline,vid_001,Engagement rate del 12.06% supera ampliamente el benchmark típico de 3-6% para contenido de skincare,external_benchmark
+baseline,vid_001,"Save rate del 2.10% y 2,100 saves indican alta intención de compra y contenido de referencia reutilizable",exact
+baseline,vid_001,Skip rate del 22.5% es moderado y el watch time promedio de 14.2s sugiere retención sólida para un video de tutorial de 3 pasos,exact
+baseline,vid_001,Engagement rate del 12.06% supera ampliamente el benchmark típico de 3-6% para contenido de belleza en Colombia,external_benchmark
+baseline,vid_001,"Save rate del 2.10% y 2,100 saves indican alta intención de compra y contenido de valor aspiracional",exact
+baseline,vid_001,Skip rate del 22.5% y watch time promedio de 14.2s son aceptables para un video de tutorial de 3 pasos con CTA claro y código de descuento trackeable,exact
+baseline,vid_001,Engagement rate del 12.06% supera ampliamente el benchmark típico de 3-6% para creadores de su tamaño,external_benchmark
+baseline,vid_001,"Save rate del 2.10% y 2,100 guardados indican alta intención de compra y contenido de referencia",exact
+baseline,vid_001,Skip rate del 22.5% es moderado y el watch time promedio de 14.2s sugiere retención aceptable en un video de tutoriales paso a paso,exact
+baseline,vid_001,"Engagement rate del 12.06% supera ampliamente el benchmark del sector (3-6%), indicando alta resonancia con la audiencia",external_benchmark
+baseline,vid_001,"Save rate del 2.10% y 1,450 shares reflejan intención de revisitar y difundir contenido de alto valor comercial",exact
+baseline,vid_001,Skip rate del 22.5% y watch time de 14.2s son aceptables para un video tutorial de skincare con llamado a acción claro,exact
+baseline,vid_001,"Engagement del 12.06% supera ampliamente el benchmark de categoría (~3-5%), señal fuerte de resonancia orgánica",external_benchmark
+baseline,vid_001,"Save rate de 2.10% y 2,100 saves indican alta intención de reutilización del contenido, ideal para conversión diferida",exact
+baseline,vid_001,Skip rate de 22.5% es aceptable para contenido tutorial; 142K views sobre 100K reach sugiere re-watches positivos,exact
+baseline,vid_001,"Engagement rate del 12.06% supera ampliamente el benchmark de la industria (3-6%), indicando audiencia altamente activa",external_benchmark
+baseline,vid_001,"Save rate del 2.10% y 2,100 saves reflejan intención de compra real y contenido de alto valor utilitario",exact
+baseline,vid_001,Skip rate del 22.5% y watch time promedio de 14.2s son aceptables para contenido de formato corto con CTA claro al final,exact
+baseline,vid_001,"Engagement rate of 12.06% supera ampliamente el benchmark regional (~3-5%), indicando audiencia altamente activa",external_benchmark
+baseline,vid_001,"Save rate de 2.10% y 2,100 saves señalan intención de compra y contenido de alto valor utilitario",exact
+baseline,vid_001,"Skip rate de 22.5% y avg watch de 14.2s son aceptables para un video tutorial de producto, con retención sólida en los primeros pasos",exact
+baseline,vid_001,Engagement rate de 12.06% supera ampliamente el benchmark estándar de 3-5% para creadores en Colombia,external_benchmark
+baseline,vid_001,"Save rate de 2.10% y 2,100 saves indican alta intención de uso futuro del contenido, señal clave de conversión potencial",exact
+baseline,vid_001,Skip rate de 22.5% y watch time promedio de 14.2s son aceptables para un video de producto de skincare de 3 pasos,exact
+baseline,vid_002,Engagement rate de 1.24% está muy por debajo del umbral mínimo recomendado de 3% para paid ads,external_benchmark
+baseline,vid_002,Skip rate crítico de 71.4% indica que la mayoría de usuarios abandona el video en los primeros segundos (avg watch solo 4.1s),exact
+baseline,vid_002,"Save rate de 0.07% y apenas 63 saves sobre 86,400 de reach refleja bajo interés real en el contenido",exact
+baseline,vid_002,Engagement rate de 1.24% está muy por debajo del umbral mínimo recomendado de 3% para inversión publicitaria,external_benchmark
+baseline,vid_002,Skip rate crítico de 71.4% indica que la mayoría de usuarios abandona el video en los primeros segundos (avg watch de solo 4.1s),exact
+baseline,vid_002,"Save rate de 0.07% y apenas 28 comentarios sobre 86,400 de alcance reflejan baja intención de compra y comunidad poco activa",exact
+baseline,vid_002,Engagement rate of 1.24% is well below the 3-4% threshold needed for paid amplification,external_benchmark
+baseline,vid_002,"Skip rate of 71.4% indicates most viewers abandon the video almost immediately, with avg watch time of only 4.1s",exact
+baseline,vid_002,Save rate of 0.07% and only 41 shares on 86K reach show very low content resonance,rounded
+baseline,vid_002,Engagement rate de 1.24% está muy por debajo del benchmark mínimo de 3% para inversión pagada,external_benchmark
+baseline,vid_002,Skip rate crítico de 71.4% indica que la mayoría del público abandona el video en los primeros segundos (avg watch de solo 4.1s),exact
+baseline,vid_002,"Save rate de 0.07% sobre 86,400 de alcance refleja muy bajo interés en guardar contenido de valor",exact
+baseline,vid_002,Engagement rate de 1.24% está muy por debajo del benchmark mínimo de 3% para inversión pagada,external_benchmark
+baseline,vid_002,Skip rate crítico de 71.4% indica que la mayoría abandona el video en los primeros segundos; avg watch de solo 4.1s confirma baja retención,exact
+baseline,vid_002,"Save rate de 0.07% y apenas 63 saves sobre 86,400 de alcance reflejan contenido con muy bajo valor percibido para la audiencia",exact
+baseline,vid_002,Engagement rate de 1.24% está muy por debajo del umbral mínimo de 3% requerido para inversión pagada,external_benchmark
+baseline,vid_002,Skip rate crítico de 71.4% indica que la mayoría de usuarios abandona el video en los primeros segundos; avg watch de solo 4.1s confirma bajo gancho inicial,exact
+baseline,vid_002,"Save rate de 0.07% y apenas 28 comentarios sobre 86,400 de alcance reflejan contenido de bajo valor percibido para la audiencia",exact
+baseline,vid_002,Engagement rate de 1.24% está muy por debajo del umbral mínimo recomendado de 3-4% para inversión pagada,external_benchmark
+baseline,vid_002,Skip rate de 71.4% indica que la mayoría de los usuarios abandona el video en los primeros segundos (avg watch de solo 4.1s),exact
+baseline,vid_002,"Save rate de 0.07% y solo 63 saves sobre 86,400 de alcance reflejan bajo interés en guardar el contenido para referencia futura",exact
+baseline,vid_002,Engagement rate de 1.24% está muy por debajo del umbral mínimo aceptable (3-4%) para inversión pagada,external_benchmark
+baseline,vid_002,Skip rate crítico de 71.4% con un tiempo promedio de visualización de solo 4.1s indica que el contenido no retiene audiencia,exact
+baseline,vid_002,"Save rate de 0.07% (63 saves sobre 86,400 de alcance) refleja bajo valor percibido del contenido",exact
+baseline,vid_003,Engagement rate de 12.28% supera ampliamente el benchmark estándar de 3-5% para contenido de food,external_benchmark
+baseline,vid_003,"Save rate de 3.12% (1,290 saves sobre 41,300 reach) indica alta intención de uso futuro de la receta",exact
+baseline,vid_003,Skip rate de 38.9% es moderado-alto pero compensado por Avg watch de 11.8s en un video de formato corto con CTA de marca integrado,exact
+baseline,vid_003,"Engagement rate 12.28% supera ampliamente el promedio de la categoría food (~5-6%), con 387 shares y 1,290 saves que indican alta intención de guardar y compartir",external_benchmark
+baseline,vid_003,"Save rate del 3.12% sobre 41,300 de alcance refleja contenido de valor utilitario real, fuerte señal de consideración",exact
+baseline,vid_003,Skip rate de 38.9% y watch time promedio de 11.8s en un video corto de receta rápida son aceptables; la mención del CTA con código VALE10 llega al final sin abandono masivo,exact
+baseline,vid_003,"Engagement rate of 12.28% significantly exceeds typical benchmarks (3-6%), indicating strong audience resonance",external_benchmark
+baseline,vid_003,"Save rate of 3.12% (1,290 saves) signals high content utility and purchase-intent behavior",exact
+baseline,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, 214 comments)",exact
+baseline,vid_003,Engagement rate del 12.28% supera ampliamente el benchmark típico del 3-6% para creadores en LatAm,external_benchmark
+baseline,vid_003,Save rate del 3.12% y 387 shares indican contenido de alto valor práctico con intención de uso futuro,exact
+baseline,vid_003,Skip rate del 38.9% es moderado y el avg watch de 11.8s sugiere retención aceptable en formato corto de receta,exact
+baseline,vid_003,Engagement rate of 12.28% is well above the 3-5% industry benchmark for short-form food content,external_benchmark
+baseline,vid_003,"Save rate of 3.12% (1,290 saves / 41,300 reach) signals strong intent and content utility, ideal for retargeting",exact
+baseline,vid_003,Skip rate of 38.9% is moderate and avg watch time of 11.8s suggests the hook retains most viewers through the key brand mention,exact
+baseline,vid_003,Engagement rate del 12.28% supera ampliamente el benchmark típico del 3-5% para contenido de food en Colombia,external_benchmark
+baseline,vid_003,"Save rate del 3.12% y 1,290 saves indican alta intención de reusar la receta, señal de contenido evergreen con potencial de conversión",exact
+baseline,vid_003,"Skip rate del 38.9% y avg watch de 11.8s son moderadamente aceptables dado el formato corto, pero representan el principal riesgo de la pauta",exact
+baseline,vid_003,"Engagement rate del 12.28% está muy por encima del benchmark estándar (3-6%), indicando alta resonancia orgánica",external_benchmark
+baseline,vid_003,"Save rate del 3.12% y 1,290 saves en 72h sugieren intención de reutilización del contenido, ideal para conversión",exact
+baseline,vid_003,Skip rate del 38.9% es moderado pero el watch time promedio de 11.8s es aceptable para un video de receta rápida con CTA claro al final,exact
+baseline,vid_003,Engagement rate de 12.28% supera ampliamente el benchmark típico de 3-6% para contenido de alimentos,external_benchmark
+baseline,vid_003,"Save rate de 3.12% (1,290 saves sobre 41,300 de alcance) indica alta intención de reutilizar la receta, señal de contenido evergreen",exact
+baseline,vid_003,"Skip rate de 38.9% y watch time promedio de 11.8s son aceptables para un video de receta corta, con 387 shares que amplían distribución orgánica",exact
+baseline,vid_004,Engagement rate of 11.34% is well above the typical 3-6% benchmark for tech/product reviews,external_benchmark
+baseline,vid_004,Save rate of 1.76% and 131 saves in only 9 hours signals strong purchase-intent behavior,exact
+baseline,vid_004,Skip rate of 44.2% and avg watch of 9.7s are moderate concerns but acceptable given the early post window,exact
+baseline,vid_004,Engagement rate of 11.34% is well above the typical 3-6% benchmark for tech/product reviews,external_benchmark
+baseline,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate strong purchase-intent signals,exact
+baseline,vid_004,"Skip rate of 44.2% and avg watch of 9.7s are moderate concerns, suggesting the hook needs optimization",exact
+baseline,vid_004,Engagement rate del 11.34% está muy por encima del benchmark típico del 3-6% para reviews de producto,external_benchmark
+baseline,vid_004,Save rate del 1.76% y 131 saves en solo 9 horas indican alta intención de compra y contenido de referencia,exact
+baseline,vid_004,Skip rate del 44.2% es elevado pero el Avg watch de 9.7s sugiere que quienes se quedan consumen buena parte del contenido,exact
+baseline,vid_004,Engagement rate del 11.34% supera ampliamente el promedio de categoría (benchmark ~3-5%),external_benchmark
+baseline,vid_004,Save rate de 1.76% y 131 saves en solo 9 horas indican alto interés de compra y contenido guardado para referencia futura,exact
+baseline,vid_004,Skip rate del 44.2% es elevado y el watch time promedio de 9.7s sugiere que el hook inicial necesita mejora para retener más audiencia,exact
+baseline,vid_004,Engagement rate del 11.34% supera ampliamente el benchmark típico de 3-6% para tech reviews,external_benchmark
+baseline,vid_004,Save rate de 1.76% y 131 saves en solo 9 horas indican alta intención de compra futura,exact
+baseline,vid_004,Skip rate del 44.2% es moderadamente alto pero el avg watch de 9.7s sugiere retención aceptable dado el formato corto,exact
+baseline,vid_004,Engagement rate of 11.34% supera ampliamente el benchmark promedio de 3-5% para contenido tech en Colombia,external_benchmark
+baseline,vid_004,Save rate de 1.76% y 131 saves en solo 9 horas indican alta intención de compra y contenido de referencia,exact
+baseline,vid_004,Skip rate de 44.2% es moderado pero el avg watch de 9.7s sugiere retención aceptable para un review de producto,exact
+baseline,vid_004,Engagement rate of 11.34% is well above the typical 3-6% benchmark for tech content,external_benchmark
+baseline,vid_004,Save rate of 1.76% and 131 saves in only 9 hours signals strong purchase-intent behavior,exact
+baseline,vid_004,Skip rate of 44.2% is moderately high and avg watch time of 9.7s suggests the hook needs strengthening,exact
+baseline,vid_004,Engagement rate del 11.34% supera ampliamente el benchmark estándar del 3-5% para contenido de tech en Colombia,external_benchmark
+baseline,vid_004,Save rate del 1.76% y 131 saves en solo 9 horas indica alta intención de compra y contenido de referencia,exact
+baseline,vid_004,Skip rate del 44.2% es elevado y el avg watch de 9.7s sugiere que el hook inicial necesita optimización para retener más audiencia,exact
+baseline,vid_005,Skip rate del 49% indica que casi la mitad de la audiencia abandona el video antes de terminar,exact
+baseline,vid_005,Reach de solo 640 con 810 views sugiere distribución muy limitada fuera de la audiencia existente,exact
+baseline,vid_005,"Aunque el engagement del 15.62% es positivo, los shares (4) y comentarios (6) son muy bajos para justificar inversión publicitaria",exact
+baseline,vid_005,Skip rate del 49% indica que casi la mitad de la audiencia abandona el video antes de completarlo,exact
+baseline,vid_005,Avg watch de solo 8.3s sugiere muy bajo tiempo de retención en el contenido,exact
+baseline,vid_005,Reach de apenas 640 con 6 comentarios refleja baja interacción conversacional pese al engagement rate del 15.62%,exact
+baseline,vid_005,"Skip rate de 49% indica que casi la mitad de la audiencia abandona el video antes de terminarlo, señal de bajo poder de retención",exact
+baseline,vid_005,Reach de solo 640 y Shares de 4 muestran distribución orgánica muy limitada con poco potencial viral,exact
+baseline,vid_005,"Avg watch de 8.3s es bajo; aunque el engagement rate de 15.62% es positivo, el volumen absoluto es insuficiente para escalar con paid media",exact
+baseline,vid_005,Skip rate del 49% indica que casi la mitad de los espectadores abandonan el video antes de terminarlo,exact
+baseline,vid_005,Reach de solo 640 usuarios es muy bajo para justificar inversión publicitaria,exact
+baseline,vid_005,Avg watch de 8.3s sugiere bajo nivel de retención del contenido,exact
+baseline,vid_005,Skip rate del 49% indica que casi la mitad de la audiencia abandona el video antes de completarlo,exact
+baseline,vid_005,Reach de solo 640 personas en 48 horas es muy bajo para justificar inversión publicitaria,exact
+baseline,vid_005,"Shares apenas 4 y comentarios 6, señal de bajo potencial viral orgánico",exact
+baseline,vid_005,Skip rate del 49% indica que casi la mitad de los usuarios abandona el video antes de terminarlo,exact
+baseline,vid_005,Reach de solo 640 personas en 48 horas sugiere distribución orgánica muy limitada,exact
+baseline,vid_005,"Aunque el engagement es 15.62%, las métricas absolutas (71 likes, 6 comentarios, 4 shares) son muy bajas para justificar inversión publicitaria",exact
+baseline,vid_005,Skip rate del 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+baseline,vid_005,"Alcance muy bajo (640) con solo 810 views en 48 horas, señal de distribución orgánica limitada",exact
+baseline,vid_005,Promedio de visualización de 8.3s es insuficiente para retener el mensaje de marca completo,exact
+baseline,vid_005,Skip rate del 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+baseline,vid_005,Reach de solo 640 con 810 vistas es volumen muy bajo para escalar con paid media,exact
+baseline,vid_005,Avg watch de 8.3s sugiere enganche insuficiente para retener audiencia en un anuncio pagado,exact
+baseline,vid_006,"Reach y Views son NaN, imposible calcular CPM o alcance real del video",no_number
+baseline,vid_006,"Con solo 14,200 likes y 890 comentarios sin datos de alcance, el engagement rate no se puede verificar",exact
+baseline,vid_006,"Ausencia de métricas clave (Shares, Saves, Skip rate, Watch time) impide evaluar calidad de audiencia",no_number
+baseline,vid_006,"Reach y Views son NaN, imposible calcular engagement rate real ni alcance pagado estimado",no_number
+baseline,vid_006,"Con solo Likes (14,200) y Comments (890) disponibles no se puede verificar eficiencia de costo por impresión",exact
+baseline,vid_006,"Ausencia de Save rate, Skip rate y Avg watch time impide evaluar retención y calidad de audiencia para pauta",no_number
+baseline,vid_006,"Datos críticos ausentes: Reach, Views, Shares y Saves son NaN, imposible calcular engagement rate real ni CPM estimado",no_number
+baseline,vid_006,"Con solo Likes (14,200) y Comments (890) no se puede validar si la audiencia es orgánica o inflada sin métricas de alcance",exact
+baseline,vid_006,"Avg watch time y skip rate desconocidos impiden evaluar retención, métrica clave para inversión paid",no_number
+baseline,vid_006,"Datos clave incompletos: Reach, Views, Shares, Saves y métricas de retención (skip rate, avg watch time) son NaN, imposibilitando evaluar alcance real y eficiencia de inversión",no_number
+baseline,vid_006,"Engagement absoluto positivo (14,200 likes + 890 comentarios) sugiere buena resonancia, pero sin denominador (Views/Reach) el engagement rate es incalculable",exact
+baseline,vid_006,"Sin Save rate ni Avg watch time no se puede confirmar intención de compra ni calidad de atención, métricas críticas para escalar con paid media",no_number
+baseline,vid_006,"Datos críticos ausentes: Reach, Views, Shares y Saves son NaN, imposible calcular engagement rate ni CPM estimado",no_number
+baseline,vid_006,Con solo Likes (14.2K) y Comments (890) no se puede validar cobertura real ni eficiencia de pauta,exact
+baseline,vid_006,Sin avg watch time ni skip rate no hay forma de medir retención de audiencia para un anuncio pagado,no_number
+baseline,vid_006,"Datos clave ausentes: Reach, Views, Shares y Saves son NaN, imposible calcular engagement rate ni CPM estimado",no_number
+baseline,vid_006,Con solo Likes (14.2K) y Comments (890) no se puede validar el alcance real ni la eficiencia de pauta,exact
+baseline,vid_006,Sin avg watch time ni skip rate no hay evidencia de retención suficiente para invertir presupuesto publicitario,no_number
+baseline,vid_006,"Datos críticos ausentes: Reach, Views, Shares y Saves son NaN, imposible calcular ER% ni CPM estimado",no_number
+baseline,vid_006,Con solo Likes (14.2K) y Comments (890) no se puede validar si el alcance justifica inversión publicitaria,exact
+baseline,vid_006,Sin avg watch time ni skip rate no hay señal de retención para optimizar paid media,no_number
+baseline,vid_006,"Datos clave (Reach, Views, Shares, Saves, Engagement%) son NaN, imposible calcular ROI o CPM confiable",no_number
+baseline,vid_006,"Con 14,200 likes y 890 comentarios hay señales de comunidad activa, pero sin views no se puede validar tasa de conversión",exact
+baseline,vid_006,"Sin avg watch time ni skip rate no se puede evaluar retención, métrica crítica para escalar paid media",no_number
+baseline,vid_007,Skip rate crítico del 88.6% y avg watch de solo 1.9s indican que casi nadie ve el contenido,exact
+baseline,vid_007,"Save rate de 0.05% (7 saves sobre 12,800 reach) muestra nulo interés en guardar el contenido",exact
+baseline,vid_007,"Engagement de 123.51% parece inflado por likes/comments desproporcionados vs. saves y shares (solo 12), señal de interacción artificial",exact
+baseline,vid_007,Skip rate crítico de 88.6% y tiempo promedio de visualización de solo 1.9s indican que la audiencia abandona el video casi de inmediato,exact
+baseline,vid_007,"Save rate de 0.05% (solo 7 saves sobre 12,800 de alcance) refleja nulo interés de retención o intención de compra",exact
+baseline,vid_007,"Aunque el engagement rate aparente es 123.51%, está inflado por likes/comments sin respaldo de retención real: 12 shares y 7 saves sobre 96,400 views es señal de bajo valor comercial",exact
+baseline,vid_007,Skip rate crítico de 88.6% y tiempo promedio de visualización de apenas 1.9s indican que la audiencia abandona el video casi de inmediato,exact
+baseline,vid_007,"Save rate de 0.05% (solo 7 saves sobre 12,800 de alcance) refleja contenido sin valor de retención ni intención de compra",exact
+baseline,vid_007,"Aunque el engagement rate aparente es 123.51%, está inflado por likes sobre un alcance bajo; con shares=12 y saves=7, la difusión orgánica real es mínima",exact
+baseline,vid_007,Skip rate crítico de 88.6% indica que casi 9 de cada 10 usuarios abandona el video de inmediato,unverified
+baseline,vid_007,Avg watch time de solo 1.9s sobre un contenido que debería enganchar desde el primer segundo,exact
+baseline,vid_007,"Save rate de 0.05% (apenas 7 saves sobre 12,800 de alcance) refleja nulo valor percibido para guardar",exact
+baseline,vid_007,Skip rate crítico del 88.6% indica que la audiencia abandona el video casi de inmediato,exact
+baseline,vid_007,Avg watch time de solo 1.9s es insuficiente para transmitir cualquier mensaje de marca,exact
+baseline,vid_007,Save rate de 0.05% y solo 7 saves revelan nulo interés en guardar el contenido para referencia futura,exact
+baseline,vid_007,Skip rate crítico del 88.6% y tiempo promedio de visualización de solo 1.9s indican que la audiencia abandona el video casi de inmediato,exact
+baseline,vid_007,"Save rate de apenas 0.05% (7 saves sobre 12,800 de alcance) refleja nulo valor percibido por los usuarios",exact
+baseline,vid_007,"Aunque el engagement rate aparenta ser alto (123.51%), está inflado por likes sin retención real: solo 12 shares y 7 saves sobre ~96K views",rounded
+baseline,vid_007,Skip rate crítico de 88.6% y tiempo promedio de visualización de apenas 1.9s indican que la audiencia abandona el video casi de inmediato,exact
+baseline,vid_007,"Save rate de 0.05% (solo 7 guardados sobre 12,800 de alcance) refleja nulo valor percibido por el contenido",exact
+baseline,vid_007,"Aunque el engagement reportado es 123.51%, está inflado por métricas de alcance poco confiables; shares de solo 12 confirman bajo interés real en difundir el contenido",exact
+baseline,vid_007,Skip rate crítico del 88.6% indica que casi 9 de cada 10 usuarios abandona el video de inmediato,unverified
+baseline,vid_007,Avg watch time de apenas 1.9s es muy por debajo del mínimo aceptable para retención de audiencia,exact
+baseline,vid_007,"Save rate de 0.05% (solo 7 saves sobre 12,800 de alcance) refleja nulo valor percibido por el contenido",exact
+baseline,vid_008,"Brand-content mismatch: video caption tags #SolaraSkincare but content is 100% home décor, creating zero brand relevance",unverified
+baseline,vid_008,Skip rate of 33.1% and avg watch time of 12.6s indicate most viewers are not retaining the message long enough for ad recall,exact
+baseline,vid_008,"Saves (903) and shares (512) show decent organic intent but engagement is driven by décor interest, not skincare audience",exact
+baseline,vid_008,El caption menciona #SolaraSkincare pero el video trata de decoración del hogar — desalineación total entre marca y contenido,no_number
+baseline,vid_008,"Skip rate del 33.1% indica que 1 de cada 3 usuarios abandona el video prematuramente, señal de baja retención pagada",unverified
+baseline,vid_008,"Avg watch de 12.6s es muy bajo para generar intención de compra en skincare, reduciendo el ROAS esperado",exact
+baseline,vid_008,"Caption y transcript hablan de decoración del hogar, pero el video está etiquetado con #SolaraSkincare — desconexión total de marca/contenido",no_number
+baseline,vid_008,Skip rate del 33.1% y watch time promedio de solo 12.6s indican que la audiencia abandona el video rápidamente,exact
+baseline,vid_008,"Aunque el engagement del 10.81% es positivo, el reach de 52,900 con saves de 903 (1.71%) no justifica inversión publicitaria dado el mismatch de categoría",exact
+baseline,vid_008,"El caption y hashtag mencionan #SolaraSkincare pero el contenido es de decoración del hogar, desconexión total con la marca",no_number
+baseline,vid_008,Skip rate de 33.1% y watch time promedio de solo 12.6s indican baja retención del público,exact
+baseline,vid_008,"Aunque el engagement general es 10.81%, el contenido no demuestra intención de compra ni relevancia para skincare",exact
+baseline,vid_008,"Caption y transcripción son de decoración del hogar, sin ninguna mención real de Solara Skincare — brand-safety crítico",no_number
+baseline,vid_008,Skip rate de 33.1% y Avg watch de 12.6s indican retención baja para un video de producto patrocinado,exact
+baseline,vid_008,"Save rate 1.71% y shares 512 muestran intención de contenido DIY, no de compra de skincare",exact
+baseline,vid_008,"Caption y transcript hablan de decoración del hogar pero el hashtag es #SolaraSkincare, desconexión total de contenido con la marca",no_number
+baseline,vid_008,Skip rate de 33.1% y Avg watch de solo 12.6s indican baja retención de la audiencia antes del mensaje clave,exact
+baseline,vid_008,"Aunque el engagement 10.81% y saves 903 son positivos, el contexto de marca es irrelevante para skincare",exact
+baseline,vid_008,Brand mismatch crítico: el video es de decoración del hogar (#SalaraSkincare) sin ninguna mención de skincare o producto patrocinado,no_number
+baseline,vid_008,Skip rate de 33.1% es elevado y el avg watch de 12.6s indica retención baja para un video de producto,exact
+baseline,vid_008,"Saves (903) y engagement (10.81%) son sólidos, pero el reach de 52,900 y la desconexión total con la marca hacen inviable la inversión",exact
+baseline,vid_008,"Caption y transcript hablan de decoración del hogar, no de Solara Skincare — mismatch total de categoría",no_number
+baseline,vid_008,Skip rate de 33.1% y avg watch de solo 12.6s indican baja retención de audiencia para un ad de producto,exact
+baseline,vid_008,"Aunque engagement es 10.81%, el contenido no tiene ninguna mención ni vínculo con la marca anunciante",exact
+baseline,vid_009,"Engagement rate of 12.42% well above the 3-5% industry benchmark, indicating strong audience resonance",external_benchmark
+baseline,vid_009,"Save rate of 2.25% on 84K reach (1,890 saves) signals high purchase-intent content worth amplifying",exact
+baseline,vid_009,"Skip rate of 24.1% and avg watch of 13.6s on a short-form video suggest decent retention, though hook could be tightened",exact
+baseline,vid_009,"Save rate 2.25% and shares 1,180 indicate strong purchase-intent signals for a product tutorial",exact
+baseline,vid_009,Engagement rate 12.42% on 84K reach is well above the 3-5% benchmark for branded content,external_benchmark
+baseline,vid_009,Skip rate 24.1% and avg watch 13.6s are moderate concerns—content hooks could be tightened to retain viewers longer,exact
+baseline,vid_009,"Engagement rate of 12.42% is well above typical benchmarks (3-6%), signaling strong audience resonance",external_benchmark
+baseline,vid_009,"Save rate of 2.25% and 1,890 saves indicate high purchase-intent content with lasting utility",exact
+baseline,vid_009,Skip rate of 24.1% is moderate and average watch time of 13.6s on a ~30s video suggests decent retention for a product demo,unverified
+baseline,vid_009,"Engagement rate of 12.42% far exceeds typical benchmarks (3-6%), signaling strong audience resonance",external_benchmark
+baseline,vid_009,"Save rate of 2.25% and 1,890 saves indicate high purchase-intent behavior ideal for a product-focused ad",exact
+baseline,vid_009,Skip rate of 24.1% is moderate and avg watch of 13.6s on a ~30s video suggests decent retention for a conversion-oriented clip,unverified
+baseline,vid_009,"Engagement rate of 12.42% significantly exceeds typical benchmarks (3-6%), signaling strong audience resonance",external_benchmark
+baseline,vid_009,"Save rate of 2.25% on 84K reach (1,890 saves) indicates high purchase-intent and content utility for viewers",exact
+baseline,vid_009,Skip rate of 24.1% and avg watch of 13.6s on a ~30s format suggest majority of viewers consume the core CTA,unverified
+baseline,vid_009,"Strong engagement at 12.42% with 1,180 shares and 1,890 saves indicating high intent and virality potential",exact
+baseline,vid_009,Reach of 84K with 121K views suggests solid content amplification above audience base,exact
+baseline,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video show decent retention for a product demo format,unverified
+baseline,vid_009,"Engagement rate of 12.42% significantly exceeds typical benchmarks (3-6%), indicating strong audience resonance",external_benchmark
+baseline,vid_009,"Save rate of 2.25% and 1,890 saves signal high purchase-intent behavior and content utility",exact
+baseline,vid_009,"Skip rate of 24.1% and avg watch time of 13.6s are moderate concerns for a short-form video, suggesting some drop-off before the CTA",exact
+baseline,vid_009,"Save rate 2.25% and 1,890 saves signal strong purchase-intent behavior — viewers want to re-make this recipe",exact
+baseline,vid_009,"Engagement 12.42% on 84K reach is well above platform benchmarks, with 1,180 shares amplifying organic distribution",exact
+baseline,vid_009,"Skip rate 24.1% and avg watch 13.6s are acceptable for a tutorial format, though there's room to hook viewers faster",exact
+baseline,vid_010,Engagement rate of 1.24% is well below the 3-4% minimum threshold for paid amplification,external_benchmark
+baseline,vid_010,Skip rate of 74.2% and avg watch time of 3.8s indicate viewers are abandoning the video almost immediately,exact
+baseline,vid_010,Save rate of 0.07% and only 22 comments signal minimal audience intent or meaningful interaction with the content,exact
+baseline,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+baseline,vid_010,Skip rate of 74.2% and average watch time of only 3.8s indicate very low audience retention,exact
+baseline,vid_010,"Save rate of 0.07% (48 saves from 73,500 reach) signals almost no perceived value or purchase intent",exact
+baseline,vid_010,Engagement rate of 1.24% is well below the 3-4% minimum threshold for paid amplification,external_benchmark
+baseline,vid_010,Skip rate of 74.2% and average watch time of only 3.8s indicate the audience is abandoning the video almost immediately,exact
+baseline,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals near-zero community activation for the brand",exact
+baseline,vid_010,Engagement rate of 1.24% is well below the 3-4% benchmark for paid amplification,external_benchmark
+baseline,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate almost no audience retention,exact
+baseline,vid_010,"Saves (48) and shares (30) are extremely low relative to 73,500 reach, signaling minimal content value",exact
+baseline,vid_010,Engagement rate of 1.24% is well below the 3-4% benchmark for scalable paid content,external_benchmark
+baseline,vid_010,Skip rate of 74.2% and average watch time of only 3.8s indicate viewers are abandoning the video almost immediately,exact
+baseline,vid_010,"Saves (48) and shares (30) are critically low relative to 73,500 reach, showing near-zero purchase intent or content resonance",exact
+baseline,vid_010,Engagement rate of 1.24% is well below the 3-4% threshold needed for paid amplification,external_benchmark
+baseline,vid_010,Skip rate of 74.2% and average watch time of only 3.8s indicate very low content retention,exact
+baseline,vid_010,"Saves (48) and Shares (30) are minimal relative to 73,500 reach, showing no viral or save-worthy value",exact
+baseline,vid_010,Engagement rate of 1.24% is well below acceptable thresholds for paid amplification,exact
+baseline,vid_010,Skip rate of 74.2% and avg watch time of 3.8s indicate viewers abandon the video almost immediately,exact
+baseline,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals minimal community response or viral potential",exact
+baseline,vid_010,"Skip rate of 74.2% signals most viewers abandon the video almost immediately, with avg watch time of only 3.8s",exact
+baseline,vid_010,"Engagement rate is just 1.24% with only 22 comments and 30 shares on 73,500 reach — very low audience interaction",exact
+baseline,vid_010,Save rate of 0.07% (48 saves) indicates content has near-zero perceived value or rewatch intent,exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_001,Engagement rate of 12.06% far exceeds the typical 3-5% benchmark for beauty content,external_benchmark
+blind,vid_001,"Save rate of 2.10% and 1,450 shares signal strong purchase-intent and virality potential",exact
+blind,vid_001,"Skip rate of 22.5% and avg watch of 14.2s are acceptable for a tutorial format, indicating the hook retains most viewers",exact
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_002,"Skip rate 71.4% is critically high, meaning most viewers abandon the video almost immediately",exact
+blind,vid_002,Avg watch time of 4.1s and engagement of 1.24% indicate very low audience interest and retention,exact
+blind,vid_002,Save rate of 0.07% (63 saves from 86K reach) shows minimal intent to revisit or act on the content,rounded
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_003,"Engagement rate of 12.28% is well above the 3-5% platform benchmark, signaling strong audience resonance",external_benchmark
+blind,vid_003,"Save rate of 3.12% and 1,290 saves indicate high utility/rewatch intent, ideal for food content amplification",exact
+blind,vid_003,"Skip rate of 38.9% and avg watch of 11.8s are moderate concerns but offset by strong conversion signals (387 shares, promo code present)",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_004,"Engagement rate of 11.34% is well above the 3-5% industry benchmark, signaling strong audience interest",external_benchmark
+blind,vid_004,Save rate of 1.76% and 131 saves in just 9 hours indicate high purchase-intent behavior among viewers,exact
+blind,vid_004,"Skip rate of 44.2% and avg watch of 9.7s suggest the hook needs work, but overall traction is solid for early-stage post",exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_005,Skip rate alto de 49% indica que casi la mitad de los usuarios abandona el video antes de terminar,exact
+blind,vid_005,Reach bajo de 640 con solo 4 shares limita el potencial de distribución orgánica,exact
+blind,vid_005,Avg watch de 8.3s es insuficiente para comunicar un mensaje de marca efectivo,exact
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_006,"Reach and Views are missing (nan), making it impossible to calculate true engagement rate or CPM estimates",no_number
+blind,vid_006,"Likes (14,200) and Comments (890) suggest decent raw interaction, but without impressions we cannot validate audience size or paid scalability",exact
+blind,vid_006,"Skip rate, Save rate, and Avg watch time are all nan, so creative retention quality is unverifiable",no_number
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_007,Skip rate of 88.6% and avg watch time of only 1.9s indicate almost no one watches past the first seconds,exact
+blind,vid_007,Save rate is critically low at 0.05% (only 7 saves) showing zero intent to return to this content,exact
+blind,vid_007,"Despite inflated engagement % figure, Shares (12) and Saves (7) are near zero, signaling low genuine interest",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_008,"Content-brand mismatch: video is a home décor transformation with zero mention of Solara Skincare, making paid amplification irrelevant",no_number
+blind,vid_008,Skip rate of 33.1% and avg watch time of only 12.6s indicate low audience retention before any message could land,exact
+blind,vid_008,"Despite decent engagement (10.81%) and saves (903), the creative has no product integration or call-to-action for the brand",exact
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_009,"High engagement rate of 12.42% with 1,890 saves (2.25% save rate) signals strong intent and content longevity",exact
+blind,vid_009,"Shares at 1,180 indicate organic virality potential, amplifying paid reach cost-effectively",exact
+blind,vid_009,Skip rate of 24.1% and avg watch time of 13.6s on a ~30s video suggest most viewers are retained through the key message and CTA,unverified
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact
+blind,vid_010,Engagement rate of 1.24% is well below the 3-5% threshold needed for paid amplification,external_benchmark
+blind,vid_010,Skip rate of 74.2% and avg watch time of only 3.8s indicate viewers are not retaining the content,exact
+blind,vid_010,"Only 22 comments and 30 shares on 73,500 reach signals very low audience connection with the brand",exact

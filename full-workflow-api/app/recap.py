@@ -84,7 +84,7 @@ def select(campaign_id):
     videos = campaign_videos(campaign_id)
     if not videos:
         raise KeyError(campaign_id)
-    scores = {vid: pipeline.load(vid, "score_p6") for vid in videos}
+    scores = {vid: pipeline.load(vid, pipeline.active_stage()) for vid in videos}
     unscored = [vid for vid, s in scores.items() if not s]
     if unscored:
         raise NotReady(f"{len(unscored)} of {len(videos)} videos are not scored yet "
@@ -198,8 +198,8 @@ def write_script(facts_text, sections, language):
     usage, extra = [], ""
     for _ in range(2):
         resp = llm.complete(ask + extra, system=_SYSTEM, max_tokens=900, json_schema=schema)
-        usage.append({k: resp[k] for k in ("input_tokens", "output_tokens", "latency_s", "model")})
-        script = {s: " ".join(str(v).split()) for s, v in json.loads(resp["text"]).items()}
+        usage.append(llm.usage(resp))
+        script = {s: " ".join(str(v).split()) for s, v in llm.parse_json(resp["text"], schema).items()}
         invented = sorted(_numbers(" ".join(script.values())) - allowed)
         if not invented:
             return script, usage

@@ -14,6 +14,7 @@ from statistics import mean, median
 import pandas as pd
 
 from . import config, ingest, pipeline, scoring
+from . import prompt_versions as pv
 from .ingest import num, val
 
 
@@ -201,7 +202,7 @@ def run(run_missing=True, reviewers=None):
             p5 = pipeline.run_p5(vid)
         else:
             p5 = pipeline.load(vid, "score_p5")
-        p6 = pipeline.load(vid, "score_p6")
+        p6 = pipeline.load(vid, pipeline.active_stage())
         feats = pipeline.load(vid, "features")
 
         expected = scoring.normalise_verdict((gt.get(vid) or {}).get("expected_verdict"))
@@ -269,4 +270,68 @@ def run(run_missing=True, reviewers=None):
         "pipeline_timing": pipeline_timing(list(videos), manual),
         "classification": classification(rows, manual),
         "reviewers": {"all": names, "selected": picked},
+        "llm": config.llm_choice(),          # the provider + model whose P5/P6 answers were evaluated
+        "prompt": pv.active(),               # the P6-family version in the "P6" rows
     }
+
+
+def _method(verdicts, truth):
+    """Exact-verdict and scale / don't-scale metrics of one prompt's final verdicts on the given videos."""
+    exact = [(verdicts[v], t["expected"]) for v, t in truth.items() if t.get("expected")]
+    ok = sum(a == b for a, b in exact)
+    out = {"expected_verdict": {"correct": ok, "n": len(exact),
+                                "accuracy": round(ok / len(exact), 3) if exact else None},
+           "expected_scale": confusion((_scale(verdicts[v]), _scale(t.get("expected"))) for v, t in truth.items()),
+           "cac_outcome": confusion((_scale(verdicts[v]), t.get("cac_call")) for v, t in truth.items())}
+    return out
+
+
+def _beats(cand, base):
+    """Whether the candidate is strictly better than the baseline on one measure (a confusion() dict).
+
+    Never more budget on losers (false SCALE) than the baseline; then higher accuracy, or the same
+    accuracy with fewer false SCALE or more winners caught."""
+    if not cand["n"]:
+        return None
+    if cand["fp"] > base["fp"]:
+        return False
+    if cand["accuracy"] != base["accuracy"]:
+        return cand["accuracy"] > base["accuracy"]
+    return cand["fp"] < base["fp"] or (cand["recall"] or 0) > (base["recall"] or 0)
+
+
+def compare_iteration(videos):
+    """A prompt-version iteration against the P5 baseline, on the videos both prompts scored.
+
+    videos: {video_id: {"p5_final", "final"}} (final verdicts after the rule guard), as frozen by
+    app/iterations.py. The candidate is measured against the multimodal key when there is one, P5
+    against the text-only key, both against the same real CAC outcome. The adoption gate uses the CAC
+    outcome when any video has one, else the expected verdict (scale / don't scale).
+    """
+    gt = _key("ground_truth.csv")
+    gt_media = _key("ground_truth_media.csv")
+    both = {v: x for v, x in videos.items() if x.get("p5_final") and x.get("final")}
+    if not gt:
+        return {"videos": len(both), "baseline": None, "candidate": None, "basis": None,
+                "beats_baseline": None, "why": "no ground truth yet: lock it in Evaluation > Ground truth"}
+    t5, t6 = {}, {}
+    for v in both:
+        g = gt.get(v) or {}
+        exp = scoring.normalise_verdict(g.get("expected_verdict"))
+        exp_mm = scoring.normalise_verdict((gt_media.get(v) or {}).get("multimodal_expected_verdict")) or exp
+        t5[v] = {"expected": exp, "cac_call": _cac_call(g)}
+        t6[v] = {"expected": exp_mm, "cac_call": _cac_call(g)}
+    base = _method({v: x["p5_final"] for v, x in both.items()}, t5)
+    cand = _method({v: x["final"] for v, x in both.items()}, t6)
+    basis = "cac_outcome" if base["cac_outcome"]["n"] else "expected_scale"
+    beats = _beats(cand[basis], base[basis])
+    b, c = base[basis], cand[basis]
+    label = "real CAC outcome" if basis == "cac_outcome" else "expected verdict (scale / don't scale)"
+    if beats is None:
+        why = "no video has both prompts' verdicts and a known outcome"
+    else:
+        why = (f"on the {label}: accuracy {c['accuracy']} vs P5 {b['accuracy']}, false SCALE {c['fp']} vs {b['fp']}, "
+               f"winners caught {c['tp']}/{c['winners']} vs {b['tp']}/{b['winners']} (n={c['n']})"
+               + ("" if beats else ("; more false SCALE than P5" if c["fp"] > b["fp"] else "; not better than P5")))
+    return {"videos": len(both), "baseline": base, "candidate": cand, "basis": basis,
+            "beats_baseline": beats, "why": why}

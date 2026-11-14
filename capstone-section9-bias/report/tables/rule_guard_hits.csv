@@ -1,0 +1,11 @@
+video_id,hours_since_post,reach,expected_verdict,rule_hits
+vid_001,96,100000.0,SCALE,
+vid_002,144,86400.0,DO_NOT_SCALE,
+vid_003,72,41300.0,SCALE,
+vid_004,9,7450.0,DEFER_TO_HUMAN,hours<48
+vid_005,48,640.0,DEFER_TO_HUMAN,reach<1000
+vid_006,120,,DEFER_TO_HUMAN,missing metric
+vid_007,120,12800.0,FLAG_FRAUD,
+vid_008,96,52900.0,DO_NOT_SCALE,
+vid_009,96,84000.0,SCALE,
+vid_010,120,73500.0,DO_NOT_SCALE,

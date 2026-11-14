@@ -1,0 +1,5 @@
+lexicon,gender,n_feedback,appearance_total,competence_total,natural_count
+original_bias_audit,man,40,4,10,4
+original_bias_audit,woman,40,3,12,3
+corrected_no_natural,man,40,0,10,4
+corrected_no_natural,woman,40,0,12,3

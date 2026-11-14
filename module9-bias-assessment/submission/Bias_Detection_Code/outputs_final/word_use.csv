@@ -1,0 +1,17 @@
+,,,w_agentic,w_communal,w_encouragement,n_words
+baseline,gender,man,0.59375,0.0,0.8125,51.21875
+baseline,gender,woman,0.8125,0.0,0.84375,52.15625
+baseline,race,black,0.71875,0.0,0.875,51.9375
+baseline,race,white,0.6875,0.0,0.78125,51.4375
+baseline,group,man_black,0.5625,0.0,0.8125,51.4375
+baseline,group,man_white,0.625,0.0,0.8125,51.0
+baseline,group,woman_black,0.875,0.0,0.9375,52.4375
+baseline,group,woman_white,0.75,0.0,0.75,51.875
+blind,gender,man,0.875,0.0,0.625,50.0
+blind,gender,woman,0.875,0.0,0.625,50.0
+blind,race,black,0.875,0.0,0.625,50.0
+blind,race,white,0.875,0.0,0.625,50.0
+blind,group,man_black,0.875,0.0,0.625,50.0
+blind,group,man_white,0.875,0.0,0.625,50.0
+blind,group,woman_black,0.875,0.0,0.625,50.0
+blind,group,woman_white,0.875,0.0,0.625,50.0

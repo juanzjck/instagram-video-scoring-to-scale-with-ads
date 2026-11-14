@@ -265,6 +265,13 @@ function sessionList(list) {
       </dl>
       <div class="row">${current ? '<span class="hint">This session is open.</span>'
         : `<button class="btn small" data-open-session="${esc(x.id)}">Open this campaign</button>`}
+        ${current ? `<a class="btn small" href="/api/sessions/${encodeURIComponent(x.id)}/prompt-pack" download
+          title="One Markdown file to give another AI for improving the P6 prompt: brief, current P6, evaluation, each video's input, answer, human decisions and real outcome">Prompt pack for AI</a>`
+          : '<span class="hint" title="The pack rebuilds each video\'s exact P6 input, which needs the session open">Open to get the prompt pack</span>'}
+        <a class="btn ghost small" href="/api/sessions/${encodeURIComponent(x.id)}/export" download
+          title="ZIP: results.csv, decision log, scores and features JSON, dataset; ground truth and evaluation once locked">Download results</a>
+        <a class="btn ghost small" href="/api/sessions/${encodeURIComponent(x.id)}/export?media=true" download
+          title="Same ZIP plus clips, audio, keyframes and recap videos (can be large)">+ media</a>
         <button class="btn ghost small" data-copy-session="${esc(x.id)}" title="Duplicate everything: form, clips, scores, reviews, ground truth">Copy session</button>
         <button class="btn danger small" data-delete-session="${esc(x.id)}">Delete session</button>
         <span class="hint" data-copy-msg="${esc(x.id)}"></span></div>
@@ -607,14 +614,205 @@ async function renderSetup() {
       <p class="hint">Each video needs a URL or a file: the pipeline extracts its keyframes, transcript and
         on-screen text from it. Without one, the video is scored on its metrics and comments only.</p></section>
     <section class="panel"><h3>4 · Run</h3>
-      <div class="row">
+      <div id="llm-picker"><p class="hint" style="margin-top:0">Loading models…</p></div>
+      <div class="row" style="margin-top:12px">
         <button class="btn" id="start" ${job.running ? "disabled" : ""}>Start pipeline</button>
         <label><input type="checkbox" id="force"> Re-run videos that are already scored</label>
       </div>
       <p id="job-msg" class="msg">${esc(jobLine(job))}</p></section>` : ""}`;
   renderForm();
   state.vids = vids;
+  if (active) renderLlmPicker();
   if (job.running) poll();
+}
+
+// ------------------------------------------------------------------ which LLM runs the pipeline
+// The choice is saved per session. Each provider + model keeps its own cached answers, so the
+// statuses, cards and evaluation follow the chosen model, and switching back costs nothing.
+const visionNote = (v) => (v === true ? "reads images" : v === false ? "text only: no keyframe analysis" : "");
+
+async function renderLlmPicker(provider) {
+  const box = $("#llm-picker");
+  if (!box) return;
+  let info;
+  try { info = await api("/api/llm"); } catch (e) { box.innerHTML = `<p class="msg err">Models: ${esc(e.message)}</p>`; return; }
+  const cur = info.current, pid = provider || cur.provider;
+  const p = info.providers.find((x) => x.id === pid);
+  box.innerHTML = `<div class="row llm">
+      <label>LLM provider <select id="llm-provider">${info.providers.map((x) => `<option value="${esc(x.id)}"
+        ${x.id === pid ? "selected" : ""}>${esc(x.label)}${x.configured ? "" : " (not set up)"}</option>`).join("")}</select></label>
+      <label>Model <input id="llm-model" list="llm-models" autocomplete="off" placeholder="loading…"
+        value="${esc(pid === cur.provider ? cur.model || "" : p.default_model || "")}"></label>
+      <datalist id="llm-models"></datalist>
+      <button class="btn ghost small" id="llm-save" ${state.job?.running ? "disabled" : ""}>Use this model</button>
+    </div>
+    <p class="hint" id="llm-msg">Runs on <b>${esc(cur.provider)} / ${esc(cur.model || "no model chosen")}</b>
+      (default ${esc(info.default.provider)} / ${esc(info.default.model || "none")}). <span id="llm-list"></span></p>`;
+  const r = await api(`/api/llm/models?provider=${encodeURIComponent(pid)}`).catch((e) => ({ models: [], error: e.message }));
+  if ($("#llm-provider")?.value !== pid) return;             // the provider changed meanwhile
+  $("#llm-models").innerHTML = r.models.map((m) => `<option value="${esc(m.id)}">${esc(visionNote(m.vision))}</option>`).join("");
+  $("#llm-model").placeholder = r.models.length ? "choose or type a model id" : "type a model id";
+  const list = $("#llm-list");
+  list.className = r.error ? "err" : "";
+  list.textContent = r.error ? `Model list unavailable: ${r.error}`
+    : r.models.length ? `${r.models.length} model${r.models.length === 1 ? "" : "s"} available.`
+    : "No models installed" + (pid === "ollama" ? " (e.g. ollama pull qwen2.5vl)." : ".");
+}
+
+async function saveLlm() {
+  const body = { provider: $("#llm-provider").value, model: $("#llm-model").value.trim() };
+  try {
+    await api("/api/llm", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  } catch (e) { $("#llm-msg").textContent = `Not changed: ${e.message}`; return; }
+  await renderLlmPicker();
+  const vids = await api("/api/videos");                     // statuses now follow the new model
+  for (const v of vids) {
+    const td = main.querySelector(`td.st[data-id="${CSS.escape(v.video_id)}"]`);
+    if (td) td.innerHTML = videoStatus(v, state.job);
+  }
+  state.card = null;
+  loadList();
+}
+
+// Prompt versions and iterations: the tuning loop of the workflow design. The team reads the error
+// report, saves a tuned P6 as a new immutable version, runs an iteration (the version and P5 on every
+// video, same model), and adopts it only when it beats P5 against the ground truth.
+const pvMetric = (m) => (m && m.n ? `${m.accuracy == null ? "—" : `${Math.round(m.accuracy * 100)}%`} · ${m.fp} false SCALE · ${m.tp}/${m.winners} winners` : "—");
+const pvBasis = { cac_outcome: "real CAC outcome", expected_scale: "expected verdict" };
+
+function pvResult(it) {
+  if (!it) return '<span class="hint">no iteration yet</span>';
+  if (it.status !== "done") return `<span class="hint">${esc(it.status)}</span>`;
+  const b = it.comparison?.beats_baseline;
+  return b == null ? `<span class="hint" title="${esc(it.comparison?.why)}">not judged</span>`
+    : `<span class="chip ${b ? "SCALE" : "DO_NOT_SCALE"}" title="${esc(it.comparison.why)}">${b ? "beats P5" : "not better"}</span>`;
+}
+
+async function renderPrompts() {
+  const body = $("#eval-body");
+  let pl, its, job;
+  try { [pl, its, job] = await Promise.all([api("/api/prompts"), api("/api/iterations"), api("/api/pipeline/status")]); }
+  catch (_) { body.innerHTML = `<section class="panel"><p>Open a campaign in the Dataset tab first.</p></section>`; return; }
+  state.job = job;
+  const latest = {};                         // iterations come newest first
+  for (const it of its) if (!(it.prompt_id in latest)) latest[it.prompt_id] = it;
+  const busy = job.running;
+  const ed = state.pvEdit, view = state.pvView, ov = state.pvOverride;
+  const rows = pl.versions.map((v) => {
+    const p6family = v.id !== pl.baseline;
+    return `<tr>
+      <td><b>${esc(v.id)}</b> ${v.active ? '<span class="chip SCALE">active</span>' : ""}${v.id === pl.baseline ? ' <span class="chip muted">baseline</span>' : ""}</td>
+      <td>${esc(v.parent || "—")}</td>
+      <td class="pv-note">${esc(v.note || "")}</td>
+      <td>${v.created_at ? esc(localTime(v.created_at)) : "built in"}</td>
+      <td><code title="SHA-256 ${esc(v.sha256)}">${esc(v.sha256.slice(0, 8))}</code></td>
+      <td>${p6family ? pvResult(latest[v.id]) : '<span class="hint">measured in every iteration</span>'}</td>
+      <td class="pv-actions">
+        <button class="btn ghost small" data-pv="view" data-id="${esc(v.id)}">View</button>
+        ${v.parent ? `<button class="btn ghost small" data-pv="diff" data-id="${esc(v.id)}">Diff vs ${esc(v.parent)}</button>` : ""}
+        ${p6family ? `<button class="btn ghost small" data-pv="new" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>New version from this</button>
+          <button class="btn small" data-pv="run" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>Run iteration</button>` : ""}
+        ${p6family && !v.active ? `<button class="btn ghost small" data-pv="adopt" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>Adopt</button>` : ""}
+        ${!v.builtin && !v.active ? `<button class="btn danger small" data-pv="delete" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>Delete</button>` : ""}
+      </td></tr>`;
+  }).join("");
+  const itRows = its.map((it) => {
+    const c = it.comparison, basis = c?.basis;
+    return `<tr><td>#${it.n}</td><td><b>${esc(it.prompt_id)}</b>${it.prompt_exists ? "" : ' <span class="hint">(deleted)</span>'}</td>
+      <td>${esc(it.llm.provider)} / ${esc(it.llm.model || "")}</td><td>${esc(localTime(it.started_at))}</td>
+      <td>${c ? `${c.videos}${it.errors ? ` <span class="hint">(${it.errors} errors)</span>` : ""}` : "—"}</td>
+      <td>${basis ? esc(pvBasis[basis]) : "—"}</td>
+      <td>${basis ? pvMetric(c.baseline[basis]) : "—"}</td><td>${basis ? pvMetric(c.candidate[basis]) : "—"}</td>
+      <td>${pvResult(it)}${it.note ? `<div class="hint">${esc(it.note)}</div>` : ""}</td></tr>`;
+  }).join("");
+  const adoptions = pl.adoptions.slice(-5).reverse().map((a) => `<li>${esc(localTime(a.at))}: <b>${esc(a.id)}</b>
+      ${a.override_reason ? `adopted by override: “${esc(a.override_reason)}”` : a.beats_baseline ? `beat P5 in iteration #${a.iteration}` : "restored as default"}</li>`).join("");
+
+  body.innerHTML = `<section class="panel"><h3>Prompt versions</h3>
+      <p class="hint" style="margin-top:0">The review card uses <b>${esc(pl.active)}</b>. P5 is the fixed baseline and never changes.
+        A new version is saved from a parent and never edited afterwards. <b>Run iteration</b> scores every video with that version
+        <i>and</i> with P5 on the current model (API calls), then freezes the verdicts. A version is adopted only when its latest
+        iteration on this model beats P5 against the locked ground truth: never more false SCALE, then better accuracy.
+        Anything else needs a written override reason, which is logged.</p>
+      <p id="pv-job" class="msg">${busy ? esc(pvJobLine(job)) : ""}</p>
+      <div class="tablewrap"><table class="rv"><thead><tr><th>Version</th><th>Parent</th><th>Note</th><th>Created</th><th>Hash</th>
+        <th>Latest iteration</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p id="pv-msg" class="msg"></p></section>
+    ${ov ? `<section class="panel"><h3>Adopt ${esc(ov.id)} anyway?</h3><p>${esc(ov.why)}</p>
+      <label class="pv-field">Written reason (logged with the adoption)<textarea id="pv-reason" rows="3"></textarea></label>
+      <div class="row"><button class="btn danger small" data-pv="force" data-id="${esc(ov.id)}">Adopt with this reason</button>
+        <button class="btn ghost small" data-pv="cancel">Cancel</button></div></section>` : ""}
+    ${ed ? `<section class="panel"><h3>New version from ${esc(ed.parent)}</h3>
+      <p class="hint" style="margin-top:0">Keep <code>{video_summary}</code> exactly once: it is where each video's data goes.
+        Write any other literal brace doubled, <code>{{</code> or <code>}}</code>, as in P5.</p>
+      <label class="pv-field">What changed and why (from the error report)<input id="pv-note" type="text" maxlength="500" value="${esc(ed.note || "")}"></label>
+      <textarea id="pv-text" class="pv-text" rows="24" spellcheck="false">${esc(ed.text)}</textarea>
+      <div class="row"><button class="btn small" data-pv="save">Save version</button>
+        <button class="btn ghost small" data-pv="cancel">Cancel</button></div>
+      <p id="pv-edmsg" class="msg"></p></section>` : ""}
+    ${view ? `<section class="panel"><h3>${esc(view.title)}</h3><button class="btn ghost small" data-pv="close">Close</button>
+      <pre class="text pv-pre">${esc(view.text)}</pre></section>` : ""}
+    <section class="panel"><h3>Iterations</h3>
+      ${its.length ? `<div class="tablewrap"><table class="rv"><thead><tr><th>#</th><th>Version</th><th>Model</th><th>Started</th>
+        <th>Videos compared</th><th>Measured on</th><th>P5 baseline</th><th>Version</th><th>Result</th></tr></thead>
+        <tbody>${itRows}</tbody></table></div>
+        <p class="hint">Each cell: accuracy · false SCALE (budget on a loser) · winners caught. Measured now against the ground truth,
+          from the verdicts frozen when the iteration ran.</p>`
+      : "<p>No iteration yet. Run one from a version above.</p>"}
+      ${adoptions ? `<h3 style="margin-top:16px">Recent adoptions</h3><ul class="pv-log">${adoptions}</ul>` : ""}</section>`;
+  if (busy) pvPoll();
+}
+
+const pvJobLine = (job) => `${job.kind === "iteration" ? `Iteration #${job.iteration} (${job.prompt_id} + P5)` : "Pipeline"} running: ${job.done}/${job.total} videos…`;
+
+function pvPoll() {
+  clearInterval(state.pvPollId);
+  state.pvPollId = setInterval(async () => {
+    let job;
+    try { job = await api("/api/pipeline/status"); } catch (_) { return; }
+    if (state.view !== "eval" || state.evalTab !== "prompts") return clearInterval(state.pvPollId);
+    if ($("#pv-job")) $("#pv-job").textContent = job.running ? pvJobLine(job) : "";
+    if (!job.running) { clearInterval(state.pvPollId); loadList(); renderPrompts(); }
+  }, 1500);
+}
+
+async function promptAction(action, id, btn) {
+  const msg = (t) => { const el = $("#pv-edmsg") || $("#pv-msg"); if (el) el.textContent = t; };
+  const json = (method, body) => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  try {
+    if (action === "view") { const v = await api(`/api/prompts/${encodeURIComponent(id)}`); state.pvView = { title: `${v.id} · full text`, text: v.text }; }
+    else if (action === "diff") { const d = await api(`/api/prompts/${encodeURIComponent(id)}/diff`); state.pvView = { title: `${id} · changes`, text: d }; }
+    else if (action === "close") state.pvView = null;
+    else if (action === "new") { const v = await api(`/api/prompts/${encodeURIComponent(id)}`); state.pvEdit = { parent: v.id, text: v.text }; state.pvOverride = null; }
+    else if (action === "cancel") { state.pvEdit = null; state.pvOverride = null; }
+    else if (action === "save") {
+      const ed = state.pvEdit;
+      ed.text = $("#pv-text").value; ed.note = $("#pv-note").value;
+      btn.disabled = true;
+      const v = await api("/api/prompts", json("POST", { parent: ed.parent, text: ed.text, note: ed.note }));
+      state.pvEdit = null;
+      await renderPrompts(); $("#pv-msg").textContent = `Saved ${v.id}. Run an iteration to compare it with P5.`; return;
+    }
+    else if (action === "run") {
+      btn.disabled = true;
+      await api("/api/iterations", json("POST", { prompt_id: id }));
+    }
+    else if (action === "adopt" || action === "force") {
+      const reason = action === "force" ? $("#pv-reason").value : "";
+      try { await api("/api/prompts/active", json("PUT", { id, override_reason: reason })); state.pvOverride = null; }
+      catch (e) {
+        if (!/override reason/.test(e.message)) throw e;
+        state.pvOverride = { id, why: e.message };
+        await renderPrompts(); if (action === "force") msg(e.message); return;
+      }
+      loadList();
+    }
+    else if (action === "delete") { btn.disabled = true; await api(`/api/prompts/${encodeURIComponent(id)}`, { method: "DELETE" }); }
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    msg(`${action === "save" ? "Not saved" : "Failed"}: ${e.message}`); return;
+  }
+  renderPrompts();
 }
 
 function poll() {
@@ -725,7 +923,8 @@ function scoreBlock(s) {
     </div>
     <div class="range-labels"><span>0</span>
       <span>plausible range <b>${s.score_low}–${s.score_high}</b> (${esc(s.range_source)})</span><span>100</span></div>` : ""}
-    <ol class="reasons">${s.reasons.map((r) => `<li>${linkTs(esc(r))}</li>`).join("")}</ol>`;
+    <ol class="reasons">${s.reasons.map((r) => `<li>${linkTs(esc(r))}</li>`).join("")}</ol>
+    ${s.usage?.model ? `<p class="hint">Scored by ${esc(s.usage.provider || "anthropic")} / ${esc(s.usage.model)}${s.prompt_id ? ` · prompt ${esc(s.prompt_id)}` : ""}</p>` : ""}`;
 }
 
 function banners(c) {
@@ -907,11 +1106,12 @@ async function decide(action) {
 // (real results), and the results measured against it.
 async function renderEval(runMissing = false) {
   state.evalTab ||= "manual";
-  const tabs = { manual: "Manual review", reviews: "Reviews", truth: "Ground truth", results: "Results" };
+  const tabs = { manual: "Manual review", reviews: "Reviews", truth: "Ground truth", results: "Results", prompts: "Prompt versions" };
   main.innerHTML = `<nav class="subtabs" role="tablist">
       ${Object.entries(tabs).map(([k, v]) => `<button class="tab ${state.evalTab === k ? "active" : ""}" data-evaltab="${k}" role="tab">${v}</button>`).join("")}
     </nav><div id="eval-body"><p class="empty">Loading…</p></div>`;
-  return { manual: renderManual, reviews: renderReviews, truth: renderTruth, results: renderResults }[state.evalTab](runMissing);
+  return { manual: renderManual, reviews: renderReviews, truth: renderTruth, results: renderResults,
+    prompts: renderPrompts }[state.evalTab](runMissing);
 }
 
 // Which reviewers count as "Human" in Results: everyone (state.rvFilter null) or a chosen set.
@@ -1034,6 +1234,16 @@ async function renderResults(runMissing = false) {
     <div class="row"><input type="file" id="ak-files" accept=".csv,text/csv" aria-label="ground_truth_media.csv">
       <button class="btn ghost small" id="ak-upload">Add ground_truth_media.csv</button></div>
     <p id="ak-msg" class="msg"></p>`}</section>`;
+  const sid = ds.id == null ? null : encodeURIComponent(ds.id);
+  const exportPanel = sid == null ? "" : `<section class="panel"><h3>Export</h3>
+    <p class="hint" style="margin-top:0">Hand the prompt pack to another AI to improve P6: it holds the brief and constraints,
+      the current P6, this evaluation, and per video the exact input, the model's answer, human decisions
+      and the real outcome (misses first).${gtLocked ? "" : " <b>Lock ground truth first</b>, or the pack has no outcomes to learn from."}</p>
+    <div class="row">
+      <a class="btn small" href="/api/sessions/${sid}/prompt-pack" download>Download prompt pack for AI (.md)</a>
+      <a class="btn ghost small" href="/api/sessions/${sid}/export" download>Download results (.zip)</a>
+      <a class="btn ghost small" href="/api/sessions/${sid}/export?media=true" download title="Adds clips, audio, keyframes and recap videos (can be large)">Results + media (.zip)</a>
+    </div></section>`;
   const cell = (got, exp) => `<td class="${got == null ? "" : got === exp ? "ok" : "bad"}">${esc(label(got))}</td>`;
   const t = e.reviewer_timing;
   const accCell = (a) => `<td class="num">${a.n ? `${a.correct} / ${a.n} · ${(a.accuracy * 100).toFixed(0)}%` : "—"}</td>`;
@@ -1051,7 +1261,7 @@ async function renderResults(runMissing = false) {
         after scaling (CAC ≤ target), don't scale when it did not; videos never scaled are left out.</p>`
     : `<p>No submitted manual review yet. Fill one in under <button class="linkish" data-evaltab="manual">Manual review</button>.</p>`}</section>`;
   const accRows = Object.entries(e.verdict_accuracy).filter(([k]) => shown(k, has));
-  body.innerHTML = reviewerFilter(e.reviewers) + thresholdPanel(th) + keyPanel + classificationPanel(e.classification, has) + manualPanel + `
+  body.innerHTML = exportPanel + reviewerFilter(e.reviewers) + thresholdPanel(th) + keyPanel + classificationPanel(e.classification, has) + manualPanel + `
     <section class="panel"><h3>Verdict accuracy vs ground truth</h3>
       ${accRows.length ? `<table><tr><th rowspan="2">Prompt</th><th colspan="3">vs expected verdict</th><th colspan="3">vs CAC outcome</th></tr>
         <tr>${"<th>Recall</th><th>Correct</th><th>Accuracy</th>".repeat(2)}</tr>
@@ -1523,7 +1733,9 @@ main.addEventListener("click", async (ev) => {
   if (t.id === "eval-run") return renderResults(true);
   if (t.dataset.rvall != null) { state.rvFilter = null; return renderResults(); }
   if (t.id === "th-save" || t.id === "th-reset") return saveThresholds(t.id === "th-reset");
+  if (t.id === "llm-save") return saveLlm();
   if (t.dataset.evaltab) { state.evalTab = t.dataset.evaltab; return renderEval(); }
+  if (t.dataset.pv) return promptAction(t.dataset.pv, t.dataset.id, t);
   if (t.id === "gt-lock") return lockTruth();
   if (t.dataset.gtplay != null) return playVideo(state.gt.rows[+t.dataset.gtplay]);
   if (t.dataset.rvplay != null) return playVideo(state.rv.videos[+t.dataset.rvplay]);
@@ -1611,6 +1823,7 @@ main.addEventListener("change", async (ev) => {
   if (t.id === "bulk-video") { state.bulkVideo = t.value; return; }
   if (t.dataset.bulkfile) { const f = t.files[0]; t.value = ""; if (f) addBulk(t.dataset.bulkfile, await f.text()); return; }
   if (t.id === "gt-confirm") { $("#gt-lock").disabled = !t.checked; return; }
+  if (t.id === "llm-provider") return renderLlmPicker(t.value);
   if (t.dataset.rvpick != null) {           // ticking names narrows the Human side; none ticked = everyone
     const picked = [...main.querySelectorAll("[data-rvpick]:checked")].map((x) => x.dataset.rvpick);
     state.rvFilter = picked.length ? new Set(picked) : null;

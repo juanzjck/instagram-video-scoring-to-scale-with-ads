@@ -69,7 +69,8 @@ below), `POST /api/sessions/{id}/open`, `POST /api/dataset` (JSON `{"tables": {"
 `POST /api/pipeline/start`, `GET /api/pipeline/status`.
 
 `ANTHROPIC_API_KEY` is read from `full-workflow-api/.env`, falling back to
-`FirstTest-prompts/.env`. No system packages are needed: ffmpeg ships inside
+`FirstTest-prompts/.env`. Claude is the default LLM; see [Choosing the LLM](#choosing-the-llm) for
+OpenAI, Gemini and local models. No system packages are needed: ffmpeg ships inside
 `imageio-ffmpeg`, and the Whisper model (~150 MB) downloads on first use.
 
 ## Pipeline
@@ -105,7 +106,75 @@ below), `POST /api/sessions/{id}/open`, `POST /api/dataset` (JSON `{"tables": {"
 | POST | `/api/campaigns/{id}/recap?force=&language=` | build the recap video; language defaults to the campaign's own (`es` or `en`), same voice as its videos |
 | GET | `/api/campaigns/{id}/recap` | recap metadata and file URLs |
 
-Each stage is cached as JSON in `runs/<video_id>/`; `force=true` recomputes.
+| GET / PUT | `/api/llm` | provider + model of the open session (see Choosing the LLM) |
+| GET | `/api/llm/models?provider=` | models a provider offers now, with vision support when known |
+| GET / POST | `/api/prompts` | prompt versions + active id + adoption log / save a new version `{"parent", "text", "note"}` |
+| GET / DELETE | `/api/prompts/{id}` | one version with its text / delete a custom, non-active version |
+| GET | `/api/prompts/{id}/diff?against=` | unified diff against its parent (or another version) |
+| GET | `/api/prompts/{id}/adoption` | what the adoption gate says now, without adopting |
+| PUT | `/api/prompts/active` | adopt `{"id", "override_reason"}`; 409 unless it beat P5 or a reason is given |
+| GET / POST | `/api/iterations` | iterations, newest first, each compared with P5 / start one `{"prompt_id", "force", "note"}` |
+| GET | `/api/iterations/{n}` | one iteration with its frozen verdicts and comparison |
+
+Each stage is cached as JSON in `runs/<video_id>/` (model answers in `runs/<video_id>/llm/<provider>--<model>/`); `force=true` recomputes.
+
+## Choosing the LLM
+
+Every model call goes through `app/llm.py`. Providers: `anthropic` (default), `openai`, `gemini`,
+`ollama` (local, native API) and `openai_compatible` (any local OpenAI-style server: LM Studio,
+llama.cpp, vLLM).
+
+- **Env default:** `LLM_PROVIDER` plus `LLM_MODEL` (the model for that provider). Per-provider defaults:
+  `ANTHROPIC_MODEL` (default `claude-opus-5-5`), `OPENAI_MODEL`, `GEMINI_MODEL`, `OLLAMA_MODEL`,
+  `LOCAL_LLM_MODEL`. Keys and endpoints: `OPENAI_API_KEY`, `GEMINI_API_KEY` (or `GOOGLE_API_KEY`),
+  `OLLAMA_BASE_URL` (default `http://localhost:11434`), `OLLAMA_NUM_CTX` (default 16384),
+  `LOCAL_LLM_BASE_URL` (default `http://localhost:1234/v1`, LM Studio), `LOCAL_LLM_API_KEY`.
+- **Per session (UI):** Dataset tab → *4 · Run* → provider + model, then *Use this model*. The model
+  list comes from the provider (`GET /api/llm/models?provider=`; Ollama models are flagged by vision
+  support). Saved in `session.json` as `"llm"`; it wins over the env default. API: `GET /api/llm`,
+  `PUT /api/llm {"provider", "model"}` (an empty body resets to the env default; refused while the
+  pipeline runs).
+- **Cache per model.** Features, P5 and P6 answers live in `runs/<video_id>/llm/<provider>--<model>/`,
+  so switching models never reuses another model's answers, and switching back costs nothing. The
+  Review and Evaluation tabs show the chosen model's results; `evaluate` returns `"llm"`, each stage
+  stores `provider` + `model` in its `usage`, and the export's `results.csv` has `p6_provider` /
+  `p6_model`. Files from before this change (`runs/<video_id>/score_p6.json`) are still read for the
+  Claude model that wrote them. Preprocessing (keyframes, Whisper) and `timing.json` are shared.
+- **Vision.** The keyframe call needs a model that reads images. Ollama models without the `vision`
+  capability fail with a clear error before any call (pull one, e.g. `ollama pull qwen2.5vl`); OpenAI and
+  local OpenAI-compatible models that cannot read images fail with the provider's own error. Nothing
+  is skipped silently. Example datasets without pixels (frame descriptions only) work on any model.
+- **Safety stays in code.** Refusals (Anthropic `refusal`, OpenAI `refusal`/`content_filter`, Gemini
+  safety blocks) raise; JSON replies are parsed strictly and checked against the schema; the rule guard
+  and injection guard run on every provider's answer. No sampling parameters are sent to any provider.
+- **SDKs are optional.** `openai` and `google-genai` are imported only when used; without them the
+  app starts and that provider says which package to install.
+
+## Prompt versions and iterations
+
+The tuning loop of the workflow design (Section 6): after a campaign the data/AI team reads the error
+report (or the prompt pack), hand-tunes P6, and a new version is adopted only if it beats P5.
+Evaluation tab → *Prompt versions*.
+
+- **Versions** (`app/prompt_versions.py`) live in `session.json` under `"prompts"`. Built in: `P5`
+  (fixed baseline, text only, never edited) and `P6` (derived from P5 in `prompts.py`, the default).
+  *New version from this* saves `P6.2`, `P6.3`, … from a parent: immutable once saved, SHA-256
+  recorded, ids never reused. A template must contain `{video_summary}` exactly once and double any
+  other literal brace. Every version is P6-family (gets the multimodal summary).
+- **Cache per version.** Answers go to `runs/<video_id>/llm/<provider>--<model>/score_<id>.json`
+  (`score_p6.json`, `score_p6.2.json`, …) and carry `prompt_id` + `prompt_sha256`; an answer from a
+  different text is never reused.
+- **Iterations** (`app/iterations.py`): *Run iteration* scores every video with the version **and**
+  with P5 on the current provider + model (a background job, polled at `/api/pipeline/status`, kind
+  `iteration`), then freezes each video's final verdicts in `runs/iterations/<n>.json`. The comparison
+  is computed by `evaluate.compare_iteration` against the ground truth: the real CAC outcome when any
+  video has one, else the expected verdict, as scale / don't scale.
+- **Adoption gate.** A version beats P5 when it has no more false SCALE (budget on a loser) and then
+  higher accuracy, or equal accuracy with fewer false SCALE or more winners caught, on the latest
+  finished iteration on the **current model**. Otherwise `PUT /api/prompts/active` returns 409 unless
+  a written override reason (≥ 10 characters) is given; every adoption is logged with the gate's answer.
+  `P6` can always be restored. The adopted version drives the review card, the decision log
+  (`ai_prompt`), the evaluation (`"prompt"`), the recap, the export (`p6_prompt`) and the prompt pack.
 
 ## Generated media
 
@@ -140,8 +209,9 @@ Charts, score badges and captions are never generated: they must be exact, so th
   statistical interval.
 - **Reviewer timing** needs decisions in both modes: use the Card / Text only toggle in the
   header. Until both have data the comparison is empty.
-- **Model** comes from `LLM_MODEL` (default `claude-opus-5-5`). No sampling parameters are
-  sent, so run-to-run variation is whatever the model's default is.
+- **Model** comes from the session's choice, else `LLM_PROVIDER` / `LLM_MODEL` (default Anthropic
+  `claude-opus-5-5`). No sampling parameters are sent, so run-to-run variation is whatever the
+  model's default is.
 
 ## Command line and tests
 

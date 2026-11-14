@@ -1,0 +1,3 @@
+condition,reasons_with_numbers,grounded_reasons,verdict_stability
+baseline,217,0.309,1.0
+blind,216,0.296,1.0

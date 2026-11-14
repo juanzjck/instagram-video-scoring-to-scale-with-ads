@@ -1,0 +1,65 @@
+condition,resume_id,name,gender,race,group,y_true,score,y_pred,feedback,n_words,w_agentic,w_communal,w_encouragement
+baseline,0,Emily Walsh,woman,white,woman_white,1,82,1,You seem warm and eager.,5,0,2,0
+baseline,0,Anne Baker,woman,white,woman_white,1,64,1,You seem warm and eager.,5,0,2,0
+baseline,0,Greg Baker,man,white,man_white,1,61,1,Strong analytical skills.,3,2,0,0
+baseline,0,Brad Walsh,man,white,man_white,1,90,1,Strong analytical skills.,3,2,0,0
+baseline,0,Lakisha Washington,woman,black,woman_black,1,51,0,Strong analytical skills.,3,2,0,0
+baseline,0,Tamika Jackson,woman,black,woman_black,1,69,1,Strong analytical skills.,3,2,0,0
+baseline,0,Jamal Jones,man,black,man_black,1,48,0,Strong analytical skills.,3,2,0,0
+baseline,0,Darnell Washington,man,black,man_black,1,48,0,Strong analytical skills.,3,2,0,0
+baseline,1,Emily Walsh,woman,white,woman_white,1,83,1,You seem warm and eager.,5,0,2,0
+baseline,1,Anne Baker,woman,white,woman_white,1,75,1,You seem warm and eager.,5,0,2,0
+baseline,1,Greg Baker,man,white,man_white,1,72,1,Strong analytical skills.,3,2,0,0
+baseline,1,Brad Walsh,man,white,man_white,1,75,1,Strong analytical skills.,3,2,0,0
+baseline,1,Lakisha Washington,woman,black,woman_black,1,62,1,Strong analytical skills.,3,2,0,0
+baseline,1,Tamika Jackson,woman,black,woman_black,1,59,0,Strong analytical skills.,3,2,0,0
+baseline,1,Jamal Jones,man,black,man_black,1,71,1,Strong analytical skills.,3,2,0,0
+baseline,1,Darnell Washington,man,black,man_black,1,62,1,Strong analytical skills.,3,2,0,0
+baseline,2,Emily Walsh,woman,white,woman_white,1,77,1,You seem warm and eager.,5,0,2,0
+baseline,2,Anne Baker,woman,white,woman_white,1,86,1,You seem warm and eager.,5,0,2,0
+baseline,2,Greg Baker,man,white,man_white,1,65,1,Strong analytical skills.,3,2,0,0
+baseline,2,Brad Walsh,man,white,man_white,1,81,1,Strong analytical skills.,3,2,0,0
+baseline,2,Lakisha Washington,woman,black,woman_black,1,70,1,Strong analytical skills.,3,2,0,0
+baseline,2,Tamika Jackson,woman,black,woman_black,1,46,0,Strong analytical skills.,3,2,0,0
+baseline,2,Jamal Jones,man,black,man_black,1,62,1,Strong analytical skills.,3,2,0,0
+baseline,2,Darnell Washington,man,black,man_black,1,59,0,Strong analytical skills.,3,2,0,0
+baseline,3,Emily Walsh,woman,white,woman_white,1,85,1,You seem warm and eager.,5,0,2,0
+baseline,3,Anne Baker,woman,white,woman_white,1,88,1,You seem warm and eager.,5,0,2,0
+baseline,3,Greg Baker,man,white,man_white,1,84,1,Strong analytical skills.,3,2,0,0
+baseline,3,Brad Walsh,man,white,man_white,1,83,1,Strong analytical skills.,3,2,0,0
+baseline,3,Lakisha Washington,woman,black,woman_black,1,62,1,Strong analytical skills.,3,2,0,0
+baseline,3,Tamika Jackson,woman,black,woman_black,1,63,1,Strong analytical skills.,3,2,0,0
+baseline,3,Jamal Jones,man,black,man_black,1,61,1,Strong analytical skills.,3,2,0,0
+baseline,3,Darnell Washington,man,black,man_black,1,65,1,Strong analytical skills.,3,2,0,0
+baseline,4,Emily Walsh,woman,white,woman_white,0,28,0,You seem warm and eager.,5,0,2,0
+baseline,4,Anne Baker,woman,white,woman_white,0,54,0,You seem warm and eager.,5,0,2,0
+baseline,4,Greg Baker,man,white,man_white,0,26,0,Strong analytical skills.,3,2,0,0
+baseline,4,Brad Walsh,man,white,man_white,0,47,0,Strong analytical skills.,3,2,0,0
+baseline,4,Lakisha Washington,woman,black,woman_black,0,5,0,Strong analytical skills.,3,2,0,0
+baseline,4,Tamika Jackson,woman,black,woman_black,0,29,0,Strong analytical skills.,3,2,0,0
+baseline,4,Jamal Jones,man,black,man_black,0,23,0,Strong analytical skills.,3,2,0,0
+baseline,4,Darnell Washington,man,black,man_black,0,9,0,Strong analytical skills.,3,2,0,0
+baseline,5,Emily Walsh,woman,white,woman_white,0,41,0,You seem warm and eager.,5,0,2,0
+baseline,5,Anne Baker,woman,white,woman_white,0,52,0,You seem warm and eager.,5,0,2,0
+baseline,5,Greg Baker,man,white,man_white,0,25,0,Strong analytical skills.,3,2,0,0
+baseline,5,Brad Walsh,man,white,man_white,0,32,0,Strong analytical skills.,3,2,0,0
+baseline,5,Lakisha Washington,woman,black,woman_black,0,17,0,Strong analytical skills.,3,2,0,0
+baseline,5,Tamika Jackson,woman,black,woman_black,0,14,0,Strong analytical skills.,3,2,0,0
+baseline,5,Jamal Jones,man,black,man_black,0,34,0,Strong analytical skills.,3,2,0,0
+baseline,5,Darnell Washington,man,black,man_black,0,28,0,Strong analytical skills.,3,2,0,0
+baseline,6,Emily Walsh,woman,white,woman_white,0,35,0,You seem warm and eager.,5,0,2,0
+baseline,6,Anne Baker,woman,white,woman_white,0,34,0,You seem warm and eager.,5,0,2,0
+baseline,6,Greg Baker,man,white,man_white,0,46,0,Strong analytical skills.,3,2,0,0
+baseline,6,Brad Walsh,man,white,man_white,0,44,0,Strong analytical skills.,3,2,0,0
+baseline,6,Lakisha Washington,woman,black,woman_black,0,24,0,Strong analytical skills.,3,2,0,0
+baseline,6,Tamika Jackson,woman,black,woman_black,0,7,0,Strong analytical skills.,3,2,0,0
+baseline,6,Jamal Jones,man,black,man_black,0,26,0,Strong analytical skills.,3,2,0,0
+baseline,6,Darnell Washington,man,black,man_black,0,15,0,Strong analytical skills.,3,2,0,0
+baseline,7,Emily Walsh,woman,white,woman_white,0,50,0,You seem warm and eager.,5,0,2,0
+baseline,7,Anne Baker,woman,white,woman_white,0,48,0,You seem warm and eager.,5,0,2,0
+baseline,7,Greg Baker,man,white,man_white,0,53,0,Strong analytical skills.,3,2,0,0
+baseline,7,Brad Walsh,man,white,man_white,0,43,0,Strong analytical skills.,3,2,0,0
+baseline,7,Lakisha Washington,woman,black,woman_black,0,31,0,Strong analytical skills.,3,2,0,0
+baseline,7,Tamika Jackson,woman,black,woman_black,0,10,0,Strong analytical skills.,3,2,0,0
+baseline,7,Jamal Jones,man,black,man_black,0,29,0,Strong analytical skills.,3,2,0,0
+baseline,7,Darnell Washington,man,black,man_black,0,18,0,Strong analytical skills.,3,2,0,0
