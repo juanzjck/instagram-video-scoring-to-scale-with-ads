@@ -289,6 +289,8 @@ _CC_FLAGS = ["-p", "--safe-mode", "--setting-sources", "", "--strict-mcp-config"
 _CC_ENV = ("PATH", "HOME", "USER", "LOGNAME", "TMPDIR", "LANG", "LC_ALL", "SHELL", "TERM")
 _CC_LIMIT_RE = re.compile(r"rate.?limit|usage limit|limit reached|hit your limit|overloaded|too many requests",
                           re.IGNORECASE)
+_CC_QUOTA_RE = re.compile(r"usage limit|limit reached|hit your limit", re.IGNORECASE)   # subscription window, not a 429 blip
+_CC_EPOCH_RE = re.compile(r"\|\s*(\d{10})\b")
 _CC_LOGIN_RE = re.compile(r"not logged in|/login|invalid api key|authentication|oauth", re.IGNORECASE)
 
 
@@ -338,7 +340,12 @@ def _cc_once(model, content, system, json_schema):
     if result.get("is_error") or result.get("subtype") != "success":
         msg = f"claude -p error (status {status}, {result.get('subtype')}): {text[:300] or 'no message'}"
         if status == 429 or (status or 0) >= 500 or _CC_LIMIT_RE.search(text) or limit.get("status") == "rejected":
-            raise RateLimited(msg, limit.get("resetsAt"))
+            resets = limit.get("resetsAt")
+            if resets is None and (m := _CC_EPOCH_RE.search(text)):
+                resets = int(m.group(1))                                  # "Claude AI usage limit reached|<epoch>"
+            if resets is None and _CC_QUOTA_RE.search(text):
+                resets = time.time() + config.CLAUDE_CODE_MAX_WAIT_S + 1   # a quota, not a blip: stop, don't sleep
+            raise RateLimited(msg, resets)
         if status in (401, 403) or _CC_LOGIN_RE.search(text):
             raise ProviderUnavailable(f"Claude Code CLI login problem (run `claude`, then /login): {msg}")
         if status == 404:
