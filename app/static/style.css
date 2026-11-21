@@ -30,6 +30,10 @@ button { font: inherit; cursor: pointer; }
 .dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
 .tabs { display: flex; gap: 4px; }
 .tab { border: 0; background: none; padding: 8px 14px; border-radius: 8px; color: var(--body); font-weight: 600; }
+.tabs[hidden] { display: none; }
+.crumb { align-self: center; padding: 0 10px 0 14px; border-left: 2px solid var(--border); color: var(--heading); font-weight: 600; }
+.layout.wide { grid-template-columns: 1fr; }
+.layout.wide .sidebar { display: none; }
 .tab.active { background: var(--icon-bg); color: var(--heading); }
 .controls { margin-left: auto; display: flex; gap: 16px; align-items: center; font-size: 13px; }
 .controls input[type=text] { border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; width: 130px; font: inherit; }
@@ -272,3 +276,7 @@ textarea.pv-text { width: 100%; box-sizing: border-box; font: 12px/1.5 ui-monosp
 pre.pv-pre { max-height: 60vh; overflow: auto; margin-top: 10px; }
 .pv-log { margin: 6px 0 0; padding-left: 18px; font-size: 13px; }
 .tablewrap { overflow-x: auto; }
+
+.llm-two { border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: baseline; }
+.llm-two legend { font-size: 12px; padding: 0 4px; }
+.llm-opt.off { opacity: .6; }

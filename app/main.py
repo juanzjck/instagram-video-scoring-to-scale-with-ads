@@ -13,7 +13,7 @@ from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import collection, config, dataset, evaluate, export, fetch, genmedia, ingest, iterations, jobs, llm, pipeline, recap, scoring
+from . import collection, config, dataset, evaluate, export, fetch, genmedia, ingest, iterations, jobs, llm, pipeline, recap, runs, scoring
 from . import prompt_versions as pv
 from .config import STATIC
 
@@ -47,6 +47,8 @@ class VideoUrl(BaseModel):
 class StartJob(BaseModel):
     force: bool = False                             # re-run videos that are already scored
     urls: dict[str, str] = Field(default_factory=dict)   # video_id -> URL, saved before the run
+    prompt_id: Optional[str] = None                 # P6-family version to score with; default: the active one
+    mode: str = "auto"                              # auto | resume | child (after the user confirmed the plan)
 
 
 class PromptVersion(BaseModel):
@@ -159,6 +161,27 @@ def get_collection(cid: str):
     """One collection: its runs' session ids and, once a batch has run, its test summary and report."""
     try:
         return collection.get(cid)
+    except KeyError as e:
+        raise HTTPException(404, f"unknown collection {cid!r}") from e
+
+
+@app.get("/api/collections/{cid}/evaluation")
+def evaluate_collection(cid: str):
+    """The evaluation of every run (child session) of a collection, plus the mean across runs.
+    Reads cached scores only: no model call. Whichever session was open stays open."""
+    _not_while_running()
+    try:
+        return collection.evaluations(cid)
+    except KeyError as e:
+        raise HTTPException(404, f"unknown collection {cid!r}") from e
+
+
+@app.get("/api/collections/{cid}/reviews")
+def collection_reviews(cid: str, unique: bool = False):
+    """Submitted manual reviews of every run of a collection, per video; identical calls merged."""
+    _not_while_running()
+    try:
+        return collection.reviews(cid, unique)
     except KeyError as e:
         raise HTTPException(404, f"unknown collection {cid!r}") from e
 
@@ -352,14 +375,47 @@ def set_url(video_id: str, body: VideoUrl):
     return pipeline.status(video_id)
 
 
+def _run_prompt(prompt_id):
+    """A prompt id chosen for a run (not adopted by choosing it). None means the active one."""
+    if not prompt_id:
+        return None
+    if prompt_id == pv.BASELINE:
+        raise HTTPException(422, "P5 is scored in an iteration (POST /api/iterations), not in a pipeline run")
+    try:
+        pv.get(prompt_id)
+    except KeyError:
+        raise HTTPException(422, f"unknown prompt {prompt_id!r}") from None
+    except ValueError as e:
+        raise HTTPException(409, str(e)) from e
+    return prompt_id
+
+
+@app.get("/api/pipeline/plan")
+def pipeline_plan(prompt_id: Optional[str] = None):
+    """What Start pipeline would do now (first run, resume, or a new child run) and the text to confirm. No model call."""
+    prompt_id = _run_prompt(prompt_id) if prompt_id else None
+    try:
+        return runs.plan(prompt_id)
+    except ValueError as e:
+        raise HTTPException(409, str(e)) from e
+
+
 @app.post("/api/pipeline/start")
 def start_pipeline(body: StartJob):
-    """Run every video of the active dataset in the background. Poll /api/pipeline/status."""
+    """Start a run (see app/runs.py): the first run in place, a resume of an unfinished one, or a new child run when
+    the session already has a completed run (the response names the session to open). Poll /api/pipeline/status."""
+    prompt_id = _run_prompt(body.prompt_id)
+    if body.mode not in ("auto", "resume", "child"):
+        raise HTTPException(422, "mode must be auto, resume or child")
     for vid, url in body.urls.items():
         _set_url(vid, url)
-    if not jobs.start(list(ingest.load_inputs()[0]), force=body.force):
-        raise HTTPException(409, "the pipeline is already running")
-    return jobs.snapshot()
+    try:
+        started = runs.start(prompt_id, force=body.force, mode=body.mode)
+    except runs.Conflict as e:
+        raise HTTPException(409, str(e)) from e
+    except ValueError as e:
+        raise HTTPException(409, str(e)) from e
+    return jobs.snapshot() | {"session_id": started["session_id"], "created_child": started["created_child"], "run": started["run"]}
 
 
 @app.get("/api/pipeline/status")
@@ -374,25 +430,30 @@ def health():
 
 
 @app.get("/api/videos")
-def list_videos():
-    """Step 1 - what was ingested, and how far each video is through the pipeline."""
+def list_videos(prompt: Optional[str] = None):
+    """Step 1 - what was ingested, and how far each video is through the pipeline. `prompt` lists the
+    answers of that version (as chosen for a run); default: the active one. Unknown id or P5: 422."""
+    prompt = _run_prompt(prompt) or runs.view_prompt()
     decided = {d["video_id"] for d in evaluate.read_decisions()}
+    stage = pipeline.pv.stage(prompt) if prompt else pipeline.active_stage()
     out = []
     for vid, row in ingest.load_inputs()[0].items():
-        s = pipeline.load(vid, pipeline.active_stage()) or {}
+        s = pipeline.load(vid, stage) or {}
         out.append({"video_id": vid, "brand": row.get("brand"), "creator": row.get("handle"),
                     "caption": row.get("caption"), "verdict": s.get("verdict"),
                     "score": s.get("score"), "decided": vid in decided,
-                    **pipeline.status(vid)})
+                    "prompt_id": prompt or pipeline.pv.active(), "active_prompt": pipeline.pv.active(),
+                    **pipeline.status(vid, prompt)})
     return out
 
 
 @app.post("/api/videos/{video_id}/process")
-def process(video_id: str, force: bool = False):
-    """Steps 2-7 for one video: preprocess, visual analysis, merge, P6, rule guard."""
+def process(video_id: str, force: bool = False, prompt: Optional[str] = None):
+    """Steps 2-7 for one video: preprocess, visual analysis, merge, P6 (or the chosen version), rule guard."""
     _check(video_id)
+    prompt = _run_prompt(prompt) or runs.view_prompt()
     try:
-        return pipeline.process(video_id, force=force)
+        return pipeline.process(video_id, force=force, prompt_id=prompt)
     except Exception as e:                                   # surface the cause to the UI
         raise HTTPException(502, f"{type(e).__name__}: {e}") from e
 
@@ -409,10 +470,10 @@ def process_all(force: bool = False):
 
 
 @app.get("/api/videos/{video_id}/card")
-def get_card(video_id: str):
-    """Step 8 - the review card payload."""
+def get_card(video_id: str, prompt: Optional[str] = None):
+    """Step 8 - the review card payload (the answer of `prompt`, default the active version)."""
     _check(video_id)
-    return pipeline.card(video_id)
+    return pipeline.card(video_id, _run_prompt(prompt) or runs.view_prompt())
 
 
 @app.get("/api/videos/{video_id}/summary", response_class=PlainTextResponse)
@@ -573,12 +634,14 @@ def put_llm(body: dict):
 
 
 @app.get("/api/evaluate")
-def get_evaluation(run_missing: bool = False, reviewer: Optional[list[str]] = Query(None)):
+def get_evaluation(run_missing: bool = False, reviewer: Optional[list[str]] = Query(None), prompt: Optional[str] = None):
     """P5 vs P6 vs the blind manual review against ground truth, feature accuracy, reviewer timing.
     run_missing=true scores any video that has not been processed yet (API calls).
-    reviewer (repeatable) limits the human side to those reviewers; omitted = everyone."""
+    reviewer (repeatable) limits the human side to those reviewers; omitted = everyone.
+    prompt: the version whose answers are evaluated as "P6" (default: the active one); unknown id or P5: 422."""
+    prompt = _run_prompt(prompt) or runs.view_prompt()
     try:
-        return evaluate.run(run_missing=run_missing, reviewers=reviewer)
+        return evaluate.run(run_missing=run_missing, reviewers=reviewer, prompt_id=prompt)
     except Exception as e:
         raise HTTPException(502, f"{type(e).__name__}: {e}") from e
 
@@ -615,14 +678,13 @@ def diff_prompt(prompt_id: str, against: Optional[str] = None):
 
 @app.post("/api/prompts", status_code=201)
 def create_prompt(body: PromptVersion):
-    """Save a new, immutable version derived from body.parent."""
-    _not_while_running()
+    """Save a new, immutable version derived from body.parent, in the global library (no campaign needed)."""
     return _pv(lambda: pv.create(body.parent, body.text, body.note))
 
 
 @app.delete("/api/prompts/{prompt_id}")
 def delete_prompt(prompt_id: str):
-    _not_while_running()
+    """Remove a version from the library. 409 while a run is in progress or a session has it active."""
     _pv(lambda: pv.delete(prompt_id))
     return pv.listing()
 
@@ -683,9 +745,17 @@ def artifact(path: str):
     return FileResponse(p, headers={"Cache-Control": "no-cache"})     # revalidate, see _frame_url
 
 
-app.mount("/static", StaticFiles(directory=STATIC), name="static")
+class _RevalidatedStatic(StaticFiles):
+    """Static files the browser must revalidate (ETag -> 304), so an edited app.js is never served stale."""
+    async def get_response(self, path, scope):
+        resp = await super().get_response(path, scope)
+        resp.headers["Cache-Control"] = "no-cache"
+        return resp
+
+
+app.mount("/static", _RevalidatedStatic(directory=STATIC), name="static")
 
 
 @app.get("/")
 def index():
-    return FileResponse(STATIC / "index.html")
+    return FileResponse(STATIC / "index.html", headers={"Cache-Control": "no-cache"})

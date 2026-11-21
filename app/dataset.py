@@ -19,6 +19,7 @@ import re
 import shutil
 import subprocess
 import sys
+import uuid
 from datetime import datetime, timezone
 from pathlib import PurePath
 
@@ -377,7 +378,7 @@ def _load_session(folder):
 def _save_session(session):
     session["updated_at"] = _now()
     p = config.UPLOADS / session["id"] / SESSION_FILE
-    tmp = p.with_name(SESSION_FILE + ".tmp")
+    tmp = p.with_name(f"{SESSION_FILE}.{uuid.uuid4().hex[:8]}.tmp")
     tmp.write_text(json.dumps(session, ensure_ascii=False, indent=2), encoding="utf-8")
     tmp.replace(p)                           # never a half-written memory file
     return session
@@ -496,6 +497,9 @@ def set_llm(values):
     else:
         if provider not in config.LLM_PROVIDERS:
             raise ValueError(f"unknown provider {provider!r}: use one of {', '.join(config.LLM_PROVIDERS)}")
+        why = llm.unavailable_reason(provider)
+        if why:
+            raise ValueError(f"{provider} cannot be used: {why}")
         model = model or config.DEFAULT_MODELS.get(provider) or ""
         if not _MODEL_ID_RE.match(model):
             raise ValueError("choose a model" if not model else f"{model!r} is not a valid model id")
@@ -553,8 +557,12 @@ def create(tables, name=None):
     return describe()
 
 
-def copy_session(session_id):
+def copy_session(session_id, for_run=False, keep_features=None):
     """Duplicate a saved session: form, dataset CSVs, clips, pipeline results, reviews and ground truth.
+
+    for_run=True makes a clean run (app/runs.py): no score caches, features, timings, iterations, recaps,
+    review sheets or decisions, and no prompt state; the locked ground truth stays. keep_features, a provider + model
+    choice, keeps that model's vision features (vision does not depend on the prompt).
 
     Uploaded videos are referenced by file:// URLs into the session's own folder; those are rewritten
     to point into the copy (clip_url.txt too, so the copied clips are not seen as stale and re-scored).
@@ -565,7 +573,19 @@ def copy_session(session_id):
     src = config.UPLOADS / session_id
     new_id = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     dst = config.UPLOADS / new_id
+    if dst.exists():
+        raise ValueError(f"{new_id} already exists; try again")
+    try:
+        return _copy_into(src, dst, new_id, session_id, for_run, keep_features)
+    except BaseException:
+        shutil.rmtree(dst, ignore_errors=True)       # only the folder this call made: a half copy is never left as a session
+        raise
+
+
+def _copy_into(src, dst, new_id, session_id, for_run, keep_features):
     _copytree(src, dst)
+    if for_run:
+        _strip_for_run(src, dst, keep_features)
     old_uri, new_uri = src.resolve().as_uri(), dst.resolve().as_uri()
     for p in dst.rglob("*"):
         if p.is_file() and p.suffix in (".json", ".csv", ".txt", ".jsonl") and p.stat().st_size < MAX_FILE_BYTES:
@@ -574,11 +594,39 @@ def copy_session(session_id):
                 p.write_text(text.replace(old_uri, new_uri), encoding="utf-8")
     session = _load_session(dst)
     session.pop("collection", None)          # a copy of a collection's run is a plain session
+    if for_run:
+        session.pop("run", None)
+        session.pop("prompts", None)
+        session["manual_review"] = {}
+    for k in ("versions", "next"):           # prompt versions are global (uploads/_prompts); a copy keeps only active + adoptions
+        (session.get("prompts") or {}).pop(k, None)
     suffix = session.get("name_suffix", "") + " (copy)"      # kept when autosave renames it after its campaign
     session.update(id=new_id, name=((campaign_name(session.get("form")) or session.get("name") or "Campaign") + suffix)[:120],
                    name_suffix=suffix, created_at=_now(), copied_from=session_id)
     _save_session(session)
     return _summary(session)
+
+
+def _strip_for_run(src, dst, keep_features):
+    """Make dst (a fresh copy of src) a clean run: keyframes, transcripts, clips and ground truth stay."""
+    runs = dst / "runs"
+    for d in (runs.iterdir() if runs.is_dir() else []):
+        if d.is_dir() and d.name not in ("iterations", "recaps"):
+            shutil.rmtree(d / "llm", ignore_errors=True)
+            for f in [*d.glob("score_*.json"), d / "features.json", d / "timing.json"]:
+                f.unlink(missing_ok=True)
+    for name in ("iterations", "recaps"):
+        shutil.rmtree(runs / name, ignore_errors=True)
+    (runs / "decisions.jsonl").unlink(missing_ok=True)
+    (dst / MANUAL_REVIEW_FILE).unlink(missing_ok=True)
+    if keep_features:
+        slug = pipeline.llm_slug(keep_features)
+        for d in (src / "runs").iterdir() if (src / "runs").is_dir() else []:
+            f = pipeline.stage_file(src / "runs", d.name, "features", keep_features) if d.is_dir() else None
+            if f:
+                out = dst / "runs" / d.name / "llm" / slug / "features.json"
+                out.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(f, out)
 
 
 def _copytree(src, dst):
@@ -847,6 +895,15 @@ def submit_manual_review(reviewer, rows):
     return manual_review(name)
 
 
+def merge_calls(calls):
+    """One entry when 2+ submitted calls are identical (same decision and reason; minutes differ naturally), else None."""
+    same = {(c["decision"], " ".join(str(c["reason"] or "").lower().split())) for c in calls.values()}
+    if len(calls) < 2 or len(same) != 1:
+        return None
+    first = next(iter(calls.values()))
+    return {"reviewers": list(calls), "count": len(calls), "decision": first["decision"], "reason": first["reason"]}
+
+
 def reviews():
     """Every reviewer of the open campaign and their decisions per video, for the Reviews overview.
 
@@ -895,8 +952,9 @@ def reviews():
                 calls[name] = {"decision": r["decision"].upper(), "reason": r.get("reason", ""),
                                "minutes": r.get("minutes_spent", "")}
         picks = {c["decision"] for c in calls.values()}
+        merged = merge_calls(calls)
         out_videos.append({"video_id": vid, "creator": row.get("handle"), "caption": row.get("caption"),
-                           **_viewer(vid, row), "calls": calls,
+                           **_viewer(vid, row), "calls": calls, "merged": merged,
                            "agreement": None if len(calls) < 2 else ("agree" if len(picks) == 1 else "split"),
                            "expected": (truth.get(vid) or {}).get("expected_verdict") or None})
     both = [v for v in out_videos if v["agreement"]]

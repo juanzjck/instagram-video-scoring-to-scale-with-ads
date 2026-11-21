@@ -3,7 +3,7 @@
 
 const $ = (s, el = document) => el.querySelector(s);
 const main = $("#main");
-const state = { view: "setup", videoId: null, card: null, startedAt: null, timerId: null,
+const state = { view: "home", videoId: null, card: null, startedAt: null, timerId: null,
   job: null, pollId: null };
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
@@ -22,6 +22,7 @@ async function api(path, opts) {
     try { msg = (await r.json()).detail || msg; } catch (_) { /* not json */ }
     const err = new Error(typeof msg === "string" ? msg : msg.message || JSON.stringify(msg));
     err.detail = msg;
+    err.status = r.status;
     throw err;
   }
   return r.headers.get("content-type")?.includes("json") ? r.json() : r.text();
@@ -39,8 +40,12 @@ function seek(t) {
 }
 
 // ------------------------------------------------------------------ sidebar
+// Views (video list, card, Evaluation) follow the open session's own run prompt: the server defaults to it, so no
+// ?prompt= is sent. The Dataset tab's prompt selector (state.runPrompt) only chooses the prompt of the NEXT run.
+const videosUrl = () => "/api/videos";
+const listVideos = () => api(videosUrl());
 async function loadList() {
-  const vids = await api("/api/videos");
+  const vids = await listVideos();
   $("#process-all").disabled = !vids.length || !!state.job?.running;
   if (!vids.length) {
     $("#video-list").innerHTML = '<li class="hint">No videos yet. Fill in the form in the Dataset tab.</li>';
@@ -49,6 +54,7 @@ async function loadList() {
   $("#video-list").innerHTML = vids.map((v) => `
     <li><button data-id="${esc(v.video_id)}" class="${v.video_id === state.videoId ? "active" : ""}">
       <span class="row1"><span>${esc(v.video_id)}${v.decided ? " ✓" : ""}</span>${chip(v.verdict)}</span>
+      ${v.prompt_id !== v.active_prompt ? `<span class="cap">prompt ${esc(v.prompt_id)} (active: ${esc(v.active_prompt)})</span>` : ""}
       <span class="cap">${esc(v.brand)} · @${esc(v.creator)}</span>
       <span class="cap">${esc(v.caption)}</span>
     </button></li>`).join("");
@@ -66,7 +72,7 @@ function videoStatus(v, job) {
   const j = job?.videos?.[v.video_id];
   if (j?.state === "error") return `<span class="err">${esc(j.error)}</span>`;
   if (j && j.state !== "done") return `<span class="busy">${esc(STEPS[j.state] || j.state)}</span>`;
-  if (v.scored) return `${chip(v.verdict)}${v.seconds != null ? ` <span class="hint" title="End-to-end pipeline time of its last full run">${dur(v.seconds)}</span>` : ""}`;
+  if (v.scored) return `${chip(v.verdict)}${v.prompt_id !== v.active_prompt ? ` <span class="hint">${esc(v.prompt_id)}</span>` : ""}${v.seconds != null ? ` <span class="hint" title="End-to-end pipeline time of its last full run">${dur(v.seconds)}</span>` : ""}`;
   if (v.source_url) return v.has_clip ? "downloaded, not scored" : "URL set, not downloaded";
   return v.has_clip ? "clip in dataset, not scored" : '<span class="na">no video: add a URL or file</span>';
 }
@@ -155,6 +161,7 @@ function flushDraft() {
       state.session = s;
       setSaveStatus(`Saved ${new Date().toLocaleTimeString()} · uploads/${s.id}/session.json`);
       if ($("#session-title")) $("#session-title").textContent = s.name;
+      refreshCrumb();
       if (opened) { $("#ds-reset")?.removeAttribute("disabled"); refreshSessionList(); }
     } catch (e) { state.dirty = true; setSaveStatus(`Not saved: ${e.message}`); }
   });
@@ -234,8 +241,8 @@ async function askDeleteSession(id) {
       dlg.close();
       state.openSessions.delete(x.id);
       if (current) {                         // the open campaign is gone: back to the empty start
-        state.session = null; clearForm(); state.videoId = null; state.card = null;
-        await Promise.all([renderSetup(), loadList()]);
+        state.session = null; await loadForm(); clearForm(); state.videoId = null; state.card = null;
+        await renderHome();
       } else await refreshSessionList();
     } catch (e) { go.disabled = false; dlg.querySelector("#del-msg").textContent = `Not deleted: ${e.message}`; }
   });
@@ -276,6 +283,8 @@ function collectionGroup(cid, kids, c) {
         : "not run yet (scripts/run_collection_test.py)"}</dd>
       <dt>Saved in</dt><dd><code>uploads/_collections/${esc(cid)}/</code></dd>
     </dl>
+    <div class="row">${c ? `<button class="btn small" data-open-collection="${esc(cid)}">Open dashboard</button>
+      <button class="btn ghost small" data-coll-tab="reviews" data-cid="${esc(cid)}">Reviews</button>` : ""}</div>
     <div class="coll-kids">${kids.map(sessionItem).join("")}</div>
   </details>`;
 }
@@ -302,8 +311,7 @@ function sessionItem(x) {
         <dt>Generated</dt><dd>${esc(localTime(x.generated_at) || (x.generated ? "yes" : "not yet"))}</dd>
         <dt>Saved in</dt><dd><code>uploads/${esc(x.id)}/session.json</code></dd>
       </dl>
-      <div class="row">${current ? '<span class="hint">This session is open.</span>'
-        : `<button class="btn small" data-open-session="${esc(x.id)}">Open this campaign</button>`}
+      <div class="row"><button class="btn small" data-open-session="${esc(x.id)}" data-scored="${+x.scored || 0}">${current ? "Go to this session" : "Open this session"}</button>
         ${current ? `<a class="btn small" href="/api/sessions/${encodeURIComponent(x.id)}/prompt-pack" download
           title="One Markdown file to give another AI for improving the P6 prompt: brief, current P6, evaluation, each video's input, answer, human decisions and real outcome">Prompt pack for AI</a>`
           : '<span class="hint" title="The pack rebuilds each video\'s exact P6 input, which needs the session open">Open to get the prompt pack</span>'}
@@ -317,16 +325,98 @@ function sessionItem(x) {
     </details>`;
 }
 
-async function openSession(id) {
+// Open a session and land on its results: Evaluation when it has scored videos (or when the caller asks for
+// it, as the parent's dashboard does), else Dataset, where there is nothing to review yet. Review and Recap
+// stay one click away in the session tabs.
+async function openSession(id, then, scored) {
   await flushDraft();
   try {
     const s = await api(`/api/sessions/${encodeURIComponent(id)}/open`, { method: "POST" });
     state.session = s;
+    await loadForm();            // the landing screen never loaded the form schema; setForm needs it
     setForm(s.form);
     state.videoId = null; state.card = null;
-    await Promise.all([renderSetup(), loadList()]);
-  } catch (e) { setSaveStatus(`Could not open: ${e.message}`); }
+    state.runPrompt = "";        // a prompt chosen for the last session may not exist here
+    const land = then === "eval" || scored > 0 ? "eval" : "setup";
+    setView(land);
+    await Promise.all([land === "eval" ? renderEval() : renderSetup(), loadList()]);
+  } catch (e) {
+    const m = $("#home-msg") || $("#coll-msg");
+    if (m) m.textContent = `Could not open: ${e.message}`; else setSaveStatus(`Could not open: ${e.message}`);
+  }
 }
+
+// Landing screen: the parent sessions (collections, and sessions on their own). Everything else
+// (Dataset, Review, Evaluation, Recap) is inside a session, reached from here.
+async function renderHome() {
+  setView("home");
+  clearInterval(state.timerId);
+  main.innerHTML = `<p class="empty">Loading…</p>`;
+  let sessions, colls;
+  try { [sessions, colls] = await Promise.all([api("/api/sessions"), api("/api/collections").catch(() => [])]); }
+  catch (e) { main.innerHTML = `<p class="empty">Error: ${esc(e.message)}</p>`; return; }
+  if (state.view !== "home") return;
+  state.collections = colls;
+  const loose = sessions.filter((x) => !x.collection?.id);
+  main.innerHTML = `<section class="panel"><h3>Sessions</h3>
+      <div class="row"><button class="btn small" id="home-new">New session</button>
+        <span class="hint" id="home-msg"></span></div>
+      <p class="hint">A session is one campaign. A parent session (collection) groups several child sessions, runs of the
+        same campaign; open it to see the evaluation of all of them, or open a child to review, evaluate and recap it.
+        Opening a single session goes straight inside it.</p>
+      <div id="session-list">${sessionList(sessions)}</div></section>
+    <section class="panel"><h3>New parent session</h3>
+      ${loose.length ? `<div class="row">
+        <select id="coll-source" aria-label="Session to repeat">${loose.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("")}</select>
+        <input type="text" id="coll-name" placeholder="Parent name" aria-label="Parent session name" maxlength="100">
+        <input type="number" id="coll-n" value="3" min="0" max="1000" aria-label="Child sessions" style="width:70px">
+        <button class="btn small" id="coll-create">Create with child sessions</button></div>
+        <p class="hint">Each child is a full copy of the chosen session (the original is only read). Run the batch on them with
+          <code>scripts/run_collection_test.py</code>.</p><p class="msg" id="coll-msg"></p>`
+        : `<p class="hint">Save a session first; a parent is made from one.</p>`}</section>`;
+}
+
+// A parent session has its own route: #/collections/<id> (Dashboard) and #/collections/<id>/reviews (Reviews),
+// so reload, back and a pasted link all land on it. The menu switches between the two.
+const COLL_TABS = { dashboard: "Dashboard", reviews: "Reviews" };
+const collRoute = (cid, tab) => `#/collections/${encodeURIComponent(cid)}${tab === "reviews" ? "/reviews" : ""}`;
+function parseCollRoute(hash) {
+  const m = /^#\/collections\/([^/]+)(\/reviews)?\/?$/.exec(hash || "");
+  if (!m) return null;
+  try { return { cid: decodeURIComponent(m[1]), tab: m[2] ? "reviews" : "dashboard" }; }
+  catch (_) { return null; }                      // malformed %-escape: not a collection route, home renders
+}
+
+// Dashboard: the evaluation of every child (cached scores, no model call). Reviews: every child's submitted reviews.
+async function openCollection(cid, tab = "dashboard") {
+  setView("coll");
+  clearInterval(state.timerId);
+  const mine = state.coll = { cid, tab };
+  if (location.hash !== collRoute(cid, tab)) location.hash = collRoute(cid, tab);   // hashchange sees state.coll is current: no reload
+  main.innerHTML = `<p class="empty">${tab === "reviews" ? "Loading the reviews of the child sessions…" : "Evaluating child sessions…"}</p>`;
+  const base = `/api/collections/${encodeURIComponent(cid)}`;
+  let r;
+  state.collUnique ??= true;                       // repeats are the norm (every run starts as a copy), so unique first
+  try { r = await api(`${base}/${tab === "reviews" ? `reviews?unique=${state.collUnique}` : "evaluation"}`); }
+  catch (e) { if (state.coll === mine) main.innerHTML = `<p class="empty">Error: ${esc(e.message)}</p>`; return; }
+  if (state.view !== "coll" || state.coll !== mine) return;
+  main.innerHTML = `<section class="panel"><div class="row"><button class="btn ghost small" id="coll-back">← Sessions</button>
+      <b class="session-title">${esc(r.name)}</b></div>${collectionMenu(cid, tab)}<p class="msg" id="coll-msg"></p>
+      ${tab === "reviews" ? "" : collectionDashboard(r)}</section>${tab === "reviews" ? collectionReviews(r) : ""}`;
+}
+
+function collectionMenu(cid, tab) {
+  return `<nav class="tabs" role="tablist" aria-label="Parent session">${Object.entries(COLL_TABS).map(([k, name]) =>
+    `<button class="tab${k === tab ? " active" : ""}" role="tab" data-coll-tab="${k}" data-cid="${esc(cid)}">${name}</button>`).join("")}</nav>`;
+}
+
+function routeFromHash() {
+  if (location.hash === "#/prompts") { if (state.view !== "prompts") openPromptLibrary(); return; }
+  const r = parseCollRoute(location.hash);
+  if (r) { if (state.view !== "coll" || state.coll?.cid !== r.cid || state.coll.tab !== r.tab) openCollection(r.cid, r.tab); }
+  else if (state.view === "coll" || state.view === "prompts") renderHome();
+}
+window.addEventListener("hashchange", routeFromHash);
 
 function refIds(file) {
   const key = REF_KEY[file];
@@ -575,6 +665,7 @@ async function generateDataset() {
     await state.saving;
     await api("/api/dataset", { method: "POST", headers: { "content-type": "application/json" }, body: draftBody() });
     state.session = await api("/api/session");
+    refreshCrumb();
     form.errors = [];
     state.videoId = null; state.card = null;
     await Promise.all([renderSetup(), loadList()]);
@@ -593,6 +684,8 @@ async function resetDataset() {
     await flushDraft();
     await api("/api/dataset/reset", { method: "POST" });
     state.session = null;
+    refreshCrumb();
+    await loadForm();
     clearForm();
     state.videoId = null; state.card = null;
     await Promise.all([renderSetup(), loadList()]);
@@ -601,18 +694,21 @@ async function resetDataset() {
 
 async function renderSetup() {
   main.innerHTML = `<p class="empty">Loading…</p>`;
-  let ds, vids, job, sessions;
+  let ds, vids, job;
   try {
-    [ds, vids, job, sessions, state.collections] = await Promise.all([api("/api/dataset"), api("/api/videos"),
-      api("/api/pipeline/status"), api("/api/sessions"), api("/api/collections").catch(() => []), loadForm()]);
+    [ds, vids, job] = await Promise.all([api("/api/dataset"), listVideos(),
+      api("/api/pipeline/status"), loadForm()]);
+    state.promptList = await api("/api/prompts").catch(() => null);
+    if (state.runPrompt && !(state.promptList?.versions || []).some((v) => v.id === state.runPrompt)) state.runPrompt = "";
   } catch (e) { main.innerHTML = `<p class="empty">Error: ${esc(e.message)}</p>`; return; }
   if (state.view !== "setup") return;
   state.job = job;
   state.session = ds.session;
+  refreshCrumb();
   const active = ds.files.includes("videos.csv");
   const s = ds.session;
   main.innerHTML = `
-    <section class="panel"><h3>Campaign sessions</h3>
+    <section class="panel"><h3>Session</h3>
       <div class="row">
         <b id="session-title" class="session-title">${esc(s?.name || "No campaign open")}</b>
         <button class="btn ghost small" id="ds-reset" ${s ? "" : "disabled"}>New campaign</button>
@@ -620,9 +716,7 @@ async function renderSetup() {
       <p class="hint" id="session-status">${s ? `Saved ${esc(localTime(s.updated_at))} · uploads/${esc(s.id)}/session.json`
         : "Each session is one campaign. A new one starts, and is saved, as soon as you type below."}</p>
       <p class="hint">Everything typed is kept in the session's <code>session.json</code>; its video URLs, clips,
-        pipeline results and review decisions are kept in the same folder. Expand a session to see it or open it.</p>
-      <h3 style="margin-top:16px">Saved campaigns</h3>
-      <div id="session-list">${sessionList(sessions)}</div></section>
+        pipeline results and review decisions are kept in the same folder. Other sessions are listed under Sessions.</p></section>
     <section class="panel"><h3>1 · Campaign</h3>
       <div class="row">
         <label class="btn ghost small">Import from CSV files…
@@ -656,11 +750,17 @@ async function renderSetup() {
       <div class="row" style="margin-top:12px">
         <button class="btn" id="start" ${job.running ? "disabled" : ""}>Start pipeline</button>
         <label><input type="checkbox" id="force"> Re-run videos that are already scored</label>
+        <label>Prompt for the next run <select id="run-prompt" title="Which prompt version the next run scores with. Choosing it does not adopt it.">
+          <option value="">Active (${esc(state.promptList?.active || "P6")})</option>
+          ${(state.promptList?.versions || []).filter((v) => v.id !== state.promptList.baseline).map((v) =>
+            `<option value="${esc(v.id)}" ${state.runPrompt === v.id ? "selected" : ""}>${esc(v.id)}${v.builtin ? " (built in)" : ""}</option>`).join("")}
+        </select></label>
       </div>
+      <p id="run-line" class="hint"></p>
       <p id="job-msg" class="msg">${esc(jobLine(job))}</p></section>` : ""}`;
   renderForm();
   state.vids = vids;
-  if (active) renderLlmPicker();
+  if (active) { renderLlmPicker(); refreshRunLine(); }
   if (job.running) poll();
 }
 
@@ -669,6 +769,28 @@ async function renderSetup() {
 // statuses, cards and evaluation follow the chosen model, and switching back costs nothing.
 const visionNote = (v) => (v === true ? "reads images" : v === false ? "text only: no keyframe analysis" : "");
 
+// The two common ways to run: this machine's Claude Code (subscription login) or the Anthropic API.
+// Availability comes from /api/llm (no model call): an option that cannot run is disabled with the reason.
+// Whether the CLI is actually logged in is only known on the first run. Never shows a key, only its env name.
+const LLM_TWO = [["claude_code", "This machine — Claude Code (subscription)"], ["anthropic", "Anthropic API"]];
+function llmReason(p) {
+  if (!p) return "not available";
+  if (p.missing_sdk) return `Python package missing: ${p.missing_sdk}`;
+  if (!p.configured) return p.id === "claude_code" ? "the claude CLI was not found (install Claude Code and log in, or set CLAUDE_CODE_BIN)" : `${p.env} is not set`;
+  return p.id === "claude_code" ? "claude CLI found; login is checked on the first run" : "API key present";
+}
+function llmTwoChoice(info, running) {
+  const cur = info.current.provider;
+  return `<fieldset class="llm-two" aria-label="Where the model runs"><legend>Run on</legend>
+    ${LLM_TWO.map(([id, name]) => {
+      const p = info.providers.find((x) => x.id === id), ok = p && p.configured && !p.missing_sdk;
+      return `<label class="llm-opt${ok ? "" : " off"}" title="${esc(llmReason(p))}"><input type="radio" name="llm-which" value="${esc(id)}"
+        ${cur === id ? "checked" : ""} ${ok && !running ? "" : "disabled"}> <b>${esc(name)}</b>
+        <span class="hint">${esc(llmReason(p))}</span></label>`;
+    }).join("")}
+    ${LLM_TWO.some(([id]) => id === cur) ? "" : `<span class="hint">Using ${esc(cur)} (chosen below).</span>`}</fieldset>`;
+}
+
 async function renderLlmPicker(provider) {
   const box = $("#llm-picker");
   if (!box) return;
@@ -676,7 +798,7 @@ async function renderLlmPicker(provider) {
   try { info = await api("/api/llm"); } catch (e) { box.innerHTML = `<p class="msg err">Models: ${esc(e.message)}</p>`; return; }
   const cur = info.current, pid = provider || cur.provider;
   const p = info.providers.find((x) => x.id === pid);
-  box.innerHTML = `<div class="row llm">
+  box.innerHTML = `${llmTwoChoice(info, state.job?.running)}<div class="row llm">
       <label>LLM provider <select id="llm-provider">${info.providers.map((x) => `<option value="${esc(x.id)}"
         ${x.id === pid ? "selected" : ""}>${esc(x.label)}${x.configured ? "" : " (not set up)"}</option>`).join("")}</select></label>
       <label>Model <input id="llm-model" list="llm-models" autocomplete="off" placeholder="loading…"
@@ -697,13 +819,39 @@ async function renderLlmPicker(provider) {
     : "No models installed" + (pid === "ollama" ? " (e.g. ollama pull qwen2.5vl)." : ".");
 }
 
-async function saveLlm() {
-  const body = { provider: $("#llm-provider").value, model: $("#llm-model").value.trim() };
+// What Start pipeline will do for the prompt chosen for the next run (no model call): the run line + button label.
+async function refreshRunLine() {
+  const line = $("#run-line"), btn = $("#start");
+  if (!line) return;
+  let p;
+  try { p = await api(`/api/pipeline/plan${state.runPrompt ? `?prompt_id=${encodeURIComponent(state.runPrompt)}` : ""}`); }
+  catch (e) { line.textContent = `Run: ${e.message}`; return; }
+  const r = p.run;
+  line.innerHTML = r ? `This session's run ${String(r.n ?? 1).padStart(3, "0")}${r.inferred ? " (inferred)" : ""}: <b>${esc(r.prompt_id)}</b> on
+      ${esc(r.provider)} / ${esc(r.model)} · ${esc(r.status)}${r.scored != null ? ` ${r.scored}/${r.videos}` : ""}.`
+    : "No run yet: Start runs the first one in this session.";
+  if (btn) btn.textContent = p.button || "Start pipeline";
+}
+
+// The two-step confirm before any model call. Returns the mode to send ("auto" | "resume" | "child") or null on cancel.
+function startChoice(p, ask) {
+  if (p.action === "ask") return ask(p.message_resume) ? "resume" : ask(p.message_child) ? "child" : null;
+  return ask(p.message) ? "auto" : null;
+}
+
+async function saveLlm(provider) {
+  const body = provider ? { provider, model: "" }          // empty model = that provider's default
+    : { provider: $("#llm-provider").value, model: $("#llm-model").value.trim() };
   try {
     await api("/api/llm", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  } catch (e) { $("#llm-msg").textContent = `Not changed: ${e.message}`; return; }
+  } catch (e) {
+    await renderLlmPicker();                                  // show what the session really uses, not the radio just clicked
+    if ($("#llm-msg")) $("#llm-msg").textContent = `Not changed: ${e.message}`;
+    return;
+  }
   await renderLlmPicker();
-  const vids = await api("/api/videos");                     // statuses now follow the new model
+  refreshRunLine();
+  const vids = await listVideos();                     // statuses now follow the new model
   for (const v of vids) {
     const td = main.querySelector(`td.st[data-id="${CSS.escape(v.video_id)}"]`);
     if (td) td.innerHTML = videoStatus(v, state.job);
@@ -717,6 +865,9 @@ async function saveLlm() {
 // video, same model), and adopts it only when it beats P5 against the ground truth.
 const pvMetric = (m) => (m && m.n ? `${m.accuracy == null ? "—" : `${Math.round(m.accuracy * 100)}%`} · ${m.fp} false SCALE · ${m.tp}/${m.winners} winners` : "—");
 const pvBasis = { cac_outcome: "real CAC outcome", expected_scale: "expected verdict" };
+// Results screen: ONE measure. The real CAC outcome when any video has one, else the expected verdict (as the adoption gate does).
+const evalBasis = (c) => (c.cac_outcome && c.cac_outcome.videos ? "cac_outcome" : "expected_verdict");
+const evalBasisName = { cac_outcome: "real CAC outcome", expected_verdict: "expected verdict (scale / don't scale)" };
 
 function pvResult(it) {
   if (!it) return '<span class="hint">no iteration yet</span>';
@@ -735,7 +886,7 @@ async function renderPrompts() {
   const latest = {};                         // iterations come newest first
   for (const it of its) if (!(it.prompt_id in latest)) latest[it.prompt_id] = it;
   const busy = job.running;
-  const ed = state.pvEdit, view = state.pvView, ov = state.pvOverride;
+  const view = state.pvView, ov = state.pvOverride;
   const rows = pl.versions.map((v) => {
     const p6family = v.id !== pl.baseline;
     return `<tr>
@@ -748,10 +899,8 @@ async function renderPrompts() {
       <td class="pv-actions">
         <button class="btn ghost small" data-pv="view" data-id="${esc(v.id)}">View</button>
         ${v.parent ? `<button class="btn ghost small" data-pv="diff" data-id="${esc(v.id)}">Diff vs ${esc(v.parent)}</button>` : ""}
-        ${p6family ? `<button class="btn ghost small" data-pv="new" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>New version from this</button>
-          <button class="btn small" data-pv="run" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>Run iteration</button>` : ""}
+        ${p6family ? `<button class="btn small" data-pv="run" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>Run iteration</button>` : ""}
         ${p6family && !v.active ? `<button class="btn ghost small" data-pv="adopt" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>Adopt</button>` : ""}
-        ${!v.builtin && !v.active ? `<button class="btn danger small" data-pv="delete" data-id="${esc(v.id)}" ${busy ? "disabled" : ""}>Delete</button>` : ""}
       </td></tr>`;
   }).join("");
   const itRows = its.map((it) => {
@@ -766,9 +915,10 @@ async function renderPrompts() {
   const adoptions = pl.adoptions.slice(-5).reverse().map((a) => `<li>${esc(localTime(a.at))}: <b>${esc(a.id)}</b>
       ${a.override_reason ? `adopted by override: “${esc(a.override_reason)}”` : a.beats_baseline ? `beat P5 in iteration #${a.iteration}` : "restored as default"}</li>`).join("");
 
-  body.innerHTML = `<section class="panel"><h3>Prompt versions</h3>
-      <p class="hint" style="margin-top:0">The review card uses <b>${esc(pl.active)}</b>. P5 is the fixed baseline and never changes.
-        A new version is saved from a parent and never edited afterwards. <b>Run iteration</b> scores every video with that version
+  body.innerHTML = `<section class="panel"><h3>Prompts for this campaign</h3>
+      <p class="hint" style="margin-top:0">The review card uses <b>${esc(pl.active)}</b>. Versions are created once in the global
+        <button class="linkish" data-pv="library">Prompts</button> area and any campaign can run them; P5 is the fixed baseline and never changes.
+        <b>Run iteration</b> scores every video with that version
         <i>and</i> with P5 on the current model (API calls), then freezes the verdicts. A version is adopted only when its latest
         iteration on this model beats P5 against the locked ground truth: never more false SCALE, then better accuracy.
         Anything else needs a written override reason, which is logged.</p>
@@ -780,14 +930,6 @@ async function renderPrompts() {
       <label class="pv-field">Written reason (logged with the adoption)<textarea id="pv-reason" rows="3"></textarea></label>
       <div class="row"><button class="btn danger small" data-pv="force" data-id="${esc(ov.id)}">Adopt with this reason</button>
         <button class="btn ghost small" data-pv="cancel">Cancel</button></div></section>` : ""}
-    ${ed ? `<section class="panel"><h3>New version from ${esc(ed.parent)}</h3>
-      <p class="hint" style="margin-top:0">Keep <code>{video_summary}</code> exactly once: it is where each video's data goes.
-        Write any other literal brace doubled, <code>{{</code> or <code>}}</code>, as in P5.</p>
-      <label class="pv-field">What changed and why (from the error report)<input id="pv-note" type="text" maxlength="500" value="${esc(ed.note || "")}"></label>
-      <textarea id="pv-text" class="pv-text" rows="24" spellcheck="false">${esc(ed.text)}</textarea>
-      <div class="row"><button class="btn small" data-pv="save">Save version</button>
-        <button class="btn ghost small" data-pv="cancel">Cancel</button></div>
-      <p id="pv-edmsg" class="msg"></p></section>` : ""}
     ${view ? `<section class="panel"><h3>${esc(view.title)}</h3><button class="btn ghost small" data-pv="close">Close</button>
       <pre class="text pv-pre">${esc(view.text)}</pre></section>` : ""}
     <section class="panel"><h3>Iterations</h3>
@@ -799,6 +941,51 @@ async function renderPrompts() {
       : "<p>No iteration yet. Run one from a version above.</p>"}
       ${adoptions ? `<h3 style="margin-top:16px">Recent adoptions</h3><ul class="pv-log">${adoptions}</ul>` : ""}</section>`;
   if (busy) pvPoll();
+}
+
+// The global Prompts module: one library of versions for every session (uploads/_prompts/library.json).
+async function openPromptLibrary() {
+  setView("prompts");
+  clearInterval(state.timerId); clearInterval(state.pvPollId);
+  if (location.hash !== "#/prompts") location.hash = "#/prompts";
+  return renderPromptLibrary();
+}
+
+async function renderPromptLibrary() {
+  let pl;
+  try { pl = await api("/api/prompts"); }
+  catch (e) { main.innerHTML = `<p class="empty">Error: ${esc(e.message)}</p>`; return; }
+  if (state.view !== "prompts") return;
+  const ed = state.pvEdit, view = state.pvView;
+  const rows = pl.versions.map((v) => `<tr>
+      <td><b>${esc(v.id)}</b>${v.id === pl.baseline ? ' <span class="chip muted">baseline</span>' : v.builtin ? ' <span class="chip muted">built in</span>' : ""}</td>
+      <td>${esc(v.parent || "—")}</td><td class="pv-note">${esc(v.note || "")}</td>
+      <td>${v.created_at ? esc(localTime(v.created_at)) : "built in"}</td>
+      <td><code title="SHA-256 ${esc(v.sha256)}">${esc(v.sha256.slice(0, 8))}</code></td><td class="num">${esc(int(v.chars))}</td>
+      <td class="pv-actions">
+        <button class="btn ghost small" data-pv="view" data-id="${esc(v.id)}">View</button>
+        ${v.parent ? `<button class="btn ghost small" data-pv="diff" data-id="${esc(v.id)}">Diff vs ${esc(v.parent)}</button>` : ""}
+        ${v.id !== pl.baseline ? `<button class="btn ghost small" data-pv="new" data-id="${esc(v.id)}">New version from this</button>` : ""}
+        ${!v.builtin ? `<button class="btn danger small" data-pv="delete" data-id="${esc(v.id)}">Delete</button>` : ""}
+      </td></tr>`).join("");
+  main.innerHTML = `<section class="panel"><h3>Prompts</h3>
+      <p class="hint" style="margin-top:0">One library for every campaign. A version is saved once, from a parent, and never edited afterwards.
+        P5 (the fixed baseline) and P6 are built in and read-only. Saving a version does not score or adopt anything: pick it in a
+        campaign's Dataset tab to run it, then compare it with P5 under that campaign's <b>Evaluation → Prompts for this campaign</b>.
+        A version a campaign has active cannot be deleted.</p>
+      <div class="tablewrap"><table class="rv"><thead><tr><th>Version</th><th>Parent</th><th>Note</th><th>Created</th><th>Hash</th>
+        <th>Characters</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p id="pv-msg" class="msg"></p></section>
+    ${ed ? `<section class="panel"><h3>New version from ${esc(ed.parent)}</h3>
+      <p class="hint" style="margin-top:0">Keep <code>{video_summary}</code> exactly once: it is where each video's data goes.
+        Write any other literal brace doubled, <code>{{</code> or <code>}}</code>, as in P5.</p>
+      <label class="pv-field">What changed and why (from the error report)<input id="pv-note" type="text" maxlength="500" value="${esc(ed.note || "")}"></label>
+      <textarea id="pv-text" class="pv-text" rows="24" spellcheck="false">${esc(ed.text)}</textarea>
+      <div class="row"><button class="btn small" data-pv="save">Save version</button>
+        <button class="btn ghost small" data-pv="cancel">Cancel</button></div>
+      <p id="pv-edmsg" class="msg"></p></section>` : ""}
+    ${view ? `<section class="panel"><h3>${esc(view.title)}</h3><button class="btn ghost small" data-pv="close">Close</button>
+      <pre class="text pv-pre">${esc(view.text)}</pre></section>` : ""}`;
 }
 
 const pvJobLine = (job) => `${job.kind === "iteration" ? `Iteration #${job.iteration} (${job.prompt_id} + P5)` : "Pipeline"} running: ${job.done}/${job.total} videos…`;
@@ -829,7 +1016,7 @@ async function promptAction(action, id, btn) {
       btn.disabled = true;
       const v = await api("/api/prompts", json("POST", { parent: ed.parent, text: ed.text, note: ed.note }));
       state.pvEdit = null;
-      await renderPrompts(); $("#pv-msg").textContent = `Saved ${v.id}. Run an iteration to compare it with P5.`; return;
+      await rerenderPrompts(); $("#pv-msg").textContent = `Saved ${v.id}. Open a campaign and run an iteration to compare it with P5.`; return;
     }
     else if (action === "run") {
       btn.disabled = true;
@@ -841,23 +1028,28 @@ async function promptAction(action, id, btn) {
       catch (e) {
         if (!/override reason/.test(e.message)) throw e;
         state.pvOverride = { id, why: e.message };
-        await renderPrompts(); if (action === "force") msg(e.message); return;
+        await rerenderPrompts(); if (action === "force") msg(e.message); return;
       }
       loadList();
     }
-    else if (action === "delete") { btn.disabled = true; await api(`/api/prompts/${encodeURIComponent(id)}`, { method: "DELETE" }); }
+    else if (action === "library") return openPromptLibrary();
+    else if (action === "delete") {
+      btn.disabled = true; await api(`/api/prompts/${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (state.runPrompt === id) state.runPrompt = "";
+    }
   } catch (e) {
     if (btn) btn.disabled = false;
     msg(`${action === "save" ? "Not saved" : "Failed"}: ${e.message}`); return;
   }
-  renderPrompts();
+  rerenderPrompts();
 }
+const rerenderPrompts = () => (state.view === "prompts" ? renderPromptLibrary() : renderPrompts());
 
 function poll() {
   clearInterval(state.pollId);
   state.pollId = setInterval(async () => {
     let job, vids;
-    try { [job, vids] = await Promise.all([api("/api/pipeline/status"), api("/api/videos")]); } catch (_) { return; }
+    try { [job, vids] = await Promise.all([api("/api/pipeline/status"), listVideos()]); } catch (_) { return; }
     state.job = job;
     const btn = $("#process-all");
     btn.disabled = job.running;
@@ -881,12 +1073,23 @@ function poll() {
 async function startPipeline() {
   const urls = {};
   main.querySelectorAll("input.url").forEach((i) => (urls[i.dataset.id] = i.value.trim()));
-  const body = { force: !!$("#force")?.checked, urls };
+  state.runPrompt = $("#run-prompt")?.value || "";
   if ($("#start")) $("#start").disabled = true;
   try {
-    state.job = await api("/api/pipeline/start", {
+    const plan = await api(`/api/pipeline/plan${state.runPrompt ? `?prompt_id=${encodeURIComponent(state.runPrompt)}` : ""}`);
+    const mode = startChoice(plan, (text) => window.confirm(text));         // nothing is created or scored before a yes
+    if (!mode) { if ($("#start")) $("#start").disabled = false; return; }
+    const body = { force: !!$("#force")?.checked, urls, prompt_id: state.runPrompt || null, mode };
+    const res = await api("/api/pipeline/start", {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    if (res.created_child && res.session_id) {                                // the new run is its own session: open it
+      state.runPrompt = "";
+      await openSession(res.session_id, "setup");
+      return;
+    }
+    state.job = res;
     if ($("#job-msg")) $("#job-msg").textContent = jobLine(state.job);
+    refreshRunLine();
     poll();
   } catch (e) {
     if ($("#job-msg")) $("#job-msg").textContent = `Not started: ${e.message}`;
@@ -905,7 +1108,7 @@ async function uploadClip(input) {
     await api(`/api/videos/${encodeURIComponent(id)}/clip`, { method: "POST", body });
     const url = main.querySelector(`input.url[data-id="${CSS.escape(id)}"]`);
     if (url) url.value = "";                 // the uploaded file replaces the URL
-    const v = (await api("/api/videos")).find((x) => x.video_id === id);
+    const v = (await listVideos()).find((x) => x.video_id === id);
     td.innerHTML = v ? videoStatus(v, state.job) : "uploaded";
   } catch (e) { td.innerHTML = `<span class="err">${esc(e.message)}</span>`; }
   input.value = "";
@@ -1060,7 +1263,8 @@ function renderCard(c) {
       <h1>${esc(c.brand)} <span style="font-weight:400">· @${esc(c.creator)}</span></h1>
       <div class="meta">${esc(c.video_id)} · ${esc(c.brand_category)} · posted ${c.hours_since_post ?? "?"}h ago ·
         spoken language: ${esc(c.language || "not available")} · media: ${esc(c.media_source || "not available")}</div>
-      <div class="cap">${esc(c.caption)}</div>${mode() === "card" ? banners(c) : ""}</section>`;
+      <div class="cap">${esc(c.caption)}</div>${c.prompt_id !== c.active_prompt
+        ? `<p class="hint">This session's run used <b>${esc(c.prompt_id)}</b>; the active (adopted) prompt is <b>${esc(c.active_prompt)}</b>.</p>` : ""}${mode() === "card" ? banners(c) : ""}</section>`;
 
   if (!c.score) {
     main.innerHTML = head + `<section class="panel" style="text-align:center">
@@ -1144,7 +1348,7 @@ async function decide(action) {
 // (real results), and the results measured against it.
 async function renderEval(runMissing = false) {
   state.evalTab ||= "manual";
-  const tabs = { manual: "Manual review", reviews: "Reviews", truth: "Ground truth", results: "Results", prompts: "Prompt versions" };
+  const tabs = { manual: "Manual review", reviews: "Reviews", truth: "Ground truth", results: "Results", prompts: "Prompts for this campaign" };
   main.innerHTML = `<nav class="subtabs" role="tablist">
       ${Object.entries(tabs).map(([k, v]) => `<button class="tab ${state.evalTab === k ? "active" : ""}" data-evaltab="${k}" role="tab">${v}</button>`).join("")}
     </nav><div id="eval-body"><p class="empty">Loading…</p></div>`;
@@ -1190,18 +1394,23 @@ async function saveThresholds(reset) {
   renderResults();
 }
 
+// The version whose answers fill the "P6" rows of the open evaluation (P6, P6.2, ...); keys stay "P6 ..." in the API.
+let evalP = "P6";
+const pname = (s) => String(s).replace(/\bP6(?![\w.])/g, evalP);
+
 // A result row or column named after a prompt (P5 / P6) shows only once that prompt has scored something.
 const shown = (name, has) => !/^P5/.test(name) || has.p5 ? !/^P6/.test(name) || has.p6 : false;
 
 // Precision / recall / F1 / accuracy of the three methods; recall leads, since a missed winner costs most.
 function classificationPanel(c, has) {
   const pc = (x) => (x == null ? "—" : `${Math.round(x * 100)}%`);
-  const names = { expected_verdict: "Measured against the expected verdict", cac_outcome: "Measured against the CAC outcome" };
+  const basis = evalBasis(c);
+  const names = { [basis]: `Measured against the ${evalBasisName[basis]}` };
   const scopes = { all: "Every video each method decided", same: "Only the videos the reviewers decided (same items for all three)" };
   const table = (m) => `<table class="cls"><tr><th>Method</th><th>Recall</th><th>Precision</th><th>F1</th>
       <th title="Misleading when winners are rare">Accuracy ⚠</th><th title="true pos · false pos · missed winners · true neg">TP · FP · FN · TN</th><th>n</th></tr>
     ${Object.entries(scopes).map(([s, title]) => `<tr><td colspan="7" class="cls-scope">${title}</td></tr>
-      ${Object.entries(m[s]).filter(([name]) => shown(name, has)).map(([name, x]) => `<tr><td>${esc(name)}</td>
+      ${Object.entries(m[s]).filter(([name]) => shown(name, has)).map(([name, x]) => `<tr><td>${esc(pname(name))}</td>
         <td class="num"><b>${pc(x.recall)}</b>${x.winners ? ` <span class="hint">${x.tp}/${x.winners}</span>` : ""}</td>
         <td class="num">${pc(x.precision)}${x.tp + x.fp ? ` <span class="hint">${x.tp}/${x.tp + x.fp}</span>` : ""}</td>
         <td class="num">${pc(x.f1)}</td><td class="num">${pc(x.accuracy)}</td>
@@ -1209,12 +1418,11 @@ function classificationPanel(c, has) {
   return `<section class="panel"><h3>Precision, recall, F1</h3>
     <p style="font-size:13px">"Scale" is the positive class: a <b>winner</b> is a video the truth says to scale.
       An AI verdict other than SCALE (defer, flag) counts as don't scale, as for the reviewers.${has.p5 || has.p6
-        ? ` ${[has.p5 && "P5", has.p6 && "P6"].filter(Boolean).join(" and ")} ${has.p5 && has.p6 ? "are their" : "is its"} final
+        ? ` ${[has.p5 && "P5", has.p6 && evalP].filter(Boolean).join(" and ")} ${has.p5 && has.p6 ? "are their" : "is its"} final
         verdict${has.p5 && has.p6 ? "s" : ""}, after the rule guard.` : ""}</p>
     ${Object.entries(names).map(([k, title]) => {
       const m = c[k];
-      if (!m.videos) return `<h4>${title}</h4><p class="hint">${k === "cac_outcome"
-        ? "No video has a CAC outcome yet (performed well after scaling)." : "Lock the ground truth first."}</p>`;
+      if (!m.videos) return `<h4>${title}</h4><p class="hint">Lock the ground truth first. (No video has a real CAC outcome yet either.)</p>`;
       return `<h4>${title}</h4>${table(m)}
         <p class="hint">${m.winners} winner${m.winners === 1 ? "" : "s"} among ${m.videos} video${m.videos === 1 ? "" : "s"} with a known result.
           ⚠ Accuracy: a method that never scales anything would score <b>${pc(m.never_scale_accuracy)}</b> here while catching no winner,
@@ -1240,9 +1448,9 @@ function timingPanel(pt) {
       ${faster ? `<div><b>${faster >= 1 ? `${faster.toFixed(1)}× faster` : `${(1 / faster).toFixed(1)}× slower`}</b><br>
         <span style="font-size:13px">AI vs human, mean per video</span></div>` : ""}</div>
     <table><tr><th>Stage</th><th>Videos timed</th><th>Mean</th><th>Median</th><th>Total</th></tr>
-      ${Object.entries(pt.stages).filter(([, s]) => s.n).map(([k, s]) => `<tr><td>${esc(STAGE_NAMES[k] || k)}</td><td class="num">${s.n}</td>
+      ${Object.entries(pt.stages).filter(([, s]) => s.n).map(([k, s]) => `<tr><td>${esc(pname(STAGE_NAMES[k] || k))}</td><td class="num">${s.n}</td>
         <td class="num">${dur(s.mean_s)}</td><td class="num">${dur(s.median_s)}</td><td class="num">${dur(s.total_s)}</td></tr>`).join("")}
-      ${e2e.n ? `<tr><td><b>End to end</b> <span class="hint">(download + keyframes + vision + P6)</span></td><td class="num">${e2e.n}</td>
+      ${e2e.n ? `<tr><td><b>End to end</b> <span class="hint">(download + keyframes + vision + ${esc(evalP)})</span></td><td class="num">${e2e.n}</td>
         <td class="num"><b>${dur(e2e.mean_s)}</b></td><td class="num">${dur(e2e.median_s)}</td><td class="num">${dur(e2e.total_s)}</td></tr>` : ""}</table>
     ${Object.keys(pt.per_video).length ? `<p class="hint">Per video: ${Object.entries(pt.per_video).map(([v, s]) =>
       `${esc(v)} ${dur(s)}`).join(" · ")}</p>` : ""}
@@ -1252,13 +1460,59 @@ function timingPanel(pt) {
       minutes spent per video.</p></section>`;
 }
 
+// The evaluation of every child session of a parent, and the mean across them.
+function collectionDashboard(r) {
+  const pc = (x) => (x == null ? "—" : `${Math.round(x * 100)}%`);
+  const aggRows = Object.entries(r.aggregate).map(([name, m]) => `<tr><td>${esc(name)}</td>
+    ${["cac_outcome"].map((k) => `<td class="num">${m[k].runs ? `<b>${pc(m[k].mean_accuracy)}</b>
+      <span class="hint">${pc(m[k].min_accuracy)}–${pc(m[k].max_accuracy)} · ${plural(m[k].runs, "run")}</span>` : "—"}</td>
+      <td class="num">${pc(m[k].mean_recall)}</td>`).join("")}</tr>`).join("");
+  const cellAcc = (a) => (a && a.n ? `${pc(a.accuracy)} <span class="hint">${a.correct}/${a.n}</span>` : "—");
+  const names = Object.keys(r.aggregate);
+  return `<h4>${esc(r.name)}: ${r.evaluated} of ${r.runs.length} runs evaluated${r.failed ? `, ${r.failed} failed` : ""}</h4>
+    ${r.runs.length ? `${aggRows ? `<table><tr><th rowspan="2">Prompt (mean over runs)</th><th colspan="2">vs CAC outcome</th></tr><tr><th>Accuracy</th><th>Recall</th></tr>${aggRows}</table>` : ""}
+      <table><tr><th>Run</th><th>Prompt · model</th><th>Scored</th>${names.map((n) => `<th>${esc(n)}</th>`).join("")}<th></th></tr>
+      ${r.runs.map((x) => `<tr><td>${esc(x.name ?? x.id)}</td><td>${x.run ? `<b>${esc(x.run.prompt_id)}</b> · ${esc(x.run.provider)} / ${esc(x.run.model)}${x.run.status && x.run.status !== "done" ? ` <span class="hint">${esc(x.run.status)}</span>` : ""}` : esc(x.llm.model ?? x.llm.provider)}</td>
+        ${x.error ? `<td colspan="${names.length + 1}" class="bad">${esc(x.error)}</td>`
+          : `<td class="num">${x.scored}/${x.videos}</td>${names.map((n) => `<td class="num">${cellAcc(x.verdict_accuracy[n]?.cac)}</td>`).join("")}`}
+        <td><button class="btn ghost small" data-open-session="${esc(x.id)}" data-then="eval">Open</button></td></tr>`).join("")}</table>
+      <p class="hint">Accuracy against the real CAC outcome (CAC vs target CAC); a blank means that run has not been scored. Averages skip blanks, never count them as 0.</p>`
+      : `<p class="hint">This collection has no runs.</p>`}`;
+}
+
+// Every run's submitted reviews per video; identical calls from all reviewers show once.
+function collectionReviews(rv) {
+  const labels = rv.columns;                       // the server orders them (runs numerically)
+  const one = (c) => `<span class="chip ${esc(c.decision)}">${esc(CALL[c.decision] || label(c.decision))}</span>
+    ${c.reason ? `<div class="cap rv-reason">${esc(c.reason)}</div>` : ""}`;
+  const runsOf = (c) => (c.runs?.length > 1 ? `<div class="cap">${c.count}× · runs ${c.runs.map(esc).join(", ")}</div>`
+    : c.runs?.length ? `<div class="cap">run ${esc(c.runs[0])}</div>` : "");
+  // unique mode: one cell per reviewer, their distinct calls stacked, each with the runs it came from
+  const cell = (c) => !c ? '<span class="na">—</span>'
+    : c.variants ? c.variants.map((x) => `<div>${one(x)}${runsOf(x)}</div>`).join("") : one(c);
+  const errs = rv.runs.filter((x) => x.error);
+  return `<section class="panel"><h3>Reviews · all runs of ${esc(rv.name)}</h3>
+    <label class="hint"><input type="checkbox" id="coll-unique" ${rv.unique ? "checked" : ""}> Unique reviews only
+      (the same reviewer's identical call, repeated across runs, shows once)</label>
+    ${errs.map((x) => `<p class="bad">${esc(x.name ?? x.id)}: ${esc(x.error)}</p>`).join("")}
+    ${labels.length ? `<div class="fwrap"><table class="rv rv-grid"><tr><th>Video</th>${labels.map((l) => `<th>${esc(l)}</th>`).join("")}<th>Agreement</th></tr>
+      ${rv.videos.map((v) => `<tr><td>${esc(v.video_id)}<div class="cap">@${esc(v.creator || "—")} · ${esc((v.caption || "").slice(0, 60))}</div></td>
+        ${v.merged ? `<td colspan="${labels.length}">${cell(v.merged)}
+            <div class="cap">same call from ${v.merged.count} reviews: ${v.merged.reviewers.map(esc).join(", ")}</div></td>`
+          : labels.map((l) => `<td>${cell(v.calls[l])}</td>`).join("")}
+        <td>${v.agreement === "agree" ? '<span class="chip SCALE">Agree</span>' : v.agreement === "split" ? '<span class="chip DEFER_TO_HUMAN">Split</span>' : '<span class="na">—</span>'}</td></tr>`).join("")}
+    </table></div><p class="hint">Submitted reviews only; drafts stay hidden.${rv.agreement.n ? ` Agree on ${rv.agreement.agree} of ${rv.agreement.n} videos with 2 or more reviews.` : ""}</p>`
+      : "<p>No submitted review in any run yet.</p>"}</section>`;
+}
+
 async function renderResults(runMissing = false) {
   const body = $("#eval-body");
   body.innerHTML = `<p class="empty">${runMissing ? "Running pipeline on unscored videos…" : "Loading…"}</p>`;
   let e;
   const who = state.rvFilter ? [...state.rvFilter].map((n) => `&reviewer=${encodeURIComponent(n)}`).join("") : "";
-  try { e = await api(`/api/evaluate?run_missing=${runMissing}${who}`); }
+  try { e = await api(`/api/evaluate?run_missing=${runMissing}${who}`); }       // the session's own run prompt (server default)
   catch (err) { body.innerHTML = `<p class="empty">Error: ${esc(err.message)}</p>`; return; }
+  evalP = e.prompt || "P6";
   const ds = await api("/api/dataset").catch(() => ({ id: null, files: [] }));
   const th = ds.id == null ? null : await api("/api/thresholds").catch(() => null);
   const has = { p5: e.videos.some((v) => v.p5_model || v.p5_final), p6: e.videos.some((v) => v.p6_model || v.p6_final) };
@@ -1285,42 +1539,51 @@ async function renderResults(runMissing = false) {
   const cell = (got, exp) => `<td class="${got == null ? "" : got === exp ? "ok" : "bad"}">${esc(label(got))}</td>`;
   const t = e.reviewer_timing;
   const accCell = (a) => `<td class="num">${a.n ? `${a.correct} / ${a.n} · ${(a.accuracy * 100).toFixed(0)}%` : "—"}</td>`;
-  const measures = { expected_verdict: "Expected verdict", cac_outcome: "CAC outcome" };
+  const basis = evalBasis(e.classification);
+  const basisCap = evalBasisName[basis][0].toUpperCase() + evalBasisName[basis].slice(1);
   const manualPanel = `<section class="panel"><h3>Manual review vs AI</h3>
     ${e.manual_review.length ? `<table><tr><th>Reviewer</th><th>Videos</th><th>Measured against</th><th>Human (blind)</th>
-        ${has.p5 ? "<th>P5 final</th>" : ""}${has.p6 ? "<th>P6 final</th>" : ""}<th>Minutes / video</th></tr>
-      ${e.manual_review.flatMap((m) => Object.entries(measures).map(([k, name], j) => `<tr>
-        ${j ? "" : `<td rowspan="2"><b>${esc(m.reviewer)}</b></td><td rowspan="2" class="num">${m.videos}</td>`}
-        <td>${name}</td>${accCell(m[k].human)}${has.p5 ? accCell(m[k].p5_final) : ""}${has.p6 ? accCell(m[k].p6_final) : ""}
-        ${j ? "" : `<td rowspan="2" class="num">${m.mean_minutes ?? "—"}${m.total_minutes != null ? `<br><span class="hint">${m.total_minutes} total</span>` : ""}</td>`}</tr>`)).join("")}</table>
+        ${has.p5 ? "<th>P5 final</th>" : ""}${has.p6 ? `<th>${esc(evalP)} final</th>` : ""}<th>Minutes / video</th></tr>
+      ${e.manual_review.map((m) => `<tr>
+        <td><b>${esc(m.reviewer)}</b></td><td class="num">${m.videos}</td>
+        <td>${esc(basisCap)}</td>${accCell(m[basis].human)}${has.p5 ? accCell(m[basis].p5_final) : ""}${has.p6 ? accCell(m[basis].p6_final) : ""}
+        <td class="num">${m.mean_minutes ?? "—"}${m.total_minutes != null ? `<br><span class="hint">${m.total_minutes} total</span>` : ""}</td></tr>`).join("")}</table>
       <p style="font-size:13px">Scored on exactly the videos each reviewer decided, so human and AI are judged on the same set.
         Reviewers choose only scale / don't scale, so every AI verdict other than SCALE (defer, flag) counts as don't scale.
-        <b>Expected verdict</b>: the ground truth's verdict. <b>CAC outcome</b>: scale when the video performed well
-        after scaling (CAC ≤ target), don't scale when it did not; videos never scaled are left out.</p>`
+        ${basis === "cac_outcome" ? "<b>Real CAC outcome</b>: scale when the video performed well after scaling (CAC ≤ target), don't scale when it did not; videos never scaled are left out."
+          : "<b>Expected verdict</b>: the ground truth's verdict (no video has a real CAC outcome yet)."}</p>`
     : `<p>No submitted manual review yet. Fill one in under <button class="linkish" data-evaltab="manual">Manual review</button>.</p>`}</section>`;
   const accRows = Object.entries(e.verdict_accuracy).filter(([k]) => shown(k, has));
-  body.innerHTML = exportPanel + reviewerFilter(e.reviewers) + thresholdPanel(th) + keyPanel + classificationPanel(e.classification, has) + manualPanel + `
+  const pi = e.prompt_info || {};
+  const methodsPanel = `<section class="panel"><h3>Methods evaluated</h3>
+    <p style="font-size:13px;margin:0"><b>Human (blind)</b> · <b>P5 text-only</b> · <b>${esc(evalP)} multimodal</b>
+      <span class="hint">on ${esc(e.llm?.provider || "")} / ${esc(e.llm?.model || "no model")}</span><br>
+      <span class="hint">${esc(evalP)}: ${pi.scored ?? "?"} of ${pi.videos ?? "?"} videos scored${pi.other_text ? `, ${pi.other_text} from a different text under this id (re-score)` : ""}${
+        pi.active && pi.active !== evalP ? ` · this session's run used ${esc(evalP)}; the active (adopted) prompt is ${esc(pi.active)}` : ""}.</span></p></section>`;
+  body.innerHTML = methodsPanel + exportPanel + reviewerFilter(e.reviewers) + thresholdPanel(th) + keyPanel + classificationPanel(e.classification, has) + manualPanel + `
     <section class="panel"><h3>Verdict accuracy vs ground truth</h3>
-      ${accRows.length ? `<table><tr><th rowspan="2">Prompt</th><th colspan="3">vs expected verdict</th><th colspan="3">vs CAC outcome</th></tr>
-        <tr>${"<th>Recall</th><th>Correct</th><th>Accuracy</th>".repeat(2)}</tr>
-      ${accRows.map(([k, v]) => `<tr><td>${esc(k)}</td>${[v, v.cac || { n: 0 }].map((a) => `<td class="num"><b>${a.recall == null ? "—"
+      ${accRows.length ? `<table><tr><th rowspan="2">Prompt</th><th colspan="3">Measured against the ${evalBasisName[basis]}</th></tr>
+        <tr><th>Recall</th><th>Correct</th><th>Accuracy</th></tr>
+      ${accRows.map(([k, v]) => `<tr><td>${esc(pname(k))}</td>${[basis === "cac_outcome" ? v.cac || { n: 0 } : v].map((a) => `<td class="num"><b>${a.recall == null ? "—"
           : (a.recall * 100).toFixed(0) + "%"}</b>${a.winners ? ` <span class="hint">${a.tp}/${a.winners}</span>` : ""}</td>
         <td class="num">${a.n ? `${a.correct} / ${a.n}` : "—"}</td>
         <td class="num">${a.accuracy == null ? "—" : (a.accuracy * 100).toFixed(0) + "%"}</td>`).join("")}</tr>`).join("")}</table>
       <p style="font-size:13px"><b>Recall</b>: of the real winners (truth says scale), how many the prompt scaled.
         A verdict of defer or flag on a winner counts as missed.</p>
-      <p style="font-size:13px"><b>vs CAC outcome</b>: right when the verdict matches what the real CAC showed after scaling
+      <p style="font-size:13px">${basis === "cac_outcome"
+        ? `<b>Real CAC outcome</b>: right when the verdict matches what the real CAC showed after scaling
         (CAC ≤ target = scale). Only scale / don't scale is compared, so defer and flag count as don't scale; videos never
-        scaled have no CAC outcome and are left out${accRows.some(([, v]) => v.cac && v.cac.n) ? "" : " (none has one yet)"}.</p>
+        scaled have no CAC outcome and are left out.`
+        : `<b>Expected verdict</b>: used because no video has a real CAC outcome yet; once one does, this table switches to it.`}</p>
       <p style="font-size:13px">${[has.p5 && "P5 is compared with <code>ground_truth.csv</code>",
-        has.p6 && "P6 with the multimodal key in <code>ground_truth_media.csv</code>"].filter(Boolean).join("; ")}.
+        has.p6 && `${esc(evalP)} with the multimodal key in <code>ground_truth_media.csv</code>`].filter(Boolean).join("; ")}.
         "After rule guard" applies the ${th ? `${th.values.min_hours}h / ${th.values.min_reach.toLocaleString()} reach` : "hours / reach"} / missing-metric rules in code.</p>`
       : "<p>No video has been scored yet.</p>"}
       <button class="btn ghost small" id="eval-run">Score any unprocessed videos</button></section>
     <section class="panel"><h3>Per video</h3>
       <table><tr><th>Video</th><th>Scenario</th><th>Expected (text / multimodal)</th>
         ${has.p5 ? "<th>P5 model</th><th>P5 final</th>" : ""}
-        ${has.p6 ? "<th>P6 model</th><th>P6 final</th><th>P6 reasons citing time</th>" : ""}<th>Human (blind)</th></tr>
+        ${has.p6 ? `<th>${esc(evalP)} model</th><th>${esc(evalP)} final</th><th>${esc(evalP)} reasons citing time</th>` : ""}<th>Human (blind)</th></tr>
       ${e.videos.map((v) => `<tr><td>${esc(v.video_id)}</td><td>${esc(label(v.scenario))}</td>
         <td>${esc(label(v.expected))} / ${esc(label(v.expected_multimodal))}</td>
         ${has.p5 ? cell(v.p5_model, v.expected) + cell(v.p5_final, v.expected) : ""}
@@ -1571,7 +1834,9 @@ async function renderReviews() {
       ${rv.videos.map((v, i) => `<tr><td><button class="vplay" data-rvplay="${i}" title="Watch this video"
             ${!v.url && !v.clip ? "disabled" : ""}>▶ ${esc(v.video_id)}</button>
           <div class="cap">@${esc(v.creator || "—")} · ${esc((v.caption || "").slice(0, 60))}</div></td>
-        ${done.map((p) => `<td>${cell(v.calls[p.reviewer])}</td>`).join("")}
+        ${v.merged ? `<td colspan="${done.length}">${cell(v.merged)}
+            <div class="cap">same call from ${v.merged.count} reviewers: ${v.merged.reviewers.map(esc).join(", ")}</div></td>`
+          : done.map((p) => `<td>${cell(v.calls[p.reviewer])}</td>`).join("")}
         <td>${v.agreement === "agree" ? '<span class="chip SCALE">Agree</span>' : v.agreement === "split" ? '<span class="chip DEFER_TO_HUMAN">Split</span>' : '<span class="na">—</span>'}</td>
         ${rv.ground_truth_locked ? `<td>${v.expected ? `<span class="chip ${esc(v.expected)}">${esc(label(v.expected))}</span>` : '<span class="na">—</span>'}</td>` : ""}</tr>`).join("")}
     </table></div>` : "<p>No submitted review yet: decisions appear here once a reviewer submits.</p>"}</section>`;
@@ -1762,6 +2027,11 @@ async function makeRecap(btn) {
 }
 
 // ------------------------------------------------------------------ events
+main.addEventListener("change", (ev) => {
+  if (ev.target.id === "run-prompt") { state.runPrompt = ev.target.value; refreshRunLine(); }
+  if (ev.target.name === "llm-which") saveLlm(ev.target.value);
+  if (ev.target.id === "coll-unique" && state.coll) { state.collUnique = ev.target.checked; openCollection(state.coll.cid, "reviews"); }
+});
 main.addEventListener("click", async (ev) => {
   const t = ev.target.closest("button");
   if (!t) return;
@@ -1769,6 +2039,11 @@ main.addEventListener("click", async (ev) => {
   if (t.dataset.action) return decide(t.dataset.action);
   if (t.id === "ov-toggle") return $("#ov").classList.toggle("open");
   if (t.id === "eval-run") return renderResults(true);
+  if (t.id === "home-new") { setView("setup"); return resetDataset(); }
+  if (t.id === "coll-back") return renderHome();
+  if (t.id === "coll-create") return createCollection(t);
+  if (t.dataset.openCollection) return openCollection(t.dataset.openCollection);
+  if (t.dataset.collTab) return openCollection(t.dataset.cid, t.dataset.collTab);
   if (t.dataset.rvall != null) { state.rvFilter = null; return renderResults(); }
   if (t.id === "th-save" || t.id === "th-reset") return saveThresholds(t.id === "th-reset");
   if (t.id === "llm-save") return saveLlm();
@@ -1799,7 +2074,7 @@ main.addEventListener("click", async (ev) => {
   }
   if (t.id === "mr-submit") return submitManual();
   if (t.id === "generate") return generateDataset();
-  if (t.dataset.openSession) return openSession(t.dataset.openSession);
+  if (t.dataset.openSession) return openSession(t.dataset.openSession, t.dataset.then, +t.dataset.scored || 0);
   if (t.dataset.copySession) return copySession(t);
   if (t.dataset.deleteSession) return askDeleteSession(t.dataset.deleteSession);
   if (t.id === "ds-reset") return resetDataset();
@@ -1889,7 +2164,7 @@ main.addEventListener("change", async (ev) => {
   try {
     await api(`/api/videos/${encodeURIComponent(t.dataset.id)}/url`, {
       method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: t.value.trim() }) });
-    const v = (await api("/api/videos")).find((x) => x.video_id === t.dataset.id);
+    const v = (await listVideos()).find((x) => x.video_id === t.dataset.id);
     if (td && v) td.innerHTML = videoStatus(v, state.job);
   } catch (e) { if (td) td.innerHTML = `<span class="err">${esc(e.message)}</span>`; }
 });
@@ -1920,10 +2195,26 @@ main.addEventListener("input", (ev) => {
   saveDraft();
 });
 
+// Home and a parent's dashboard are outside any session; Dataset, Review, Evaluation and Recap are sub-items
+// of the open session (shown with the video list, under a breadcrumb).
+function refreshCrumb() {
+  $("#crumb").textContent = [state.session?.collection?.name, state.session?.name].filter(Boolean).join(" › ");
+}
+const SESSION_VIEWS = ["setup", "review", "eval", "recap"];
 function setView(v) {
   state.view = v;
-  for (const name of ["setup", "review", "eval", "recap"]) $(`#tab-${name}`).classList.toggle("active", v === name);
+  if (v !== "coll") state.coll = null;
+  if (!(v === "coll" || v === "prompts") && /^#\/(collections\/|prompts$)/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search);
+  const inside = SESSION_VIEWS.includes(v);
+  $("#session-tabs").hidden = !inside;
+  $(".layout").classList.toggle("wide", !inside);
+  $("#tab-home").classList.toggle("active", !inside && v !== "prompts");
+  $("#tab-prompts").classList.toggle("active", v === "prompts");
+  refreshCrumb();
+  for (const name of SESSION_VIEWS) $(`#tab-${name}`).classList.toggle("active", v === name);
 }
+$("#tab-prompts").addEventListener("click", () => openPromptLibrary());
+$("#tab-home").addEventListener("click", () => renderHome());
 $("#tab-setup").addEventListener("click", () => { setView("setup"); clearInterval(state.timerId); renderSetup(); });
 $("#tab-recap").addEventListener("click", () => { setView("recap"); clearInterval(state.timerId); renderRecap(); });
 $("#tab-review").addEventListener("click", () => { setView("review"); state.card ? renderCard(state.card) : (main.innerHTML = '<p class="empty">Select a video.</p>'); });
@@ -1942,5 +2233,17 @@ main.addEventListener("focusin", (ev) => {
   if (tr && state.mr) state.mrStart[state.mr.rows[+tr.dataset.mrrow].video_id] ||= Date.now();
 });
 
-loadList();
-renderSetup();
+routeFromHash();
+if (!state.coll && state.view !== "prompts") renderHome();
+
+async function createCollection(btn) {
+  const msg = $("#coll-msg"), name = $("#coll-name").value.trim();
+  if (!name) { msg.textContent = "Give the parent a name."; return; }
+  btn.disabled = true;
+  msg.textContent = "Copying the session…";
+  try {
+    await api("/api/collections", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ source: $("#coll-source").value, name, children: +$("#coll-n").value || 0 }) });
+    await renderHome();
+  } catch (e) { btn.disabled = false; msg.textContent = `Not created: ${e.message}`; }
+}

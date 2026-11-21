@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # Local .env wins; the first-test project's .env is the fallback so the key lives in one place.
 load_dotenv(ROOT / ".env")
-_FALLBACK = dotenv_values(ROOT.parent / "FirstTest-prompts" / ".env")
+_FALLBACK = dotenv_values(ROOT / "old" / "FirstTest-prompts" / ".env")
 
 
 def _env(name):

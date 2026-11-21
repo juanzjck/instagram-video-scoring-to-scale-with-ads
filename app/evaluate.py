@@ -184,8 +184,9 @@ def pipeline_timing(video_ids, manual):
                       "median_s": round(median(human) * 60, 1) if human else None}}
 
 
-def run(run_missing=True, reviewers=None):
+def run(run_missing=True, reviewers=None, prompt_id=None):
     """Build the evaluation report. With run_missing, videos not yet scored are processed.
+    prompt_id: the P6-family version whose answers fill the "P6" rows (default: the active one).
     reviewers: names whose blind decisions count as "Human"; None means every submitted reviewer."""
     videos, _ = ingest.load_inputs()
     gt = _key("ground_truth.csv")
@@ -195,14 +196,20 @@ def run(run_missing=True, reviewers=None):
     picked = names if reviewers is None else [n for n in names if n in set(reviewers)]
     manual = [m for m in every if m["reviewer"] in picked]
 
+    pid = prompt_id or pv.active()
+    version = pv.get(pid)                    # KeyError for an unknown id
     rows, feat_totals = [], {}
+    scored = stale = 0
     for vid in videos:
         if run_missing:
-            pipeline.process(vid)
+            pipeline.process(vid, prompt_id=prompt_id)
             p5 = pipeline.run_p5(vid)
         else:
             p5 = pipeline.load(vid, "score_p5")
-        p6 = pipeline.load(vid, pipeline.active_stage())
+        p6 = pipeline.load(vid, pv.stage(pid))
+        if p6:
+            scored += 1
+            stale += p6.get("prompt_sha256") not in (None, version["sha256"])    # made from another text under this id
         feats = pipeline.load(vid, "features")
 
         expected = scoring.normalise_verdict((gt.get(vid) or {}).get("expected_verdict"))
@@ -271,7 +278,10 @@ def run(run_missing=True, reviewers=None):
         "classification": classification(rows, manual),
         "reviewers": {"all": names, "selected": picked},
         "llm": config.llm_choice(),          # the provider + model whose P5/P6 answers were evaluated
-        "prompt": pv.active(),               # the P6-family version in the "P6" rows
+        "prompt": pid,                       # the P6-family version in the "P6" rows
+        # an answer cache holds one version on one model, so a mix cannot happen; what can differ is coverage
+        "prompt_info": {"id": pid, "scored": scored, "videos": len(videos), "other_text": stale,
+                        "active": pv.active()},
     }
 
 

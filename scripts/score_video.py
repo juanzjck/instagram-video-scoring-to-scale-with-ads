@@ -32,13 +32,14 @@ def list_sessions():
         print(f"{d.name}: {', '.join(vids) or '(no videos)'}")
 
 
-def score(video_id, force):
+def score(video_id, force, prompt_id=None):
     """Run the pipeline for one video and return a compact result."""
-    card = pipeline.process(video_id, force=force,
+    card = pipeline.process(video_id, force=force, prompt_id=prompt_id,
                             progress=lambda step: print(f"  {video_id}: {step}", file=sys.stderr))
     s = card.get("score") or {}
     return {
         "video_id": video_id,
+        "prompt_id": s.get("prompt_id") or prompt_id,
         "verdict": s.get("verdict"),
         "model_verdict": s.get("model_verdict"),
         "score": s.get("score"),
@@ -57,6 +58,7 @@ def main():
     ap.add_argument("videos", nargs="*")
     ap.add_argument("--all", action="store_true", help="every video in the session")
     ap.add_argument("--force", action="store_true", help="ignore cached results and call the API again")
+    ap.add_argument("--prompt", default=None, help="P6-family prompt id (P6, P6.2, ...); default: the session's active one. Not adopted.")
     ap.add_argument("--summary", action="store_true", help="print the text the model receives; no API call")
     ap.add_argument("--list", action="store_true", help="list saved sessions")
     a = ap.parse_args()
@@ -74,6 +76,13 @@ def main():
     if not ids or unknown:
         sys.exit(f"error: unknown or missing video ids {unknown or ''}. Known: {', '.join(known)}")
 
+    print("note: this scores in place and records no run; use the app's Start pipeline (or scripts/run_collection_test.py) "
+          "for runs that are kept apart per prompt and model.", file=sys.stderr)
+    if a.prompt:
+        from app import prompt_versions as pv
+        if a.prompt == pv.BASELINE or not any(x["id"] == a.prompt for x in pv.listing()["versions"]):
+            sys.exit(f"error: unknown or unusable prompt {a.prompt!r} (a P6-family id of this session, not P5)")
+
     if a.summary:
         for v in ids:
             print(pipeline.summary(v, multimodal=True), "\n")
@@ -82,7 +91,7 @@ def main():
     results, failed = [], 0
     for v in ids:
         try:
-            results.append(score(v, a.force))
+            results.append(score(v, a.force, a.prompt))
         except Exception as e:                       # one bad video must not stop the batch
             failed += 1
             results.append({"video_id": v, "error": f"{type(e).__name__}: {e}"})

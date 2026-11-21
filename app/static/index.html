@@ -4,13 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PartGram · Scale review</title>
-<link rel="stylesheet" href="/static/style.css?v=21">
+<link rel="stylesheet" href="/static/style.css?v=24">
 </head>
 <body>
 <header class="topbar">
   <div class="brand"><span class="dot"></span>PartGram <span class="sub">scale review</span></div>
   <nav class="tabs" role="tablist">
-    <button id="tab-setup" class="tab active" role="tab">Dataset</button>
+    <button id="tab-home" class="tab active" role="tab">Sessions</button>
+    <button id="tab-prompts" class="tab" role="tab">Prompts</button>
+  </nav>
+  <nav class="tabs" id="session-tabs" role="tablist" aria-label="Inside the open session" hidden>
+    <span id="crumb" class="crumb"></span>
+    <button id="tab-setup" class="tab" role="tab">Dataset</button>
     <button id="tab-review" class="tab" role="tab">Review</button>
     <button id="tab-eval" class="tab" role="tab">Evaluation</button>
     <button id="tab-recap" class="tab" role="tab">Recap</button>
@@ -35,6 +40,6 @@
   <main id="main" aria-live="polite"><p class="empty">Loading…</p></main>
 </div>
 
-<script src="/static/app.js?v=28"></script>
+<script src="/static/app.js?v=39"></script>
 </body>
 </html>

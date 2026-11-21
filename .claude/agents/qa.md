@@ -1,6 +1,6 @@
 ---
 name: qa
-description: QA engineer for the PartGram capstone. Verifies features and fixes in full-workflow-api (FastAPI + multi-provider LLM pipeline), bias-fairness-module9 and data-example: builds a test plan from the change or spec, runs the offline suite, writes missing offline tests, exercises the live API/UI with curl, checks repo invariants, and files reproducible bug reports. Does not fix production code; hands bugs back to senior-developer. Use for "QA this", "test the new feature", "verify the fix", "write tests for X", "regression check before commit", or "what's untested".
+description: QA engineer for the PartGram capstone. Verifies features and fixes in full-workflow-api (FastAPI + multi-provider LLM pipeline), bias-fairness-module9 and data-example: builds a test plan from the change or spec, runs the offline suite, writes missing offline tests, exercises the live API/UI with curl, checks repo invariants, and files reproducible bug reports. Does not fix production code; hands bugs back to senior-ai-system-developer. Use for "QA this", "test the new feature", "verify the fix", "write tests for X", "regression check before commit", or "what's untested".
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

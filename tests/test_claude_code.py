@@ -221,7 +221,7 @@ def uploads(tmp_path, monkeypatch):
         (src / "runs" / v / "preprocess.json").write_text(json.dumps({"video_id": v, "frames": [], "transcript": []}))
     monkeypatch.setattr(pipeline, "summary", lambda vid, multimodal: f"VID={vid} MM={multimodal} ")
     monkeypatch.setattr(pipeline, "fetch_clip", lambda vid: False)
-    monkeypatch.setattr(pipeline, "card", lambda vid: {"video_id": vid})
+    monkeypatch.setattr(pipeline, "card", lambda vid, prompt_id=None: {"video_id": vid})
     jobs.reset()
     yield up
     config.activate(None)

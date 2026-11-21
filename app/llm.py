@@ -59,7 +59,7 @@ def _require(provider):
     pip = sdk_missing(provider)
     if pip:
         raise ProviderUnavailable(f"{config.LLM_PROVIDERS[provider]} needs the {pip!r} package: "
-                                  f"../.venv/bin/pip install {pip}")
+                                  f".venv/bin/pip install {pip}")
 
 
 # ---------------------------------------------------------------- content helpers
@@ -522,6 +522,33 @@ def _configured(provider):
     return True, "LOCAL_LLM_BASE_URL"
 
 
+def _redact_url(url):
+    """scheme://host:port/path: no user:pass@, query string or fragment (they can carry secrets)."""
+    from urllib.parse import urlsplit
+    try:
+        u = urlsplit(url or "")
+        host = u.hostname or ""
+        host = f"[{host}]" if ":" in host else host            # IPv6 literal
+        if not (u.scheme and host):
+            return None if not url else "(invalid URL)"
+        return f"{u.scheme}://{host}{':%d' % u.port if u.port else ''}{u.path}"
+    except ValueError:
+        return "(invalid URL)"
+
+
+def unavailable_reason(provider):
+    """Why a provider cannot run as configured (names an env variable, never its value), or None. No network."""
+    p = next((x for x in providers() if x["id"] == provider), None)
+    if p is None:
+        return f"unknown provider {provider!r}"
+    if p["missing_sdk"]:
+        return f"Python package missing: {p['missing_sdk']}"
+    if not p["configured"]:
+        return ("the claude CLI was not found (install Claude Code and log in, or set CLAUDE_CODE_BIN)"
+                if provider == "claude_code" else f"{p['env']} is not set")
+    return None
+
+
 def providers():
     """Every provider with whether it is set up. No network calls."""
     out = []
@@ -530,8 +557,8 @@ def providers():
         pip = sdk_missing(pid)
         out.append({"id": pid, "label": label, "configured": ok and not pip, "env": env,
                     "missing_sdk": pip, "default_model": config.DEFAULT_MODELS.get(pid),
-                    "base_url": {"ollama": config.OLLAMA_BASE_URL,
-                                 "openai_compatible": config.LOCAL_LLM_BASE_URL}.get(pid)})
+                    "base_url": _redact_url({"ollama": config.OLLAMA_BASE_URL,
+                                             "openai_compatible": config.LOCAL_LLM_BASE_URL}.get(pid))})
     return out
 
 
@@ -542,7 +569,7 @@ def list_models(provider):
         raise ValueError(f"unknown provider {provider!r}")
     info = next(p for p in providers() if p["id"] == provider)
     if info["missing_sdk"]:
-        return dict(info, models=[], error=f"install it: ../.venv/bin/pip install {info['missing_sdk']}")
+        return dict(info, models=[], error=f"install it: .venv/bin/pip install {info['missing_sdk']}")
     if not info["configured"]:
         return dict(info, models=[], error=f"set {info['env']} in full-workflow-api/.env")
     try:

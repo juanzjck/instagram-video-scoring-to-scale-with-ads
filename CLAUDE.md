@@ -37,7 +37,7 @@ cd full-workflow-api && ../.venv/bin/python -m pytest -q tests
 
 # full-workflow-api: CLI pipeline (no UI)
 ../.venv/bin/python scripts/score_video.py --list
-../.venv/bin/python scripts/score_video.py <session_id> --all [--force] [--summary]
+../.venv/bin/python scripts/score_video.py <session_id> --all [--force] [--summary] [--prompt P6.2]
 ../.venv/bin/python scripts/make_synthetic_media.py --dataset=<id> [--ai-images] [--force] vid_001
 
 # full-workflow-api: collection test (N runs of one session via the `claude` CLI, subscription login)
@@ -69,7 +69,7 @@ and `bias_study.py` consume them.
 prompt. `full-workflow-api` ports both **verbatim** (`app/flatten.py`, `app/p5_template.txt`); P6 is
 derived from P5 by string surgery in `app/prompts.py` so the two cannot drift. Don't edit P5 to
 "improve" it — it is the fixed baseline P6 is evaluated against. Tuned prompts are saved as immutable versions
-(`P6.2`, `P6.3`, … in `session.json`, `app/prompt_versions.py`); an iteration (`app/iterations.py`) runs a
+(`P6.2`, `P6.3`, … in one global library, `uploads/_prompts/library.json`, `app/prompt_versions.py`; UI: top-level *Prompts*, route `#/prompts`; the active version and adoption log stay per session in `session.json`); an iteration (`app/iterations.py`) runs a
 version next to P5 and freezes verdicts in `runs/iterations/`; a version is adopted only if it beats P5
 (no more false SCALE, then accuracy) or with a logged written override.
 
@@ -96,6 +96,16 @@ evaluation (`evaluate.py`).
 - **`claude_code` provider** runs `claude -p` with clean-context flags (`--safe-mode`, no settings / MCP /
   tools, its own `--system-prompt`, an empty temp cwd, no `ANTHROPIC_API_KEY` in its env). Not `--bare`: that
   drops the subscription login. Images go in on stdin via `--input-format stream-json`.
+- **Runs** (`app/runs.py`): a run is one pipeline execution with a fixed (prompt version, provider, model), recorded in
+  `session.json` under `"run"` (`{n, prompt_id, prompt_sha256, provider, model, status, scored, videos, errors, ...}`).
+  *Start pipeline* (`GET /api/pipeline/plan` previews it, `POST /api/pipeline/start` does it; the UI confirms first): no run
+  yet → runs in place; an unfinished run (`partial`) → resumes in place (or asks when the prompt/model changed); a completed run
+  → creates a new child session (the original becomes run 001 of an auto-created parent collection, `source_is_run`) and runs
+  there. A child copies the dataset, clips, keyframes/transcripts and the locked ground truth, but no score caches,
+  iterations, recaps, timings, review sheets or decisions; vision features only when provider + model are the same as the run it
+  branches from. Views (video list, card, Evaluation, process) default to the session's own run prompt; the Dataset tab's selector
+  only chooses the prompt of the NEXT run. Sessions without a record are inferred on read from their score caches, never rewritten.
+  `scripts/score_video.py` stays a low-level in-place scorer (no run recorded).
 - **Collections** (`app/collection.py`): a parent in `uploads/_collections/<id>/` groups copies ("runs") of one
   session; each run's `session.json` has `"collection"`. `scripts/run_collection_test.py` drives them.
 

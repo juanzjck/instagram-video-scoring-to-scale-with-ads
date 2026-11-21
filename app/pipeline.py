@@ -160,8 +160,10 @@ def run_prompt(video_id, prompt_id, force=False):
         cached = None
     if cached:
         return cached
-    return _save(video_id, st, _timed(video_id, "score_p6", lambda: scoring.score(
-        prompt_id, summary(video_id, True), row, template=None if v["builtin"] else v["text"])))
+    out = _timed(video_id, "score_p6", lambda: scoring.score(
+        prompt_id, summary(video_id, True), row, template=None if v["builtin"] else v["text"]))
+    pv.get(prompt_id)                    # KeyError when the version was deleted mid-run: leave no orphan cache
+    return _save(video_id, st, out)
 
 
 def analyse(video_id, force=False, progress=None):
@@ -200,16 +202,17 @@ def process(video_id, force=False, progress=None, prompt_id=None):
 
     step("scoring")
     run_prompt(video_id, prompt_id or pv.active(), force=force)
-    return card(video_id)
+    return card(video_id, prompt_id)
 
 
-def status(video_id):
+def status(video_id, prompt_id=None):
+    """Where a video stands. `scored` is about prompt_id's answer (default: the active version)."""
     return {
         "has_clip": ingest.clip_path(video_id) is not None,
         "source_url": ingest.video_url(video_id),
         "preprocessed": _exists(video_id, "preprocess"),
         "analysed": _exists(video_id, "features"),
-        "scored": _exists(video_id, active_stage()),
+        "scored": _exists(video_id, pv.stage(prompt_id) if prompt_id else active_stage()),
         "seconds": seconds(video_id),
     }
 
@@ -248,12 +251,15 @@ def _frame_url(video_id, file):
     return f"/artifacts/{video_id}/frames/{file}?v={v}"
 
 
-def card(video_id):
-    """Everything the review card renders, in one payload."""
+def card(video_id, prompt_id=None):
+    """Everything the review card renders, in one payload. prompt_id shows that version's answer (default: the active one)."""
     row, comments = _row(video_id)
     pre = load(video_id, "preprocess") or {}
     feats = load(video_id, "features") or {}
-    s = load(video_id, active_stage())
+    pid = prompt_id or pv.active()
+    s = load(video_id, pv.stage(pid))
+    if s and s.get("prompt_sha256") not in (None, pv.get(pid)["sha256"]):
+        s = None                             # an answer made from another text under this id is not this version's
     d = fl.derived_metrics(row)
 
     clip = ingest.clip_path(video_id)
@@ -294,7 +300,8 @@ def card(video_id):
                                 else num(row.get("avg_watch_time_ms")) / 1000,
         },
         "score": s,
-        "prompt_id": pv.active(),
+        "prompt_id": prompt_id or pv.active(),
+        "active_prompt": pv.active(),
         "injection_flags": flags,
         "spoken_summary": _spoken_summary(row, s),
         "text_summary": summary(video_id, False),      # the "without the card" view

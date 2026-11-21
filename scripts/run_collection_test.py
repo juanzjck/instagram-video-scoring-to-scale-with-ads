@@ -17,9 +17,9 @@ time. Progress goes to uploads/_collections/<id>/test_summary.json after every r
 be stopped and started again: finished runs are skipped, failed or interrupted ones are retried. A
 usage limit that resets later than CLAUDE_CODE_MAX_WAIT_S stops new runs; start again after the reset.
 
-    ../.venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2 --limit 2   # pilot
-    ../.venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2           # all / resume
-    ../.venv/bin/python scripts/run_collection_test.py --report-only
+    .venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2 --limit 2   # pilot
+    .venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2           # all / resume
+    .venv/bin/python scripts/run_collection_test.py --report-only
 """
 
 import argparse
