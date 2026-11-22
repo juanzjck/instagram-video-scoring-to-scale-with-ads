@@ -1,0 +1,7 @@
+video_id,name,gender,y_pred
+vid_003,Andrés Andrade,man,0
+vid_003,Camila Torres,woman,1
+vid_003,Lucía Andrade,woman,1
+vid_003,Mateo Torres,man,1
+vid_003,Sebastián Ruiz,man,1
+vid_003,Valentina Ruiz,woman,1

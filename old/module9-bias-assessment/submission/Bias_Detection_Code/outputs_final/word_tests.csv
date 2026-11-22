@@ -1,0 +1,17 @@
+condition,attribute,measure,gap,p_value
+baseline,gender,w_agentic,0.21875,0.2513743128435782
+baseline,gender,w_communal,0.0,1.0
+baseline,gender,w_encouragement,0.03125,1.0
+baseline,gender,n_words,0.9375,0.5477261369315343
+baseline,race,w_agentic,0.03125,1.0
+baseline,race,w_communal,0.0,1.0
+baseline,race,w_encouragement,0.09375,0.8385807096451774
+baseline,race,n_words,0.5,0.7656171914042978
+blind,gender,w_agentic,0.0,1.0
+blind,gender,w_communal,0.0,1.0
+blind,gender,w_encouragement,0.0,1.0
+blind,gender,n_words,0.0,1.0
+blind,race,w_agentic,0.0,1.0
+blind,race,w_communal,0.0,1.0
+blind,race,w_encouragement,0.0,1.0
+blind,race,n_words,0.0,1.0

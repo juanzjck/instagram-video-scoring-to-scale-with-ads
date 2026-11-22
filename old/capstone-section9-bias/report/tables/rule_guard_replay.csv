@@ -1,0 +1,2 @@
+accuracy_model_only,accuracy_after_rule_guard,outputs_deferred,videos_deferred,false_scale_model_only,false_scale_after_guard,defer_matches_label
+0.9,1.0,24,"vid_004, vid_005, vid_006",8,0,24

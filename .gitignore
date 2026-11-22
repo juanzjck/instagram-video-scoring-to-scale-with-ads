@@ -25,3 +25,16 @@ scoring/*_filled.xlsx
 
 # NOTE: outputs/generations.* , outputs/*.png and outputs/run.log are intentionally
 # tracked - they are the evidence behind the report's numbers.
+
+# --- from full-workflow-api ---
+!.env.example
+# pipeline artifacts (frames, audio, model outputs). decisions.jsonl is the human log.
+runs/*/
+# uploaded datasets, with their own runs/
+uploads/
+
+# background server log + pid
+logs/
+
+# env backups (contain real keys)
+*.env.bak

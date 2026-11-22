@@ -1,0 +1,40 @@
+== niche
+niche
+food          2
+beauty        1
+fitness       1
+tech          1
+travel        1
+comedy        1
+business      1
+home_decor    1
+lifestyle     1
+
+== creator_top_audience_country
+top_country
+CO               3
+MX               2
+US               2
+not available    1
+IN               1
+BR               1
+
+== language
+primary_language
+es    8
+en    2
+
+== expected_verdict
+expected_verdict
+SCALE             3
+DO_NOT_SCALE      3
+DEFER_TO_HUMAN    3
+FLAG_FRAUD        1
+
+== verdict_by_follower_tier
+expected_verdict  DEFER_TO_HUMAN  DO_NOT_SCALE  FLAG_FRAUD  SCALE
+follower_tier                                                    
+10-50K                         1             1           0      2
+50-100K                        1             1           1      1
+100K+                          1             1           0      0
+

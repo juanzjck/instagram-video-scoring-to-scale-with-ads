@@ -1,0 +1,4 @@
+condition,attribute,observed_gap,permutations,p_value
+baseline,gender,1.1,10000,0.054
+baseline,country,0.15,10000,0.825
+baseline_previous_run,gender,1.6,10000,0.028

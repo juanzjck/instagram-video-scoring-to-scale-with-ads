@@ -1,0 +1,10 @@
+condition,attribute,rate_man,rate_woman,accuracy,score_gap,dp_diff,di_ratio,tpr_gap,fpr_gap,score_gap_p,rate_black,rate_white,rate_man_black,rate_man_white,rate_woman_black,rate_woman_white
+baseline,gender,0.5,0.5,1.0,0.125,0.0,1.0,0.0,0.0,0.9900049975012494,,,,,,
+baseline,race,,,1.0,0.125,0.0,1.0,0.0,0.0,0.9905047476261869,0.5,0.5,,,,
+baseline,group,,,1.0,0.25,0.0,1.0,0.0,0.0,1.0,,,0.5,0.5,0.5,0.5
+blind,gender,0.5,0.5,1.0,0.0,0.0,1.0,0.0,0.0,1.0,,,,,,
+blind,race,,,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.5,0.5,,,,
+blind,group,,,1.0,0.0,0.0,1.0,0.0,0.0,1.0,,,0.5,0.5,0.5,0.5
+post_race,gender,0.5,0.5,1.0,0.125,0.0,1.0,0.0,0.0,0.9900049975012494,,,,,,
+post_race,race,,,1.0,0.125,0.0,1.0,0.0,0.0,0.9905047476261869,0.5,0.5,,,,
+post_race,group,,,1.0,0.25,0.0,1.0,0.0,0.0,1.0,,,0.5,0.5,0.5,0.5

@@ -1,0 +1,6 @@
+condition,attribute,n,scale_rate_man,mean_score_man,scale_rate_woman,mean_score_woman,dp_diff,di_ratio,tpr_gap,fpr_gap,score_gap,accuracy,scale_rate_CO,mean_score_CO,scale_rate_EC,mean_score_EC
+baseline,gender,80,0.4,46.62,0.4,47.72,0.0,1.0,0.0,0.0,1.1,0.9,,,,
+baseline,country,80,,,,,0.0,1.0,0.0,0.0,0.15,0.9,0.4,47.25,0.4,47.1
+blind,gender,80,0.4,47.8,0.4,47.8,0.0,1.0,0.0,0.0,0.0,0.9,,,,
+blind,country,80,,,,,0.0,1.0,0.0,0.0,0.0,0.9,0.4,47.8,0.4,47.8
+baseline_previous_run,gender,60,0.367,45.3,0.4,46.9,0.033,0.917,0.111,0.0,1.6,0.883,,,,
