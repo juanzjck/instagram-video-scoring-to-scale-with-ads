@@ -113,11 +113,12 @@ def reguard(out, row):
     return dict(out, **apply_rules(parse(out["raw_output"]), row))
 
 
-def score(prompt_id, summary, row, template=None):
+def score(prompt_id, summary, row, template=None, choice=None):
     """Run one prompt over one summary and return parsed + rule-guarded output.
-    template: the prompt text for a versioned prompt (P6.2, ...); built-ins come from prompts.TEMPLATES."""
+    template: the prompt text for a versioned prompt (P6.2, ...); built-ins come from prompts.TEMPLATES.
+    choice: {"provider", "model"} instead of the open session's (see llm.complete)."""
     template = prompts.TEMPLATES[prompt_id] if template is None else template
-    resp = llm.complete(template.format(video_summary=summary), max_tokens=1200)
+    resp = llm.complete(template.format(video_summary=summary), max_tokens=1200, choice=choice)
     out = apply_rules(parse(resp["text"]), row)
     out.update(prompt_id=prompt_id, prompt_sha256=hashlib.sha256(template.encode("utf-8")).hexdigest(),
                raw_output=resp["text"], usage=llm.usage(resp))

@@ -238,6 +238,40 @@ list-price cost and failures.
 Options: `--source`, `--name`, `--provider`, `--model`, `--prompt` (default: each run's active prompt),
 `--vision shared|per-child`, `--limit`, `--concurrency`, `--skip-errors`, `--report-only`.
 
+### Score-only harness (fast prompt iterations)
+
+`scripts/score_only.py` samples one P6-family prompt N times without copying sessions: it reads the source
+session once (the pipeline's own `pipeline.summary()` input, with the source's cached vision features for the
+chosen provider + model; no vision call), makes N x videos scoring calls through `app/llm.py`, `--concurrency`
+at a time (default 4), with the rule guard applied in code (model verdict kept) and the injection guard inside
+`flatten()`. Answers go to one resumable `uploads/_collections/<id>/answers.jsonl` (done pairs skipped, errors
+retried; a usage limit / 429 stops new calls). P5 is reused from a finished `run_collection_test.py` collection
+of the same source (`--p5-from`, paired by run index, cycled or truncated, stated in the report) or scored fresh
+(`--with-p5`). `report.json` / `report.md` use the same `build_report` / `render`, plus a `score_only` block.
+
+```bash
+.venv/bin/python scripts/score_only.py --source 20261119-152838-287693 --prompt P6.3 \
+    --p5-from col-20261119-180338-923160 --runs 30 --concurrency 4          # run, or resume
+.venv/bin/python scripts/score_only.py --source 20261119-152838-287693 --prompt P6.3 \
+    --p5-from col-20261119-180338-923160 --report-only
+```
+
+Options: `--source`, `--prompt` (required, P5 refused), `--runs` (default 30), `--concurrency`, `--provider`,
+`--model`, `--p5-from <collection id>` | `--with-p5` (one required), `--name` (an existing one resumes), `--report-only`.
+
+### Prompt evidence and `/iterate-prompt`
+
+`scripts/prompt_evidence.py` (read only, no model call) pools every scored answer in every session and
+collection per prompt id + text SHA-256 and per source campaign: accuracy / false SCALE / winners caught per
+run (via `evaluate.truth` / `verdict_metrics`), per-video verdict distributions, model reasons and human
+notes for wrong verdicts (fenced as untrusted in `evidence.md`), the gate ranking, overfitting risks and the
+version diffs. The `/iterate-prompt [extra guidance]` Claude Code command builds on it: two independent
+engineer proposals, questions to the user, and a new version saved only after confirmation (never adopted).
+
+```bash
+.venv/bin/python scripts/prompt_evidence.py --out /tmp/evidence [--source <session>] [--prompts P6,P6.2] [--samples 3]
+```
+
 ## Runs
 
 A **run** is one pipeline execution with a fixed prompt version, provider and model, recorded in `session.json` under

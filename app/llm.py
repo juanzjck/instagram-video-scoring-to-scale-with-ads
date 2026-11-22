@@ -389,7 +389,7 @@ _ADAPTERS = {"anthropic": _anthropic, "openai": _openai, "gemini": _gemini, "oll
              "claude_code": _claude_code}
 
 
-def complete(content, system=None, max_tokens=1500, json_schema=None, stream=False):
+def complete(content, system=None, max_tokens=1500, json_schema=None, stream=False, choice=None):
     """Single user turn. `content` is a string or a list of content blocks (text + images).
 
     stream=True is for long outputs on Anthropic: the reply arrives as it is written, so a
@@ -398,8 +398,10 @@ def complete(content, system=None, max_tokens=1500, json_schema=None, stream=Fal
     Returns {"text", "input_tokens", "output_tokens", "latency_s", "provider", "model", "stop_reason",
     "cost_usd"}. Token counts are None when a local server does not report them (never 0); cost_usd is
     None unless the provider reports it (the Claude Code CLI does).
+
+    choice: {"provider", "model"} to use instead of the open session's (scripts that only read a session).
     """
-    choice = config.llm_choice()
+    choice = choice or config.llm_choice()
     provider, model = choice["provider"], choice["model"]
     if not model:
         raise ProviderUnavailable(f"no model chosen for {config.LLM_PROVIDERS[provider]}: pick one in the "

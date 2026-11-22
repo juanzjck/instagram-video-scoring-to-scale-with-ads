@@ -44,6 +44,12 @@ cd full-workflow-api && ../.venv/bin/python -m pytest -q tests
 ../.venv/bin/python scripts/run_collection_test.py --children 100 --concurrency 2 [--limit 2]   # resumable
 ../.venv/bin/python scripts/run_collection_test.py --report-only
 
+# score-only harness: N samples of one P6.x on a session's cached inputs, no session copies (resumable)
+../.venv/bin/python scripts/score_only.py --source <session> --prompt P6.x --p5-from <col-id> [--runs 30 --concurrency 4] [--report-only]
+
+# prompt evidence pack (read only, no model call); used by the /iterate-prompt [extra guidance] command
+../.venv/bin/python scripts/prompt_evidence.py --out <dir> [--source <session>] [--prompts P6,P6.2] [--samples 3]
+
 # bias study (Module 9)
 cd bias-fairness-module9
 MOCK=1 ../.venv/bin/python bias_study.py      # free dry run, fake scorer with a planted gender penalty

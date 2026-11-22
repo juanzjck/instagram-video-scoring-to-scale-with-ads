@@ -75,8 +75,9 @@ def _exists(video_id, stage):
     return stage_file(config.RUNS, video_id, stage, config.llm_choice()) is not None
 
 
-def load(video_id, stage):
-    p = stage_file(config.RUNS, video_id, stage, config.llm_choice())
+def load(video_id, stage, choice=None):
+    """A cached stage, or None. choice: whose model answers to read (default: the open session's model)."""
+    p = stage_file(config.RUNS, video_id, stage, choice or config.llm_choice())
     if p is None:
         return None
     data = json.loads(p.read_text(encoding="utf-8"))
@@ -123,12 +124,12 @@ def _row(video_id):
     return videos[video_id], comments.get(video_id)
 
 
-def summary(video_id, multimodal):
-    """flatten() output: six sections for P5, seven for P6."""
+def summary(video_id, multimodal, choice=None):
+    """flatten() output: six sections for P5, seven for P6 (with choice's vision features, default the session's model)."""
     row, comments = _row(video_id)
     content = None
     if multimodal:
-        content = {"preprocess": load(video_id, "preprocess"), "features": load(video_id, "features")}
+        content = {"preprocess": load(video_id, "preprocess"), "features": load(video_id, "features", choice)}
     return fl.flatten(row, comments, content)
 
 

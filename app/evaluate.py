@@ -18,10 +18,11 @@ from . import prompt_versions as pv
 from .ingest import num, val
 
 
-def _key(name):
-    if config.DATA is None:
+def _key(name, folder=None):
+    folder = config.DATA if folder is None else folder
+    if folder is None:
         return {}
-    p = config.DATA / name
+    p = folder / name
     if not p.exists():
         return {}
     return {r["video_id"]: {k: val(v) for k, v in r.items()} for _, r in pd.read_csv(p, dtype=ingest.ID_DTYPES).iterrows()}
@@ -294,6 +295,34 @@ def _method(verdicts, truth):
            "expected_scale": confusion((_scale(verdicts[v]), _scale(t.get("expected"))) for v, t in truth.items()),
            "cac_outcome": confusion((_scale(verdicts[v]), t.get("cac_call")) for v, t in truth.items())}
     return out
+
+
+def truth(folder):
+    """Per video of one session folder's answer keys: {"expected", "expected_multimodal", "cac_call",
+    "scenario"}, for code that measures verdicts it collected itself (scripts/prompt_evidence.py) without
+    opening the keys. Read only; {} when the session has no ground truth."""
+    gt, gt_media = _key("ground_truth.csv", folder), _key("ground_truth_media.csv", folder)
+    out = {}
+    for v, g in gt.items():
+        exp = scoring.normalise_verdict(g.get("expected_verdict"))
+        out[v] = {"expected": exp, "scenario": g.get("scenario"), "cac_call": _cac_call(g),
+                  "expected_multimodal": scoring.normalise_verdict(
+                      (gt_media.get(v) or {}).get("multimodal_expected_verdict")) or exp}
+    return out
+
+
+def verdict_metrics(verdicts, keys, multimodal):
+    """_method() of one run's final verdicts ({video_id: verdict}) against truth() rows: P6-family prompts on
+    the multimodal key, P5 on the text-only key, both on the same CAC outcome. Videos without a verdict or a
+    key are left out."""
+    t = {v: {"expected": keys[v]["expected_multimodal" if multimodal else "expected"], "cac_call": keys[v]["cac_call"]}
+         for v, x in verdicts.items() if x and v in keys}
+    return _method({v: verdicts[v] for v in t}, t)
+
+
+def beats(cand, base):
+    """The adoption gate's rule (see _beats) on any two confusion()-shaped dicts."""
+    return _beats(cand, base)
 
 
 def _beats(cand, base):

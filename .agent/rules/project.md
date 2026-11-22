@@ -5,7 +5,7 @@ description: PartGram capstone project context, commands, architecture and invar
 
 # PartGram capstone: project rules
 
-Workspace rules for the Antigravity agent. You (the coding agent) edit this repo; the *product*
+Workspace rules for the  Antigravity agent. You (the coding agent) edit this repo; the *product*
 uses Claude (Anthropic) as its scoring model. Do not confuse the two: code, prompts and docs in
 this repo refer to Claude because that is the model PartGram calls, and that must stay so.
 
